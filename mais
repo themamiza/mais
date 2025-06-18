@@ -283,11 +283,13 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     }
 
     # Change this so it uses fzf for easier access.
-    pprint "Timezone (Region/City): " && read -r timezone
-    while ! find /usr/share/zoneinfo | grep -q "$timezone"; do
-        wprint "Timezone not valid. A valid timezone looks like -> \"US/Eastern\""
+    [ -z "$timezone" ] && {
         pprint "Timezone (Region/City): " && read -r timezone
-    done
+        while ! find /usr/share/zoneinfo | grep -q "$timezone"; do
+            wprint "Timezone not valid. A valid timezone looks like -> \"US/Eastern\""
+            pprint "Timezone (Region/City): " && read -r timezone
+        done
+    }
 
     # TODO: Print configuration before installing.
 
