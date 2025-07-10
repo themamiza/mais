@@ -130,6 +130,7 @@ or let the script do it for you.
 # Goals
 Here is a list of tasks that I want done. I keep track of them here.
 
-* [ ] Make the script less monolithic.
-* [ ] List essential programs using command.
-* [ ] Make use of `fzf` when choosing timezone.
+- [ ] Make the script less monolithic.
+- [ ] List essential programs using command.
+- [ ] Make use of `fzf` when choosing timezone.
+- [ ] Export functions correctly (before 'arch_install').
