@@ -8,7 +8,7 @@ bios_or_uefi="UEFI"        # Set to "BIOS" to install for BIOS systems.
 bootloader_id="ArchLinux"  # Only matters when using "UEFI".
 efi_directory="/efi"
 disk_to_install="/dev/vda" # Only matters when using "BIOS".
-aurhelper="paru"
+aurhelper="yay"
 
 # Default script behavior
 verbose=false
