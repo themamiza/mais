@@ -14,6 +14,9 @@ efi_directory="/efi"
 
 aurhelper="yay"
 
+regex_valid_username="^[a-z_][a-z0-9_-]*$"
+regex_valid_hostname="^[a-z_][a-z0-9_-]*$"
+
 # The goal is to make the script as silent as possible, only
 # printing necessary messages and prompts.
 # 'verbose=true' should be as verbose as possible; printing the output
@@ -81,9 +84,9 @@ re_match() { [[ "$1" =~ $2 ]] && return 0 || return 1; }
 # Return 0 if running by root, otherwise return 1.
 isRoot() { [ "$(id -u)" == 0 ] && return 0 || return 1; }
 
-verify_username() {
-    echo "$1" | grep -q "^[a-z_][a-z0-9_-]*$"
-}
+verify_username() { re_match "$1" "$regex_valid_username"; }
+
+verify_hostname() { re_match "$1" "$regex_valid_hostname"; } 
 
 # Checks a given name against both the executable and package names.
 check_installed() {
@@ -292,6 +295,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
 
     ask_username
 
+    # Get password for said user.
     while true; do
         pprint "$username's password: " && read -rs pass1 && printf "\n"
         pprint "Retype password: " && read -rs pass2 && printf "\n"
@@ -299,14 +303,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
         wprint "Passwords do not match or are empty. Try again."
     done
 
-    if [ -z "$hostname" ]; then
-        while true; do
-            pprint "Hostname: " && read -r hostname
-            # Hostname follows the same regex as the username, hence using the same function to verify validity.
-            verify_username "$hostname" && break
-            wprint "Hostname '$hostname' not valid.\nGive a hostname beginning with a letter, with only lowercase letters, - or _."
-        done
-    fi
+    ask_hostname
 
     # Change this so it uses fzf for easier access.
     if [ -z "$timezone" ]; then
@@ -553,14 +550,26 @@ install_dotfiles() {
 }
 
 ask_username() {
-    [ -z "$username" ] || return
-    pprint "Username: " && read -r username
-    while ! echo "$username" | grep -q "^[a-z_][a-z0-9_-]*$"; do
-        wprint "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _."
+    # Return and do noting if username is already set.
+    [ -n "$username" ] && return
+
+    while true; do
         pprint "Username: " && read -r username
+        verify_username "$username" && break
+        wprint "Username '$username' is not valid.\nGive a username beginning with a letter, with only lowercase letters, - or _.\n"
     done
 }
 
+ask_hostname() {
+    # Return and do noting if hostname is already set.
+    [ -n "$hostname" ] && return
+
+    while true; do
+        pprint "Hostname: " && read -r hostname
+        verify_hostname "$hostname" && break
+        wprint "hostname '$hostname' is not valid.\nGive a hostname beginning with a letter, with only lowercase letters, - or _.\n"
+    done
+}
 
 install_essentials() {
     local essential_programs=("base-devel" "git" "rsync")
