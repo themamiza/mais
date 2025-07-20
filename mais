@@ -272,24 +272,24 @@ arch_install_run_in_chroot() {
     # This should be the last thing done.
     if [ -f "/etc/installation.date" ]; then
         wprint "'/etc/installation.date' already exists."
-        pprint "Do you wish to overwrite it? (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] && date > /etc/installation.date
+        printf "Do you wish to overwrite it? (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] && date > /etc/installation.date
     fi
 }
 
 arch_install() {
-    pprint "The rest of the installation assumes you have
+    printf "The rest of the installation assumes you have
 1. an internet connection. \`iwctl\`
 2. synchronized system clock. \`timedatectl set-ntp true\`
 3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`\n
 SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
-    pprint "Continue (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] || exit 0
+    printf "Continue (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] || exit 0
 
     ask_username
 
     # Get password for said user.
     while true; do
-        pprint "$username's password: " && read -rs pass1 && printf "\n"
-        pprint "Retype password: " && read -rs pass2 && printf "\n"
+        printf "%s's password: " "$username" && read -rs pass1 && printf "\n"
+        printf "Retype password: " && read -rs pass2 && printf "\n"
         [ -n "$pass1" ] && [ "$pass1" = "$pass2" ] && unset pass2 && break
         wprint "Passwords do not match or are empty. Try again."
     done
@@ -299,7 +299,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     # Change this so it uses fzf for easier access.
     if [ -z "$timezone" ]; then
         while true; do
-            pprint "Timezone (Region/City) [UTC]: " && read -r timezone
+            printf "Timezone (Region/City) [UTC]: " && read -r timezone
             timezone="${timezone:-UTC}"
             [ -f "/usr/share/zoneinfo/$timezone" ] && break
             wprint "Timezone not valid. A valid timezone looks like -> \"US/Eastern\""
@@ -337,7 +337,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     arch-chroot /mnt /bin/sh -c "arch_install_run_in_chroot '$username' '$pass1' '$hostname' '$timezone' '$bios_or_uefi' '$bootloader_id' '$efi_directory' '$disk_to_install' '$cmd_suffix'"
 
     unset pass1 pass2
-    pprint "The system should be ready to reboot, Continue (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] || exit 0
+    printf "The system should be ready to reboot, Continue (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] || exit 0
     reboot
 }
 
@@ -545,7 +545,7 @@ ask_username() {
     [ -n "$username" ] && return
 
     while true; do
-        pprint "Username: " && read -r username
+        printf "Username: " && read -r username
         verify_username "$username" && break
         wprint "Username '$username' is not valid.\nGive a username beginning with a letter, with only lowercase letters, - or _.\n"
     done
@@ -556,7 +556,7 @@ ask_hostname() {
     [ -n "$hostname" ] && return
 
     while true; do
-        pprint "Hostname: " && read -r hostname
+        printf "Hostname: " && read -r hostname
         verify_hostname "$hostname" && break
         wprint "hostname '$hostname' is not valid.\nGive a hostname beginning with a letter, with only lowercase letters, - or _.\n"
     done
@@ -614,7 +614,7 @@ ensure_mount_points_clean() {
 
     if [[ ${#mounted[@]} -gt 0 ]]; then
         wprint "The following mount points are already in use: ${mounted[*]}"
-        pprint "Do you want to unmount them before continuing? (Y/N): "
+        printf "Do you want to unmount them before continuing? (Y/N): "
         read -r answer
         if [[ "$answer" =~ ^[Yy]$ ]]; then
             for mnt in "${mounted[@]}"; do
