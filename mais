@@ -100,7 +100,7 @@ check_installed() {
     return 1
 }
 
-isArch() { check_installed "pacman" && return 0 || return 1; }
+is_archlinux() { check_installed "pacman" && return 0 || return 1; }
 
 check_internet_connection() {
     local target="google.com"
@@ -114,6 +114,9 @@ check_internet_connection() {
     fi
 }
 
+# This trap runs when the script terminates in any way.
+# Removes the tmp sudoers file that let's any user from the wheel group to execute any command.
+# Then stores the normal state and exits.
 trap_cleanup_sudoers() {
     eval "rm -f /etc/sudoers.d/mais-tmp $cmd_suffix"
 
@@ -718,48 +721,42 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Set username to current user, unless running by root or explicitly specifying the username through arguments.
-if ! isRoot && [ -z "$username" ]; then
-    username="$(id -un)"
-fi
+! isRoot && [ -z "$username" ] && username="$(id -un)"
 
 # Set hostname to current hostname if not already provided.
-if [ -z "$hostname" ]; then
-    hostname="$(hostnamectl hostname 2>/dev/null || cat /etc/hostname)"
-fi
+[ -z "$hostname" ] && hostname="$(hostnamectl hostname 2>/dev/null || cat /etc/hostname)"
 
-if [ -n "$help" ]; then
-    print_help && exit 0
-fi
+[ -n "$help" ] && print_help && exit 0
 
-if [ -n "$args_arch_install" ]; then
+[ -n "$args_arch_install" ] && {
+    is_archlinux || eprint "Can only install an ArchLinux system."
     ensure_mount_points_clean
     arch_install
     exit
-fi
+}
 
-if [ -n "$args_install_dotfiles" ]; then
-    if isRoot; then
-        wheel_can_sudo
-    fi
-
+[ -n "$args_install_dotfiles" ] && {
+    isRoot && wheel_can_sudo
     ask_username
     install_essentials || eprint "Could not install essential programs.\nHint: Run as root."
     install_dotfiles
     exit
-fi
+}
 
-if [ -n "$args_install_aurhelper" ]; then
-    ask_username
+[ -n "$args_install_aurhelper" ] && {
+    isRoot || eprint "Only root can install packages."
     wheel_can_sudo
+    ask_username
     install_essentials
     install_aurhelper
-fi
+}
 
-if [ -n "$args_install_env" ]; then
+[ -n "$args_install_env" ] && {
+    isRoot || eprint "Only root can install packages."
     clean_programs_file
-    ask_username
     wheel_can_sudo
+    ask_username
     install_essentials
     install_aurhelper
     install_environment "$environment"
-fi
+}
