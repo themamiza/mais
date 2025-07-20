@@ -221,43 +221,44 @@ arch_install_run_in_chroot() {
     local disk_to_install="$8"
     local cmd_suffix"$9"
     
-    if command -v nvim >/dev/null 2>&1; then
-        if [ ! -e "/usr/bin/vim" ] || [ -L "/usr/bin/vim" ]; then
-            nprint "Symlink: vim -> nvim."
-            ln -sf /usr/bin/nvim /usr/bin/vim
-        fi
-        if [ ! -e "/usr/bin/vi" ] || [ -L "/usr/bin/vi" ]; then
-            nprint "Symlink: vi -> nvim."
-            ln -sf /usr/bin/nvim /usr/bin/vi
-        fi
-    fi
-    printf "\n"
+    # TODO: Should this be done during initial installation?
+    # if command -v nvim >/dev/null 2>&1; then
+    #     if [ ! -e "/usr/bin/vim" ] || [ -L "/usr/bin/vim" ]; then
+    #         sprint "Creating symlink: vim -> nvim."
+    #         ln -sf /usr/bin/nvim /usr/bin/vim
+    #     fi
+    #     if [ ! -e "/usr/bin/vi" ] || [ -L "/usr/bin/vi" ]; then
+    #         sprint "Creating symlink: vi -> nvim."
+    #         ln -sf /usr/bin/nvim /usr/bin/vi
+    #     fi
+    # fi
+    # printf "\n"
 
-    nprint "Setting timezone to '$timezone'."
+    sprint "Setting timezone to '$timezone'.\n"
     ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
 
-    nprint "Configuring hardware clock."
+    sprint "Configuring hardware clock."
     hwclock --systohc
 
-    nprint "Configuring locale."
+    sprint "Configuring locale."
     sed -i 's/^#\s*\(en_US.UTF-8\)/\1/' /etc/locale.gen
     eval "locale-gen $cmd_suffix"
     printf "LANG=en_US.UTF-8\n" > /etc/locale.conf
 
-    nprint "Setting hostname to '$hostname'."
+    sprint "Setting hostname to '$hostname'."
     printf "%s\n" "$hostname" > /etc/hostname
 
     # TODO: Check if it's actually necessary to run this command.
     # nprint "Creating new initramfs."
     # eval "mkinitcpio -P $cmd_suffix"
 
-    nprint "Installing grub bootloader to /efi."
+    sprint "Installing grub bootloader to /efi."
     case "$bios_or_uefi" in
         "UEFI") eval "grub-install --target=x86_64-efi --efi-directory=$efi_directory --bootloader-id=$bootloader_id $cmd_suffix";;
         "BIOS") eval "grub-install --target=i386-pc $disk_to_install";;
     esac
 
-    nprint "Re-creating grub configuration."
+    sprint "Re-creating grub configuration."
     eval "grub-mkconfig -o /boot/grub/grub.cfg $cmd_suffix"
 
     nprint "Creating new user '$username'."
@@ -265,13 +266,13 @@ arch_install_run_in_chroot() {
         useradd --create-home --user-group --groups wheel --shell /bin/bash "$username"
     fi
 
-    nprint "Changing password for new user."
+    sprint "Changing password for new user."
     echo "$username:$pass1" | chpasswd
     unset pass1 pass2
 
     wheel_can_sudo
 
-    nprint "Enabling NerworkManager."
+    sprint "Enabling NerworkManager."
     eval "systemctl enable NetworkManager $cmd_suffix"
 
     # This should be the last thing done.
@@ -315,19 +316,19 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     
     eval "cat /sys/firmware/efi/fw_platform_size $cmd_suffix" || bios_or_uefi="BIOS"
 
-    nprint "Checking internet connection...\n"
-    verbose=false check_internet_connection || eprint "Can't reach the web."
-    nprint "Internet connection is available.\n"
+    sprint "Checking internet connection...\n"
+    check_internet_connection || eprint "Can't reach the web."
+    sprint "Internet connection is available.\n"
 
     base_packages=(base linux-lts linux-firmware grub networkmanager sudo neovim)
     [ "$bios_or_uefi" = "UEFI" ] && base_packages+=(efibootmgr)
-    nprint "Bootstraping the system...\n"
+    sprint "Bootstraping the system...\n"
     pacstrap -K /mnt "${base_packages[@]}"
-    nprint "Done bootstrapping the system.\n"
+    sprint "Done bootstrapping the system.\n"
 
-    nprint "Generating fsatb...\n"
+    sprint "Generating fstab...\n"
     genfstab -U /mnt >> /mnt/etc/fstab
-    nprint "fstab written to /mnt/etc/fstab.\n"
+    sprint "fstab written to /mnt/etc/fstab.\n"
 
     # Exporting the function to later be passed to arch-chroot as a command.
     # That is why all the variables are passed manually.
@@ -402,7 +403,7 @@ update_package_descriptions() {
 
     done <"$programs_file"
 
-    nprint "Updated package descriptions."
+    sprint "Updated package descriptions."
 }
 
 install_package() {
@@ -441,12 +442,12 @@ install_aurhelper() {
 }
 
 pacman_install() {
-    nprint "Installing $1 :: $2"
+    sprint "Installing $1 -> $2"
     eval "pacman -S --noconfirm '$1' $cmd_suffix"
 }
 
 aur_install() {
-    nprint "Installing $1 :: $2"
+    sprint "Installing $1 -> $2"
     sudo -u "$username" sh -c "$aurhelper -S --noconfirm $1 $cmd_suffix"
 }
 
@@ -519,14 +520,14 @@ install_environment() {
 # TODO: Check if this function is fully verbosified.
 install_dotfiles() {
     local srcdir
-    nprint "Installing dotfiles."
+    sprint "Installing dotfiles."
 
     # Mainly for my convenience.
     if [ -d "/home/$username/rp/dotfiles" ]; then
-        nprint "Found local dotfiles."
+        sprint "Found local dotfiles."
         srcdir="/home/$username/rp/dotfiles/"
     else
-        nprint "Cloning remote repository."
+        sprint "Cloning remote repository."
         srcdir="/home/$username/.local/src/$dotfiles_name/"
         sudo -u "$username" mkdir -p "/home/$username/.local/src"
         sudo -u "$username" sh -c "git clone --depth 1 --single-branch --no-tags $dotfiles_url /home/$username/.local/src/$dotfiles_name $cmd_suffix" ||
@@ -570,10 +571,10 @@ ask_hostname() {
 install_essentials() {
     local essential_programs=("base-devel" "git" "rsync")
 
-    nprint "Installing essential programs."
+    sprint "Installing essential programs."
     for p in "${essential_programs[@]}"; do
         if check_installed "$p"; then
-            nprint "'$p' is already installed."
+            sprint "'$p' is already installed."
         else
             pacman_install "$p" "Installing $p which is required to install and configure other packages."
         fi
@@ -581,17 +582,17 @@ install_essentials() {
 }
 
 configure_grub() {
-    nprint "Configuring grub options."
+    sprint "Configuring grub options."
 
     # These configurations need to be done regardless of having swap.
     sed -i "/^GRUB_TIMEOUT=.*$/s/=.*/=3/;/^#GRUB_DISABLE_OS_PROBER=false$/s/#//" /etc/default/grub
     sed -i "/^GRUB_DEFAULT=.*$/s/=.*/=saved/;/^#GRUB_SAVEDEFAULT=true$/s/#//" /etc/default/grub
     sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=.*$/s/ quiet//" /etc/default/grub
 
-    nprint "Checking swap partition."
+    sprint "Checking swap partition."
     # Enable hibernation only if there is a swap device larger than 8G.
     blkid | grep "TYPE=\"swap\"" | cut -d " " -f1 | sed "s/://" | xargs lsblk -no SIZE | sed "s/\s\+//;s/.$//;s/\..*//" | xargs test 8 -le && {
-        nprint "Enabling hibernation."
+        sprint "Enabling hibernation."
         grep -q resume /etc/mkinitcpio.conf || {
             sed -i "/^HOOKS=(.*)$/s/)$/ resume)/" /etc/mkinitcpio.conf
             eval "mkinitcpio -P $cmd_suffix"
