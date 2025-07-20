@@ -654,8 +654,6 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         "help") help=true; shift;;
 
-        "verify") verify=true; shift;;
-
         "arch-install")
             args_arch_install=true
             [ -z "$2" ] && eprint "\`arch-install\` -> you should provide a 'parition_mode' (vm, main, X220, mounted)."
@@ -731,17 +729,6 @@ fi
 
 if [ -n "$help" ]; then
     print_help && exit 0
-fi
-
-if [ -n "$verify" ]; then
-    # Don't bother checking anything if pacman is not found.
-    isArch || eprint "Not running on ArchLinux."
-
-    # Check internet connection and print warning.
-    check_internet_connection || wprint "Can't reach the web."
-
-    # Check if ran by root and print warning.
-    isRoot || wprint "\`mais\` should be ran by root."
 fi
 
 if [ -n "$args_arch_install" ]; then
