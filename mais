@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# SC2015
+# You can often see that I use: A && B || C as if-then-else.
+# This is generally not correct, if A is true but B is false, C will run.
+# But it's safe to use when B is just a variable definition or a command that is never false.
+
 ### Global variables ###
 
 # Saving to a variable for easy use in messages.
@@ -646,6 +651,7 @@ while [[ $# -gt 0 ]]; do
         "arch-install")
             args_arch_install=true
             [ -z "$2" ] && eprint "\`arch-install\` -> you should provide a 'parition_mode' (vm, main, X220, mounted)."
+            # shellcheck disable=2015
             re_match "$2" "^(vm|main|X220|mounted)$" && partition_mode="$2" || eprint "'$2' is not a valid partitioning mode."
             shift 2
             ;;
@@ -660,6 +666,7 @@ while [[ $# -gt 0 ]]; do
 
         "install-env")
             args_install_env=true
+            # shellcheck disable=2015
             re_match "$2" "^(Hyprland|DWM|All|)$" && environment="$2" || eprint "'$2' is not a valid environment."
             shift 2
             ;;
