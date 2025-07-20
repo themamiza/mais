@@ -18,24 +18,14 @@ aurhelper="yay"
 regex_valid_username="^[a-z_][a-z0-9_-]{0,31}$"
 regex_valid_hostname="^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$"
 
-# The goal is to make the script as silent as possible, only
-# printing necessary messages and prompts.
+# 'verbose=false' should only print messages from the script and suppress all
+# the commands that are being executed.
 # 'verbose=true' should be as verbose as possible; printing the output
 # of all commands that get run.
 verbose=false
 # When 'verbose=false' where should the suppressed output go?
 # This could be log file or just plain '/dev/null/' to destroy the messages.
 cmd_suffix=">/dev/null 2>&1"
-
-# The script uses color by default. TODO: This may change later.
-# ANSI escape codes
-if [ -t 1 ] && [ -z "$NO_COLOR" ]; then
-    BOLD='\033[1m'
-    RESET='\033[0m'
-    BLUE='\033[34m'
-    YELLOW='\033[33m'
-    RED='\033[31m'
-fi
 
 # URL to dotfiles repository.
 dotfiles_url="https://github.com/themamiza/dotfiles"
@@ -53,18 +43,18 @@ programs_file_url="https://raw.githubusercontent.com/themamiza/mais/refs/heads/m
 ### Functions ###
 
 # NormalPRINT: Print information (can also be notifying) to stdout.
-nprint() { $verbose || return 0; printf "${BOLD}${BLUE}%s:${RESET} %b\n" "$program_name" "$1"; }
+nprint() { printf "%s: %b\n" "$program_name" "$1"; }
+
+# SilentPRINT: Same as 'nprint' but respect 'verbose'.
+sprint() { $verbose || return 0; printf "%s: %b\n" "$program_name" "$1"; }
 
 # WarningPRINT: Print warnings to stderr but don't exit.
-wprint() { printf "${BOLD}${YELLOW}%s:${RESET} %b\n" "$program_name" "$1" >&2; }
-
-# PromptPRINT: Print prompts.
-pprint() { printf "${BOLD}%b${RESET}" "$1"; }
+wprint() { printf "%s: %b\n" "$program_name" "$1" >&2; }
 
 # ErrorPRINT: Print error to stderr and exit with code (second argument).
 eprint() {
     local code=${2:-1}
-    printf "${BOLD}${RED}%s:${RESET} %b\n" "$program_name" "$1" >&2
+    printf "%s: %b\n" "$program_name" "$1" >&2
     exit "$code"
 }
 
