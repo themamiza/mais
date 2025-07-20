@@ -14,8 +14,9 @@ efi_directory="/efi"
 
 aurhelper="yay"
 
-regex_valid_username="^[a-z_][a-z0-9_-]*$"
-regex_valid_hostname="^[a-z_][a-z0-9_-]*$"
+# Common username and hostname conventions.
+regex_valid_username="^[a-z_][a-z0-9_-]{0,31}$"
+regex_valid_hostname="^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$"
 
 # The goal is to make the script as silent as possible, only
 # printing necessary messages and prompts.
