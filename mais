@@ -750,6 +750,7 @@ if [ -n "$args_install_aurhelper" ]; then
     ask_username
     wheel_can_sudo
     install_essentials
+    install_aurhelper
 fi
 
 if [ -n "$args_install_env" ]; then
