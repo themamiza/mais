@@ -63,6 +63,12 @@ eprint() {
     exit "$code"
 }
 
+yes_no() {
+    local answer
+    printf "%s" "$1" && read -r answer && [[ "$answer" == [yY] ]] && return 0
+    return 1
+}
+
 # Helper function to report incorrect usage.
 invalid_option() {
     eprint "Invalid option '$1'
@@ -278,7 +284,7 @@ arch_install_run_in_chroot() {
     # This should be the last thing done.
     if [ -f "/etc/installation.date" ]; then
         wprint "'/etc/installation.date' already exists."
-        printf "Do you wish to overwrite it? (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] && date > /etc/installation.date
+        yes_no "Do you wish to overwrite it? (Y/N): " && date > /etc/installation.date
     fi
 }
 
@@ -288,7 +294,7 @@ arch_install() {
 2. synchronized system clock. \`timedatectl set-ntp true\`
 3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`\n
 SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
-    printf "Continue (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] || exit 0
+    yes_no "Continue (Y/N): " || exit 0
 
     ask_username
 
@@ -343,7 +349,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     arch-chroot /mnt /bin/sh -c "arch_install_run_in_chroot '$username' '$pass1' '$hostname' '$timezone' '$bios_or_uefi' '$bootloader_id' '$efi_directory' '$disk_to_install' '$cmd_suffix'"
 
     unset pass1 pass2
-    printf "The system should be ready to reboot, Continue (Y/N): " && read -r continue && [[ "$continue" == [yY] ]] || exit 0
+    yes_no "The system should be ready to reboot, Continue (Y/N): " || exit 0
     reboot
 }
 
@@ -621,6 +627,7 @@ ensure_mount_points_clean() {
     if [[ ${#mounted[@]} -gt 0 ]]; then
         wprint "The following mount points are already in use: ${mounted[*]}"
         printf "Do you want to unmount them before continuing? (Y/N): "
+        local answer
         read -r answer
         if [[ "$answer" =~ ^[Yy]$ ]]; then
             for mnt in "${mounted[@]}"; do
