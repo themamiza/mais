@@ -228,7 +228,7 @@ arch_install_run_in_chroot() {
     local efi_directory="$7"
     local disk_to_install="$8"
     local cmd_suffix"$9"
-    local program_name"$10"
+    local program_name"${10}"
     
     # TODO: Should this be done during initial installation?
     # if command -v nvim >/dev/null 2>&1; then
