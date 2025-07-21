@@ -228,6 +228,7 @@ arch_install_run_in_chroot() {
     local efi_directory="$7"
     local disk_to_install="$8"
     local cmd_suffix"$9"
+    local program_name"$10"
     
     # TODO: Should this be done during initial installation?
     # if command -v nvim >/dev/null 2>&1; then
@@ -344,13 +345,13 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     # That is why all the variables are passed manually.
     # TODO: Investigate if it can be done any other way.
     # arch_install_run_in_chroot() { # -> args: username pass1 hostname timezone bios_or_uefi bootloader_id efi_directory disk_to_install
-    exported_functions=(arch_install_run_in_chroot wheel_can_sudo trap_cleanup_sudoers nprint sprint wprint printf)
+    exported_functions=(arch_install_run_in_chroot wheel_can_sudo trap_cleanup_sudoers nprint sprint wprint)
     for fn in "${exported_functions[@]}"; do
         # shellcheck disable=2163
         export -f "$fn"
     done
 
-    arch-chroot /mnt /bin/sh -c "arch_install_run_in_chroot '$username' '$pass1' '$hostname' '$timezone' '$bios_or_uefi' '$bootloader_id' '$efi_directory' '$disk_to_install' '$cmd_suffix'"
+    arch-chroot /mnt /bin/sh -c "arch_install_run_in_chroot '$username' '$pass1' '$hostname' '$timezone' '$bios_or_uefi' '$bootloader_id' '$efi_directory' '$disk_to_install' '$cmd_suffix' '$program_name'"
 
     unset pass1 pass2
     yes_no "The system should be ready to reboot, Continue (Y/N): " || exit 0
