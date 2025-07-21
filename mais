@@ -676,8 +676,9 @@ while [[ $# -gt 0 ]]; do
 
         "install-env")
             args_install_env=true
+            [ -z "$2" ] && environment="All" && shift && continue
             # shellcheck disable=2015
-            re_match "$2" "^(Hyprland|DWM|All|)$" && environment="$2" || eprint "'$2' is not a valid environment."
+            re_match "$2" "^(Hyprland|DWM|All)$" && environment="$2" || eprint "'$2' is not a valid environment."
             shift 2
             ;;
 
