@@ -298,6 +298,8 @@ arch_install() {
 SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     yes_no "Continue (Y/N): " || exit 0
 
+    ensure_mount_points
+
     ask_username
 
     # Get password for said user.
@@ -614,7 +616,7 @@ configure_grub() {
     }
 }
 
-ensure_mount_points_clean() {
+ensure_mount_points() {
     local required_mounts=("/mnt" "/mnt/home")
     [ "$bios_or_uefi" = "UEFI" ] && required_mounts+=("/mnt/efi")
 
@@ -660,7 +662,7 @@ while [[ $# -gt 0 ]]; do
             [ -z "$2" ] && eprint "\`arch-install\` -> you should provide a 'parition_mode' (vm, main, X220, mounted)."
             args_arch_install=true
             # shellcheck disable=2015
-            re_match "$2" "^(vm|main|X220|mounted)$" && partition_mode="$2" || eprint "'$2' is not a valid partitioning mode."
+            re_match "$2" "^(vm|main|x220|mounted)$" && partition_mode="$2" || eprint "'$2' is not a valid partitioning mode."
             shift 2
             ;;
 
@@ -732,7 +734,7 @@ done
 
 [ -n "$args_arch_install" ] && {
     is_archlinux || eprint "Can only install an ArchLinux system."
-    ensure_mount_points_clean
+    eval "partition_$partition_mode"
     arch_install
     exit
 }
