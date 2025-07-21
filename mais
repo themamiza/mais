@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# SC2015
-# You can often see that I use: A && B || C as if-then-else.
+# SC2015: You can often see that I use: A && B || C as if-then-else.
 # This is generally not correct, if A is true but B is false, C will run.
 # But it's safe to use when B is just a variable definition or a command that is never false.
 
@@ -658,8 +657,8 @@ while [[ $# -gt 0 ]]; do
         "help") help=true; shift;;
 
         "arch-install")
-            args_arch_install=true
             [ -z "$2" ] && eprint "\`arch-install\` -> you should provide a 'parition_mode' (vm, main, X220, mounted)."
+            args_arch_install=true
             # shellcheck disable=2015
             re_match "$2" "^(vm|main|X220|mounted)$" && partition_mode="$2" || eprint "'$2' is not a valid partitioning mode."
             shift 2
@@ -668,7 +667,9 @@ while [[ $# -gt 0 ]]; do
         "install-dotfiles") args_install_dotfiles=true; shift;;
 
         "install-aurhelper")
+            [ -z "$2" ] && eprint "\`install-aurhelper\` -> you should provide a 'aurhelper' (yay, paru)."
             args_install_aurhelper=true 
+            # shellcheck disable=2015
             re_match "$2" "^(yay|paru)$" && aurhelper="$2" || eprint "'$2' is not a valid aurhelper."
             shift 2
             ;;
