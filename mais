@@ -342,7 +342,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     # That is why all the variables are passed manually.
     # TODO: Investigate if it can be done any other way.
     # arch_install_run_in_chroot() { # -> args: username pass1 hostname timezone bios_or_uefi bootloader_id efi_directory disk_to_install
-    exported_functions=(arch_install_run_in_chroot wheel_can_sudo trap_cleanup_sudoers nprint wprint pprint)
+    exported_functions=(arch_install_run_in_chroot wheel_can_sudo trap_cleanup_sudoers nprint sprint wprint printf)
     for fn in "${exported_functions[@]}"; do
         # shellcheck disable=2163
         export -f "$fn"
