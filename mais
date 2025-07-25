@@ -134,6 +134,10 @@ wheel_can_sudo() {
 
 # In case of there not being a 'programs.csv' download it.
 ensure_programs_file() {
+    # Look for a local programs_file
+    [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/$programs_file" ] && return 0
+
+    # Also look in the same directory for the file
     [ -f "$programs_file" ] && return 0
 
     nprint "'$programs_file' not found. Downloading it..."
