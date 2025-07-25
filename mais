@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SC2015: You can often see that I use: A && B || C as if-then-else.
 # This is generally not correct, if A is true but B is false, C will run.
