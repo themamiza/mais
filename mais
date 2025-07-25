@@ -451,14 +451,22 @@ install_environment() {
     # Create an empty tmp file.
     : > "$programs_to_install"
 
-    # Grab programs and add to tmp file based on the environment that is provided.
+    # Grab programs and add to tmp file based on the tag that is provided.
+    # case matches the tags to it's children.
     case "$1" in
-        "Hyprland") grep -E "Wayland|Hyprland|All" "$programs_file" | cut -d"|" -f3 >> "$programs_to_install";;
-        "DWM") grep -E "X11|DWM|All" "$programs_file" | cut -d"|" -f3 >> "$programs_to_install";;
-        "All") cut -d"|" -f3  "$programs_file" >> "$programs_to_install";;
+        "HYPRLAND") grep -E "WAYLAND|HYPRLAND|ALL"     "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "DWM")      grep -E "X11|DWM|ALL"              "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "DEV")      grep -E "PYTHON|CLANG|LUA|BASH|JS" "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "PYTHON")   grep -E "PYTHON"                   "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "CLANG")    grep -E "CLANG"                    "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "LUA")      grep -E "LUA"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "BASH")     grep -E "BASH"                     "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "JS")       grep -E "JS"                       "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "EXTRA")    grep -E "EXTRA"                    "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "ALL") cut -d"|" -f3 "$programs_file.clean" >> "$programs_to_install";;
     esac
 
-    # Also grab lines that have to environment set (meaning install to every environment).
+    # Also grab lines that have no tag set (meaning install to every environment).
     awk -F'|' '
       {
         original_line = $0
@@ -626,9 +634,9 @@ while [[ $# -gt 0 ]]; do
 
         "install-env")
             args_install_env=true
-            [ -z "$2" ] && environment="All" && shift && continue
+            [ -z "$2" ] && environment="ALL" && shift && continue
             # shellcheck disable=2015
-            re_match "$2" "^(Hyprland|DWM|All)$" && environment="$2" || eprint "'$2' is not a valid environment."
+            re_match "$2" "^(DWM|HYPRLAND|DEV|PYTHON|CLANG|LUA|BASH|JS|EXTRA|VIRT|ALL)$" && environment="$2" || eprint "'$2' is not a valid environment."
             shift 2
             ;;
 
