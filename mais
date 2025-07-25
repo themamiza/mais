@@ -481,7 +481,7 @@ install_environment() {
     ' "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install"
 
     # Install nvidia drivers if there's an nvidia gpu
-    if lcpci | grep -qi nvidia; then
+    if lspci | grep -qi nvidia; then
         printf "nvidia-lts\nnvidia-settings\nnvidia-prime\n" >> "$programs_to_install"
     fi
 
