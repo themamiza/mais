@@ -359,19 +359,21 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
 }
 
 clean_programs_file() { 
-    sed -i 's/[ ]*#.*//g;/^$/d' "$programs_file"
-    awk '
+    # Remove comments and empty lines
+    sed 's/[ ]*#.*//g;/^$/d' "$programs_file" > "$programs_file.clean"
+    # Remove all whitespace, but keep quoted strings intact
+    gawk -i inplace '
         BEGIN {FS = OFS = "\""}
         /^[[:blank:]]*$/ {next}
         {for (i=1; i<=NF; i+=2) gsub (/[[:space:]]/,"",$i)}
         1
-        ' "$programs_file" > "$programs_file.tmp" && mv "$programs_file.tmp" "$programs_file"
+        ' "$programs_file.clean"
 }
 
 install_package() {
     check_installed "$1" && return 0
 
-    package_info="$(grep "$1" "$programs_file")"
+    package_info="$(grep "$1" "$programs_file.clean")"
 
     while IFS="|" read -r method _ _ description; do
         case "$method" in
@@ -464,11 +466,7 @@ install_environment() {
         gsub(/^[ \t]+|[ \t]+$/, "", field2)
         if (field2 == "") print original_line
       }
-    ' "$programs_file" | cut -d"|" -f3 >> "$programs_to_install"
-
-    # Remove every whitespace from the final tmp file.
-    sed -i 's/[[:space:]]//g' "$programs_to_install"
-    sed -i 's/^#.*//g' "$programs_to_install"
+    ' "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install"
 
     while IFS= read -r program; do
         install_package "$program"
