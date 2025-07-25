@@ -85,10 +85,6 @@ re_match() { [[ "$1" =~ $2 ]] && return 0 || return 1; }
 # Return 0 if running by root, otherwise return 1.
 isRoot() { [ "$(id -u)" == 0 ] && return 0 || return 1; }
 
-verify_username() { re_match "$1" "$regex_valid_username"; }
-
-verify_hostname() { re_match "$1" "$regex_valid_hostname"; } 
-
 # Checks a given name against both the executable and package names.
 check_installed() {
     # Check if a command is available.
@@ -515,7 +511,7 @@ ask_username() {
 
     while true; do
         printf "Username: " && read -r username
-        verify_username "$username" && break
+        re_match "$username" "$regex_valid_username" && break
         wprint "Username '$username' is not valid.\nGive a username beginning with a letter, with only lowercase letters, - or _.\n"
     done
 }
@@ -526,7 +522,7 @@ ask_hostname() {
 
     while true; do
         printf "Hostname: " && read -r hostname
-        verify_hostname "$hostname" && break
+        re_match "$hostname" "$regex_valid_hostname" && break
         wprint "hostname '$hostname' is not valid.\nGive a hostname beginning with a letter, with only lowercase letters, - or _.\n"
     done
 }
@@ -644,7 +640,7 @@ while [[ $# -gt 0 ]]; do
                 eprint "'-u' -> You should provide a username."
             fi
             username="$2"
-            if ! verify_username "$username"; then
+            if ! re_match "$username" "$regex_valid_username"; then
                 eprint "Username '$username' is not valid.\nGive a username beginning with a letter, with only lowercase letters, - or _."
             fi
             shift 2
@@ -655,8 +651,7 @@ while [[ $# -gt 0 ]]; do
                 eprint "'-h' -> You should provide a hostname."
             fi
             hostname="$2"
-            # Hostname follows the same regex as the username, hence using the same function to verify validity.
-            if ! verify_username "$hostname"; then
+            if ! re_match "$hostname" "$regex_valid_hostname"; then
                 eprint "Hostname '$hostname' is not valid.\nGive a hostname beginning with a letter, with only lowercase letters, - or _."
             fi
             shift 2
