@@ -4,6 +4,8 @@
 # This is generally not correct, if A is true but B is false, C will run.
 # But it's safe to use when B is just a variable definition or a command that is never false.
 
+set -eo pipefail
+
 ### Global variables ###
 
 # Saving to a variable for easy use in messages.
