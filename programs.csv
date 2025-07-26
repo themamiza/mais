@@ -32,7 +32,7 @@ AUR             |            | brave-bin                        | "Web browser t
 
 # Window Manager / Compositor
                 | HYPRLAND   | hyprland                         | "a highly customizable dynamic tiling Wayland compositor"
-Suckless        | DWM        | dwm                              | "A dynamic window manager for X"
+Suckless        | DWM        | themamiza/dwm                    | "A dynamic window manager for X"
                 | X11        | xcompmgr                         | "Composite window effect manager for X.org"
 
 # X11
@@ -58,7 +58,7 @@ Suckless        | DWM        | dwm                              | "A dynamic win
 
 # Bar / Panel
                 | WAYLAND    | waybar                           | "Highly customizable Wayland bar for Sway and Wlroots based compositors"
-Suckless        | DWM        | dwmblocks                        | "N/A"
+Suckless        | DWM        | lukesmithxyz/dwmblocks           | "N/A"
 
 # Screenshot
                 | WAYLAND    | slurp                            | "Select a region in a Wayland compositor"
