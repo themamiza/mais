@@ -153,6 +153,38 @@ ensure_programs_file() {
     fi
 }
 
+ensure_mount_points() {
+    local required_mounts=("/mnt" "/mnt/home")
+    [ "$bios_or_uefi" = "UEFI" ] && required_mounts+=("/mnt/efi")
+
+    local mounted=()
+
+    for mnt in "${required_mounts[@]}"; do
+        if mountpoint -q "$mnt"; then
+            mounted+=("$mnt")
+        fi
+    done
+
+    if [[ ${#mounted[@]} -gt 0 ]]; then
+        wprint "The following mount points are already in use: ${mounted[*]}"
+        printf "Do you want to unmount them before continuing? (Y/N): "
+        local answer
+        read -r answer
+        if [[ "$answer" =~ ^[Yy]$ ]]; then
+            for mnt in "${mounted[@]}"; do
+                umount -R "$mnt"
+            done
+        else
+            nprint "Proceeding with existing mount points."
+        fi
+    fi
+
+    for mnt in "${required_mounts[@]}"; do
+        mountpoint -q "$mnt" || eprint "Required mountpoint '$mnt' is missing. Aborting."
+    done
+}
+
+
 # TODO: Make sure device is not mounted before going through the install.
 # TODO: Thinking this partitioning function should go inside the configuration file to be made.
 # label -> label type: dos/gpt
@@ -580,37 +612,6 @@ configure_grub() {
             eval "grub-mkconfig -o /boot/grub/grub.cfg $cmd_suffix"
         }
     }
-}
-
-ensure_mount_points() {
-    local required_mounts=("/mnt" "/mnt/home")
-    [ "$bios_or_uefi" = "UEFI" ] && required_mounts+=("/mnt/efi")
-
-    local mounted=()
-
-    for mnt in "${required_mounts[@]}"; do
-        if mountpoint -q "$mnt"; then
-            mounted+=("$mnt")
-        fi
-    done
-
-    if [[ ${#mounted[@]} -gt 0 ]]; then
-        wprint "The following mount points are already in use: ${mounted[*]}"
-        printf "Do you want to unmount them before continuing? (Y/N): "
-        local answer
-        read -r answer
-        if [[ "$answer" =~ ^[Yy]$ ]]; then
-            for mnt in "${mounted[@]}"; do
-                umount -R "$mnt"
-            done
-        else
-            nprint "Proceeding with existing mount points."
-        fi
-    fi
-
-    for mnt in "${required_mounts[@]}"; do
-        mountpoint -q "$mnt" || eprint "Required mountpoint '$mnt' is missing. Aborting."
-    done
 }
 
 ### Handling arguments ###
