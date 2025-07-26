@@ -448,15 +448,17 @@ doomemacs_install() {
     eprint "Not implemented!"
 }
 
-install_environment() {
+install_programs() {
     # Create an empty tmp file.
     : > "$programs_to_install"
 
     # Grab programs and add to tmp file based on the tag that is provided.
     # case matches the tags to it's children.
     case "$1" in
-        "HYPRLAND") grep -E "WAYLAND|HYPRLAND|ALL"     "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "DWM")      grep -E "X11|DWM|ALL"              "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "X11")      grep -E "X11"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "DWM")      grep -E "X11|DWM"                  "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "WAYLAND")  grep -E "WAYLAND"                  "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "HYPRLAND") grep -E "WAYLAND|HYPRLAND"         "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
         "DEV")      grep -E "PYTHON|CLANG|LUA|BASH|JS" "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
         "PYTHON")   grep -E "PYTHON"                   "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
         "CLANG")    grep -E "CLANG"                    "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
@@ -467,7 +469,7 @@ install_environment() {
         "ALL") cut -d"|" -f3 "$programs_file.clean" >> "$programs_to_install";;
     esac
 
-    # Also grab lines that have no tag set (meaning install to every environment).
+    # Also grab lines that have no tag set.
     awk -F'|' '
       {
         original_line = $0
@@ -638,11 +640,11 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
 
-        "install-env")
-            args_install_env=true
-            [ -z "$2" ] && environment="ALL" && shift && continue
+        "install-programs")
+            args_install_programs=true
+            [ -z "$2" ] && programs="ALL" && shift && continue
             # shellcheck disable=2015
-            re_match "$2" "^(DWM|HYPRLAND|DEV|PYTHON|CLANG|LUA|BASH|JS|EXTRA|VIRT|ALL)$" && environment="$2" || eprint "'$2' is not a valid environment."
+            re_match "$2" "^(X11|DWM|WAYLAND|HYPRLAND|DEV|PYTHON|CLANG|LUA|BASH|JS|EXTRA|VIRT|ALL)$" && programs="$2" || eprint "'$2' is not a valid tag."
             shift 2
             ;;
 
@@ -716,7 +718,7 @@ done
     install_aurhelper
 }
 
-[ -n "$args_install_env" ] && {
+[ -n "$args_install_programs" ] && {
     isRoot || eprint "Only root can install packages."
     ensure_programs_file
     clean_programs_file
@@ -724,5 +726,5 @@ done
     ask_username
     install_essentials
     install_aurhelper
-    install_environment "$environment"
+    install_programs "$programs"
 }
