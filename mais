@@ -34,6 +34,9 @@ verbose=false
 # This could be log file or just plain '/dev/null/' to destroy the messages.
 cmd_suffix=">/dev/null 2>&1"
 
+# 'quite=true' should silence any output from the script.
+quiet=false
+
 # URL to dotfiles repository.
 dotfiles_url="https://github.com/themamiza/dotfiles"
 # Dotfiles repository can have different name e.g. voidrice <https://github.com/lukesmithxyz/voidrice>.
@@ -49,11 +52,11 @@ programs_file_url="https://raw.githubusercontent.com/themamiza/mais/refs/heads/m
 
 ### Functions ###
 
-# NormalPRINT: Print information (can also be notifying) to stdout.
-nprint() { printf "%s: %b\n" "$program_name" "$1"; }
+# NormalPRINT: Print information (can also be notifying) to stdout. (just respects 'quiet')
+nprint() { $quiet && return; printf "%s: %b\n" "$program_name" "$1"; }
 
-# SilentPRINT: Same as 'nprint' but respect 'verbose'.
-sprint() { $verbose || return 0; printf "%s: %b\n" "$program_name" "$1"; }
+# SilentPRINT: Same as 'nprint' but respect 'verbose' and 'quiet'.
+sprint() { ! $verbose || $quiet && return; printf "%s: %b\n" "$program_name" "$1"; }
 
 # WarningPRINT: Print warnings to stderr but don't exit.
 wprint() { printf "%s: %b\n" "$program_name" "$1" >&2; }
@@ -374,7 +377,7 @@ clean_programs_file() {
 }
 
 install_package() {
-    check_installed "$1" && return 0
+    check_installed "$1" && nprint "Found '$1'." && return 0
 
     package_info="$(grep "$1" "$programs_file.clean")"
 
@@ -389,7 +392,7 @@ install_package() {
 }
 
 install_aurhelper() {
-    check_installed "$aurhelper" && nprint "'$aurhelper' is already installed." && return 0
+    check_installed "$aurhelper" && nprint "Found '$aurhelper'." && return 0
     
     nprint "Installing '$aurhelper'."
     local src="/home/$username/.local/src/$aurhelper"
@@ -408,12 +411,12 @@ install_aurhelper() {
 }
 
 pacman_install() {
-    sprint "Installing $1 -> $2"
+    nprint "Installing $1 -> $2"
     eval "pacman -S --noconfirm '$1' $cmd_suffix"
 }
 
 aur_install() {
-    sprint "Installing $1 -> $2"
+    nprint "Installing $1 -> $2"
     sudo -u "$username" sh -c "$aurhelper -S --noconfirm $1 $cmd_suffix"
 }
 
@@ -650,6 +653,8 @@ while [[ $# -gt 0 ]]; do
 
         "-v"|"--verbose") verbose=true; cmd_suffix=""; shift;;
 
+        "-q"|"--quiet") quiet=true; shift;;
+
         "-u"|"--username")
             if [ -z "$2" ]; then
                 eprint "'-u' -> You should provide a username."
@@ -686,6 +691,8 @@ while [[ $# -gt 0 ]]; do
         *) invalid_option "$1";;
     esac
 done
+
+$verbose && $quiet && eprint "Can't use '-v' with '-q'."
 
 # Set username to current user, unless running by root or explicitly specifying the username through arguments.
 ! isRoot && [ -z "$username" ] && username="$(id -un)"
