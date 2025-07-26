@@ -337,8 +337,6 @@ arch_install() {
 SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     yes_no "Continue (Y/N): " || exit 0
 
-    ensure_mount_points
-
     ask_username
 
     # Get password for said user.
@@ -707,6 +705,7 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
 
 [ -n "$args_arch_install" ] && {
     is_archlinux || eprint "Can only install an ArchLinux system."
+    ensure_mount_points
     eval "partition_$partition_mode"
     arch_install
     exit
