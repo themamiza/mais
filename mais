@@ -153,37 +153,15 @@ ensure_programs_file() {
     fi
 }
 
-ensure_mount_points() {
-    local required_mounts=("/mnt" "/mnt/home")
-    [ "$bios_or_uefi" = "UEFI" ] && required_mounts+=("/mnt/efi")
-
-    local mounted=()
-
-    for mnt in "${required_mounts[@]}"; do
-        if mountpoint -q "$mnt"; then
-            mounted+=("$mnt")
-        fi
-    done
-
-    if [[ ${#mounted[@]} -gt 0 ]]; then
-        wprint "The following mount points are already in use: ${mounted[*]}"
-        printf "Do you want to unmount them before continuing? (Y/N): "
-        local answer
-        read -r answer
-        if [[ "$answer" =~ ^[Yy]$ ]]; then
-            for mnt in "${mounted[@]}"; do
-                umount -R "$mnt"
-            done
-        else
-            nprint "Proceeding with existing mount points."
-        fi
+ensure_mount_point() {
+    if mountpoint -q /mnt; then
+        wprint "'/mnt' is already in use."
+        yes_no "Do you want to unmount before continuing? (Y/N): " && umount -R /mnt && return
+        nprint "Proceeding with existing mount points." && return 1
+    else
+        return 0
     fi
-
-    for mnt in "${required_mounts[@]}"; do
-        mountpoint -q "$mnt" || eprint "Required mountpoint '$mnt' is missing. Aborting."
-    done
 }
-
 
 # TODO: Make sure device is not mounted before going through the install.
 # TODO: Thinking this partitioning function should go inside the configuration file to be made.
@@ -705,8 +683,7 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
 
 [ -n "$args_arch_install" ] && {
     is_archlinux || eprint "Can only install an ArchLinux system."
-    ensure_mount_points
-    eval "partition_$partition_mode"
+    ensure_mount_point && yes_no "Continuing will result in your data being lost. Continue? (Y/N): " && eval "partition_$partition_mode"
     arch_install
     exit
 }
