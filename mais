@@ -696,6 +696,9 @@ $verbose && $quiet && eprint "Can't use '-v' with '-q'."
 # Set username to current user, unless running by root or explicitly specifying the username through arguments.
 ! isRoot && [ -z "$username" ] && username="$(id -un)"
 
+# If running as root through `sudo`; set username to $SUDO_USER 
+isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
+
 # Set hostname to current hostname if not already provided.
 [ -z "$hostname" ] && hostname="$(hostnamectl hostname 2>/dev/null || cat /etc/hostname)"
 
