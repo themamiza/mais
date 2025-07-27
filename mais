@@ -596,6 +596,19 @@ configure_grub() {
     fi
 }
 
+configure_pacman() {
+    sprint "Enabling color and VerbosePkgLists."
+    sed -i "^#Color$/s/#//;
+            ^#VerbosePkgLists$/s/#//;" /etc/pacman.conf
+    sprint "Enabling eye-candy." 
+    grep -q "ILoveCandy" /etc/pacman.conf || sed -i "^/^Color$/a ILoveCandy" /etc/pacman.conf
+
+}
+
+configure_makepkg() {
+    sprint "Using all cores for compilation."
+    sed -i "/^#MAKEFLAGS/s/^#//;
+            s/-j2/-j$(nproc)/;" /etc/makepkg.conf
 }
 
 ### Handling arguments ###
