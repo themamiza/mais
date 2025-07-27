@@ -567,16 +567,20 @@ install_essentials() {
 }
 
 configure_grub() {
-    sprint "Configuring grub options."
-
     # These configurations need to be done regardless of having swap.
-    sed -i "/^GRUB_TIMEOUT=.*$/s/=.*/=3/;/^#GRUB_DISABLE_OS_PROBER=false$/s/#//" /etc/default/grub
-    sed -i "/^GRUB_DEFAULT=.*$/s/=.*/=saved/;/^#GRUB_SAVEDEFAULT=true$/s/#//" /etc/default/grub
-    sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=.*$/s/ quiet//" /etc/default/grub
+    sed -i "/^GRUB_TIMEOUT=.*$/s/=.*/=3/;
+            /^#GRUB_DISABLE_OS_PROBER=false$/s/#//;
+            /^GRUB_DEFAULT=.*$/s/=.*/=saved/;
+            /^#GRUB_SAVEDEFAULT=true$/s/#//;
+            /^GRUB_CMDLINE_LINUX_DEFAULT=.*$/s/ quiet//;" /etc/default/grub
 
     sprint "Checking swap partition."
     # Enable hibernation only if there is a swap device larger than 8G.
-    blkid | grep "TYPE=\"swap\"" | cut -d " " -f1 | sed "s/://" | xargs lsblk -no SIZE | sed "s/\s\+//;s/.$//;s/\..*//" | xargs test 8 -le && {
+    local swapsizegb
+    # Grab size of swap partition in GBs.
+    swapsizegb="$(blkid | grep "TYPE=\"swap\"" | cut -d" " -f1 | sed "s/://" | xargs lsblk -no SIZE | sed "s/\s\+//;s/.$//;s/\..*//")" 
+
+    if [ "$swapsizegb" -gt 8 ]; then
         sprint "Enabling hibernation."
         grep -q resume /etc/mkinitcpio.conf || {
             sed -i "/^HOOKS=(.*)$/s/)$/ resume)/" /etc/mkinitcpio.conf
@@ -587,7 +591,11 @@ configure_grub() {
             sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=.*$/s/.$/ resume=UUID=$swapuuid\"/" /etc/default/grub
             eval "grub-mkconfig -o /boot/grub/grub.cfg $cmd_suffix"
         }
-    }
+    else 
+        wprint "Not enough swap for hibernation."
+    fi
+}
+
 }
 
 ### Handling arguments ###
