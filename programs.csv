@@ -113,7 +113,7 @@ Suckless        | DWM        | lukesmithxyz/dwmblocks           | "N/A"
 
 # Calculator
                 |            | bc                               | "An arbitrary precision calculator language"
-                |            | qalculate-gtk                    | "GTK frontend for libqalculate"
+                | EXTRA      | qalculate-gtk                    | "GTK frontend for libqalculate"
 
 # PDF
                 |            | zathura                          | "Minimalistic document viewer"
@@ -141,6 +141,7 @@ AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and
                 |            | man-db                           | "A utility for reading man pages"
                 |            | man-pages                        | "Linux man pages"
                 |            | htop                             | "Interactive process viewer"
+                | EXTRA      | btop                             | "A monitor of system resources, bpytop ported to C++"
                 |            | rsync                            | "A fast and versatile file copying tool for remote and local files"
 
 # Extras
@@ -156,7 +157,7 @@ AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and
 # Filesystem
                 |            | dosfstools                       | "DOS filesystem utilities"
                 |            | ntfs-3g                          | "NTFS filesystem driver and utilities"
-AUR             |            | simple-mtpfs                     | "A FUSE filesystem that supports reading/writing from MTP devices"
+AUR             | EXTRA      | simple-mtpfs                     | "A FUSE filesystem that supports reading/writing from MTP devices"
 
 # Virtual Machine
                 | VIRT       | qemu-full                        | "A full QEMU setup"
@@ -208,7 +209,7 @@ AUR             |            | xcursor-breeze                   | "KDE Plasma 6 
                 | DEV        | emacs                            | "The extensible, customizable, self-documenting real-time display editor"
 
 # Communication
-                |            | telegram-desktop                 | "Official Telegram Desktop client"
+                | EXTRA      | telegram-desktop                 | "Official Telegram Desktop client"
 
 # Computation
                 | EXTRA      | octave                           | "A high-level language, primarily intended for numerical computations"
