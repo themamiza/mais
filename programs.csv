@@ -101,11 +101,11 @@ Suckless        | DWM        | lukesmithxyz/dwmblocks           | "N/A"
 
 # File Manager
                 |            | yazi                             | "Blazing fast terminal file manager written in Rust, based on async I/O"
-                |            | thunar                           | "Modern, fast and easy-to-use file manager for Xfce"
-                |            | thunar-volman                    | "Automatic management of removable drives and media for Thunar"
-                |            | tumbler                          | "Thumbnail service implementing the thumbnail management D-Bus specification"
-                |            | gvfs                             | "Virtual filesystem implementation for GIO"
-                |            | gvfs-mtp                         | "Virtual filesystem implementation for GIO - MTP backend (Android, media player)"
+                | EXTRA      | thunar                           | "Modern, fast and easy-to-use file manager for Xfce"
+                | EXTRA      | thunar-volman                    | "Automatic management of removable drives and media for Thunar"
+                | EXTRA      | tumbler                          | "Thumbnail service implementing the thumbnail management D-Bus specification"
+                | EXTRA      | gvfs                             | "Virtual filesystem implementation for GIO"
+                | EXTRA      | gvfs-mtp                         | "Virtual filesystem implementation for GIO - MTP backend (Android, media player)"
 
 # Notification
                 |            | libnotify                        | "Library for sending desktop notifications"
