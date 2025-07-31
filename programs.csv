@@ -178,7 +178,7 @@ AUR             |            | simple-mtpfs                     | "A FUSE filesy
 AUR             |            | dracula-gtk-theme-git            | "Dark theme for GTK"
                 |            | breeze-icons                     | "Breeze icon theme"
 AUR             |            | catppuccin-gtk-theme-macchiato   | "Soothing pastel theme for GTK - Macchiato"
-AUR             | EXTRA      | alacritty-theme-git              | "Collection of Alacritty color schemes."
+# AUR             | EXTRA      | alacritty-theme-git              | "Collection of Alacritty color schemes." # Broken install
                 |            | nwg-look                         | "GTK settings editor adapted to work on wlroots-based compositors"
 AUR             |            | xcursor-breeze                   | "KDE Plasma 6 'Breeze' cursor theme. This package is for usage in non-KDE Plasma desktops."
                 |            | kvantum                          | "SVG-based theme engine for Qt6 (including config tool and extra themes)"
