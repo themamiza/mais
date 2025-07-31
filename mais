@@ -387,6 +387,7 @@ clean_programs_file() {
 install_package() {
     check_installed "$1" && nprint "Found '$1'." && return 0
 
+    # TODO: This grep does not work properly: 'alacritty' matches 'alacritty-theme-git' too.
     local package_info; package_info="$(grep "$1" "$programs_file.clean")"
 
     while IFS="|" read -r method _ _ description; do
@@ -567,8 +568,8 @@ install_essentials() {
 }
 
 configure_grub() {
-    sprint "Configuring general grub options."
-
+    # TODO: This message could be more verbose
+    sprint "Configuring grub."
     # These configurations need to be done regardless of having swap.
     sed -i "/^GRUB_TIMEOUT=.*$/s/=.*/=3/;
             /^#GRUB_DISABLE_OS_PROBER=false$/s/#//;
@@ -577,14 +578,17 @@ configure_grub() {
             /^GRUB_CMDLINE_LINUX_DEFAULT=.*$/s/ quiet//;" /etc/default/grub
 
     sprint "Checking swap partition."
-    blkid | grep -q "TYPE=\"swap\"" || wprint "Did not find swap partition." && return
+    if ! blkid | grep -q "TYPE=\"swap\""; then
+        wprint "Did not find swap partition."
+        return
+    fi
 
     # Enable hibernation only if there is a swap device larger than 8G.
     local swapsizegb
     # Grab size of swap partition in GBs.
     swapsizegb="$(blkid | grep "TYPE=\"swap\"" | cut -d" " -f1 | sed "s/://" | xargs lsblk -no SIZE | sed "s/\s\+//;s/.$//;s/\..*//")" 
 
-    if [ "$swapsizegb" -gt 8 ]; then
+    if [ "$swapsizegb" -ge 8 ]; then
         sprint "Enabling hibernation."
         grep -q resume /etc/mkinitcpio.conf || {
             sed -i "/^HOOKS=(.*)$/s/)$/ resume)/" /etc/mkinitcpio.conf
@@ -601,18 +605,23 @@ configure_grub() {
 }
 
 configure_pacman() {
-    sprint "Enabling Color and VerbosePkgLists."
+    sprint "Configuring \`pacman\` to do Colors, VerbosePkgLists and ILoveCandy."
     sed -i "/^#Color$/s/#//;
             /^#VerbosePkgLists$/s/#//;" /etc/pacman.conf
-    sprint "Enabling eye-candy." 
     grep -q "ILoveCandy" /etc/pacman.conf || sed -i "/^Color$/a ILoveCandy" /etc/pacman.conf
-
 }
 
 configure_makepkg() {
-    sprint "Using all cores for compilation."
+    sprint "Configuring \`makepkg\` to use all cores for compilation."
     sed -i "/^#MAKEFLAGS/s/^#//;
             s/-j2/-j$(nproc)/;" /etc/makepkg.conf
+}
+
+configure_proxychains() {
+    sprint "Configuring \`proxychains\` to forward packets to localhost:6969."
+    # Remove any previous proxies; then add new configuration.
+    sed -i "/^\[ProxyList\]$/q" /etc/proxychains.conf
+    printf "# MAIS\nsocks5 127.0.0.1 6969\n" >> /etc/proxychains.conf
 }
 
 ### Handling arguments ###
@@ -651,6 +660,8 @@ while [[ $# -gt 0 ]]; do
             re_match "$2" "^(X11|DWM|WAYLAND|HYPRLAND|DEV|PYTHON|CLANG|LUA|BASH|JS|EXTRA|VIRT|ALL)$" && programs="$2" || eprint "'$2' is not a valid tag."
             shift 2
             ;;
+
+        "configure") args_configure=true; shift;;
 
         "-v"|"--verbose") verbose=true; cmd_suffix=""; shift;;
 
@@ -738,4 +749,12 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     install_essentials
     install_aurhelper
     install_programs "$programs"
+}
+
+[ -n "$args_configure" ] && {
+    isRoot || eprint "Only root can configure the system."
+    configure_grub
+    configure_pacman
+    configure_makepkg
+    configure_proxychains
 }
