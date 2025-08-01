@@ -21,10 +21,43 @@ You can run this command to get `mais`:
 ``` bash
 curl -LO https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/mais && chmod +x mais
 ```
-# Watch Out
+You can run `mais install` to install mais locally or you can just use it as it is.
 
-The script is not in a "usable" state yet. It's going under heavy refactoring and rewrites.
-***It may just brick your system if you use as it is now!***
-I'm mainly just publishing it now so that I can keep track of changes.
-Once it reaches a usable and semi-stable state I will be updating the README to reflect how
-the project is used and what the options are.
+### Partition Modes
+#### vm
+* 1GB  /efi (Only on UEFI systems)
+* 30GB /
+* \*   /home
+
+#### main
+TODO: To be implemented
+
+#### x220
+* 1GB  /efi (Only on UEFI systems)
+* 30GB /
+* \*    /home
+
+On UEFI systems where hibernation is done there's also an 8GBs swap partition at the end.
+
+### `mais configure`
+Here are all the configuration that is done by this command
+
+#### Grub
+* Set `GRUB_TIMEOUT` to 3 seconds
+* Enable `os-prober` to look for other operating systems
+* Save previous selection
+* Print log messages during boot
+
+* Enable hibernation only if there's a swap partition larger that 8GBs
+
+#### Pacman
+* Enable colors
+* Enable VerbosePkgLists
+* Enable eye-candy
+
+#### Makepkg
+* Use all cpu cores for compilations
+
+#### Proxychains
+
+* Craete SOCKS5 proxy on localhost:6969
