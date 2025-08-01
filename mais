@@ -698,7 +698,10 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
 
-        "install-dotfiles") args_install_dotfiles=true; shift;;
+        "install-dotfiles")
+            args_install_dotfiles=true;
+            [ -z "$2" ] && dotfiles_url="$2" && shift && continue
+            ;;
 
         "install-aurhelper")
             [ -z "$2" ] && eprint "\`install-aurhelper\` -> you should provide a 'aurhelper' (yay, paru)."
