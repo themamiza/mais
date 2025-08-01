@@ -468,17 +468,17 @@ install_programs() {
     # Grab programs and add to tmp file based on the tag that is provided.
     # case matches the tags to it's children.
     case "$1" in
-        "X11")      grep -E "X11"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "DWM")      grep -E "X11|DWM"                  "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "WAYLAND")  grep -E "WAYLAND"                  "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "HYPRLAND") grep -E "WAYLAND|HYPRLAND"         "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "DEV")      grep -E "PYTHON|CLANG|LUA|BASH|JS" "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "PYTHON")   grep -E "PYTHON"                   "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "CLANG")    grep -E "CLANG"                    "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "LUA")      grep -E "LUA"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "BASH")     grep -E "BASH"                     "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "JS")       grep -E "JS"                       "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "EXTRA")    grep -E "EXTRA"                    "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "X11")      grep -E "X11"                          "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "DWM")      grep -E "X11|DWM"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "WAYLAND")  grep -E "WAYLAND"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "HYPRLAND") grep -E "WAYLAND|HYPRLAND"             "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "DEV")      grep -E "DEV|PYTHON|CLANG|LUA|BASH|JS" "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "PYTHON")   grep -E "PYTHON"                       "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "CLANG")    grep -E "CLANG"                        "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "LUA")      grep -E "LUA"                          "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "BASH")     grep -E "BASH"                         "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "JS")       grep -E "JS"                           "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
+        "EXTRA")    grep -E "EXTRA"                        "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
         "ALL") cut -d"|" -f3 "$programs_file.clean" >> "$programs_to_install";;
     esac
 
