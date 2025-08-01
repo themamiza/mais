@@ -675,6 +675,8 @@ perform_backup() {
     # 7z a -t7z -mx=9 "backup-$(date "+%Y-%m-%d")" "$backup_dest"
 }
 
+update_mirrors() { reflector --country Germany --latest 16 --protocol https --sort rate --save /etc/pacman.d/mirrorlist; }
+
 ### Handling arguments ###
 
 if [[ $# -lt 1 ]]; then
@@ -721,6 +723,8 @@ while [[ $# -gt 0 ]]; do
             re_match "$2" "$regex_valid_directory" && backup_name="$2" || eprint ""
             shift 2
             ;;
+
+        "update-mirrors") args_update_mirrors=true; shift;;
 
         "-v"|"--verbose") verbose=true; cmd_suffix=""; shift;;
 
@@ -822,3 +826,11 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     isRoot && eprint "Root cannot take backups."
     perform_backup
 }
+
+[ -n "$args_update_mirrors" ] && {
+    is_archlinux || eprint "Not running ArchLinux."
+    isRoot || eprint "Only root can update mirrors."
+    check_internet_connection || eprint "Can't reach the web."
+    update_mirrors
+}
+
