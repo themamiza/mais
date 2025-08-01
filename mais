@@ -11,6 +11,8 @@ set -eo pipefail
 # Saving to a variable for easy use in messages.
 program_name="$(basename "$0")"
 
+install_path="/usr/local/bin"
+
 bios_or_uefi="UEFI"        # Set to "BIOS" to install for BIOS systems.
                            # Use "BIOS" when "UEFI" is not available.
 cat /sys/firmware/efi/fw_platform_size >/dev/null 2>&1 || bios_or_uefi="BIOS"
@@ -726,6 +728,8 @@ while [[ $# -gt 0 ]]; do
 
         "update-mirrors") args_update_mirrors=true; shift;;
 
+        "install") args_install=true; shift;;
+
         "-v"|"--verbose") verbose=true; cmd_suffix=""; shift;;
 
         "-q"|"--quiet") quiet=true; shift;;
@@ -832,5 +836,15 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     isRoot || eprint "Only root can update mirrors."
     check_internet_connection || eprint "Can't reach the web."
     update_mirrors
+}
+
+[ -n "$args_install" ] && {
+    is_archlinux || eprint "Not running ArchLinux."
+    isRoot || eprint "Only root can install $program_name."
+    check_internet_connection || eprint "Can't reach the web."
+    
+    mkdir -p "$install_path"
+    curl "https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/mais" > "$install_path/$program_name"
+    chmod 755 "$install_path/$program_name"
 }
 
