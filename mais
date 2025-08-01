@@ -786,6 +786,7 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
 
 [ -n "$args_arch_install" ] && {
     is_archlinux || eprint "Can only install an ArchLinux system."
+    isRoot || eprint "Only root can install the system."
     ensure_mount_point && yes_no "Continuing will result in your data being lost. Continue? (Y/N): " && eval "partition_$partition_mode"
     arch_install
     exit
