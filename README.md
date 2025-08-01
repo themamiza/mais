@@ -16,6 +16,11 @@ or let the script do it for you.
 * `base-devel` &rarr; For making packages.
 * `git` &rarr; Used to clone remote repositories.
 
+## Running `mais`
+You can run this command to get `mais`:
+``` bash
+curl -LO https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/mais && chmod +x mais
+```
 # Watch Out
 
 The script is not in a "usable" state yet. It's going under heavy refactoring and rewrites.
