@@ -770,8 +770,8 @@ while [[ $# -gt 0 ]]; do
             ;;
 
         "install-dotfiles")
-            args_install_dotfiles=true;
-            [ -z "$2" ] && dotfiles_url="$2" && shift && continue
+            args_install_dotfiles=true; shift
+            [ -n "$2" ] && dotfiles_url="$2" && shift && continue
             ;;
 
         "install-aurhelper")
