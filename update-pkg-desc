@@ -2,7 +2,7 @@
 
 program_name="$(basename "$0")"
 
-[ $# -lt 4 ] && printf "%s: Invaild usage.\n\nUsage: %s -i input_file -o output_file\n" "$program_name" "$program_name" && exit 1
+[ $# -lt 4 ] && printf "%s: Invalid usage.\n\nUsage: %s -i input_file -o output_file\n" "$program_name" "$program_name" && exit 1
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
