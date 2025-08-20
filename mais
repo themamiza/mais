@@ -133,6 +133,7 @@ print_help() {
                 Take a backup from a set of pre-defined files
 
                 'backup_name' is optional and is the name of the directory of the final backup (~/backup_name)
+                Defaults to '~/backup_\$(date \"+%%Y-%%m-%%d_%%H:%%M\")'
 
         update-mirrors          Runs a reflector command to fetch faster mirrors
 
