@@ -710,7 +710,7 @@ sync_file() {
         mkdir -p "$dest_dir"
         rsync -aP "$src" "$dest_dir/"
     else
-        eprint "$src not found."
+        wprint "$src not found."
     fi
 }
 
