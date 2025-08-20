@@ -794,7 +794,7 @@ while [[ $# -gt 0 ]]; do
 
         "backup")
             args_backup=true
-            [ -z "$2" ] && backup_name="backup" && shift && continue
+            [ -z "$2" ] && backup_name="backup_$(date "+%Y-%m-%d_%H:%M")" && shift && continue
             # shellcheck disable=2015
             re_match "$2" "$regex_valid_directory" && backup_name="$2" || eprint ""
             shift 2
@@ -930,4 +930,3 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     curl "https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/mais" > "$install_path/$program_name"
     chmod 755 "$install_path/$program_name"
 }
-

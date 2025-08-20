@@ -153,6 +153,8 @@ AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and
                 | EXTRA      | ripgrep                          | "A search tool that combines the usability of ag with the raw speed of grep"
                 | EXTRA      | yt-dlp                           | "A youtube-dl fork with additional features and fixes"
                 | EXTRA      | inxi                             | "Full featured CLI system information tool"
+                | EXTRA      | pacman-contrib                   | "Contributed scripts and tools for pacman systems"
+                | EXTRA      | pkgfile                          | "A tool to search for files in official repository packages"
 
 
 # Filesystem
