@@ -746,6 +746,9 @@ perform_backup() {
 
     # TODO: consider compressing the backup.
     # 7z a -t7z -mx=9 "backup-$(date "+%Y-%m-%d")" "$backup_dest"
+
+    # Warn about what is not being backed up
+    wprint "== Backup anything browser related (extension settings, downloads, bookmarks, sync, ...) manually!"
 }
 
 update_mirrors() { reflector --country Germany --latest 16 --protocol https --sort rate --save /etc/pacman.d/mirrorlist; }
