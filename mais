@@ -902,7 +902,13 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     configure_grub
     configure_pacman
     configure_makepkg
-    configure_proxychains
+
+    if check_installed proxychains; then
+        configure_proxychains
+    else
+        wprint "\`proxychains\` not installed. Install, then run \`mais configure\`."
+    fi
+
 }
 
 [ -n "$args_backup" ] && {
