@@ -602,7 +602,7 @@ install_dotfiles() {
     sudo -u "$username" rsync -a "$srcdir" "/home/$username"
 
     # Remove extra files
-    rm "/home/$username/.gitignore" "/home/$username/LICENSE" "/home/$username/README.md"
+    rm "/home/$username/.gitignore" "/home/$username/.gitmodules" "/home/$username/LICENSE" "/home/$username/README.md"
 
     rm -rf "/home/$username/.git"
 }
