@@ -605,6 +605,9 @@ install_dotfiles() {
     rm "/home/$username/.gitignore" "/home/$username/.gitmodules" "/home/$username/LICENSE" "/home/$username/README.md"
 
     rm -rf "/home/$username/.git"
+
+    # Symbolic links to useful applications
+    [ -f /opt/v2rayn-bin/v2rayN ] && sudo -u "$username" ln -sf /opt/v2rayn-bin/v2rayN "/home/$username/.local/bin/v2rayn"
 }
 
 ask_username() {
