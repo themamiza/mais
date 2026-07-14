@@ -711,6 +711,8 @@ configure_keyd() {
 [main]
 capslock = esc
 esc = capslock\n" > /etc/keyd/default.conf
+
+    systemctl enable --now keyd
     keyd reload
 }
 
