@@ -633,7 +633,7 @@ ask_hostname() {
 }
 
 install_essentials() {
-    local essential_programs=("base-devel" "git" "rsync")
+    local essential_programs=("base-devel" "git" "rsync" "keyd")
 
     sprint "Installing essential programs."
     for p in "${essential_programs[@]}"; do
@@ -700,6 +700,18 @@ configure_proxychains() {
     # Remove any previous proxies; then add new configuration.
     sed -i "/^\[ProxyList\]$/q" /etc/proxychains.conf
     printf "# MAIS\nsocks5 127.0.0.1 6969\n" >> /etc/proxychains.conf
+}
+
+configure_keyd() {
+    sprint "Configuring \`keyd\` to swap escape and capslock."
+    printf "# MAIS
+[ids]
+*
+
+[main]
+capslock = esc
+esc = capslock\n" > /etc/keyd/default.conf
+    keyd reload
 }
 
 sync_file() {
@@ -912,6 +924,11 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
         wprint "\`proxychains\` not installed. Install, then run \`mais configure\`."
     fi
 
+    if check_installed keyd; then
+        configure_keyd
+    else
+        wprint "\`keyd\` not installed. Install, then run \`mais configure\`."
+    fi
 }
 
 [ -n "$args_backup" ] && {
