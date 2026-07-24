@@ -26,6 +26,8 @@ mais_load_module "lib/core/sudo.sh"
 mais_load_module "lib/distro/detect.sh"
 mais_load_module "lib/distro/arch.sh"
 
+mais_load_module "lib/commands/backup.sh"
+
 ### Functions ###
 
 # Helper function to report incorrect usage.
@@ -574,59 +576,6 @@ esc = capslock\n" > /etc/keyd/default.conf
     eval "keyd reload $cmd_suffix"
 }
 
-sync_file() {
-    local src="$1"
-    local dest="$2"
-
-    if [ -d "$src" ]; then
-        rsync -aPR "$src" "$dest/"
-    elif [ -f "$src" ]; then
-        local dest_dir; dest_dir="$dest/$(dirname "$src")"
-        mkdir -p "$dest_dir"
-        rsync -aP "$src" "$dest_dir/"
-    else
-        wprint "$src not found."
-    fi
-}
-
-perform_backup() {
-    local backup_dest="$HOME/$backup_name"
-    local backup_files=(
-        "$PASSWORD_STORE_DIR"
-
-        "${XDG_DATA_HOME:-$HOME/.local/share}/vpn_credentials"
-
-        "${XDG_DATA_HOME:-$HOME/.local/share}/wallpapers"
-
-        "$HOME/.minecraft/saves"
-        "$HOME/.minecraft/mods"
-        "$HOME/.minecraft/shaderpacks"
-        "$HOME/.minecraft/resourcepacks"
-        "$HOME/.minecraft/config"
-        "$HOME/.minecraft/schematics"
-        "$HOME/.minecraft/screenshots"
-        "$HOME/.minecraft/options.txt"
-
-        "$HOME/.cache/zsh"
-
-        "$HOME/dl"
-        "$HOME/pix"
-        "$HOME/rp"
-    )
-
-    mkdir -p "$backup_dest"
-
-    for file in "${backup_files[@]}"; do
-        sync_file "$file" "$backup_dest"
-    done
-
-    # TODO: consider compressing the backup.
-    # 7z a -t7z -mx=9 "backup-$(date "+%Y-%m-%d")" "$backup_dest"
-
-    # Warn about what is not being backed up
-    wprint "== Backup anything browser related (extension settings, downloads, bookmarks, sync, ...) manually!"
-}
-
 ### Handling arguments ###
 
 if [[ $# -lt 1 ]]; then
@@ -674,7 +623,7 @@ while [[ $# -gt 0 ]]; do
         "backup")
             args_backup=true
             [ -z "$2" ] && backup_name="backup_$(date "+%Y-%m-%d_%H:%M")" && shift && continue
-            # shellcheck disable=2015
+            # shellcheck disable=2015,2034
             re_match "$2" "$regex_valid_directory" && backup_name="$2" || eprint ""
             shift 2
             ;;
@@ -871,10 +820,7 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     exit
 }
 
-[ -n "$args_backup" ] && {
-    isRoot && eprint "Root cannot take backups."
-    perform_backup
-}
+[[ -n "$args_backup" ]] && command_backup
 
 [ -n "$args_update_mirrors" ] && {
     is_archlinux || eprint "Not running ArchLinux."
