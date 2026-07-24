@@ -2,13 +2,15 @@
 
 set -uo pipefail
 
-readonly TEST_ROOT="$(
-    cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1
+TEST_ROOT="$(
+    cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 || exit 1
     pwd -P
 )"
+readonly TEST_ROOT
 
 readonly MAIS="$TEST_ROOT/mais"
-readonly TEST_TMP="$(mktemp -d)"
+TEST_TMP="$(mktemp -d)" || exit 1
+readonly TEST_TMP
 
 passed=0
 failed=0
@@ -72,15 +74,22 @@ run_test() {
     ((passed++))
 }
 
-if ! bash -n "$MAIS"; then
-    printf 'FAIL: mais has invalid Bash syntax\n'
-    exit 1
-fi
+syntax_files=(
+    "$MAIS"
+    "$TEST_ROOT/lib/core/loader.sh"
+    "$TEST_ROOT/lib/core/config.sh"
+    "$TEST_ROOT/lib/core/log.sh"
+    "$TEST_ROOT/lib/core/validate.sh"
+    "$TEST_ROOT/lib/core/prompt.sh"
+    "$TEST_ROOT/lib/core/run.sh"
+)
 
-if ! bash -n "$TEST_ROOT/lib/core/loader.sh"; then
-    printf 'FAIL: loader.sh has invalid Bash syntax\n'
-    exit 1
-fi
+for shell_file in "${syntax_files[@]}"; do
+    if ! bash -n "$shell_file"; then
+        printf 'FAIL: %s has invalid Bash syntax\n' "$shell_file"
+        exit 1
+    fi
+done
 
 run_test \
     "help" \
@@ -103,6 +112,9 @@ run_test \
     "Invalid option" \
     "$MAIS" definitely-not-a-command
 
+# $1 must be expanded by the child shell, not this script.
+# Therefore using single quotes here.
+# shellcheck disable=2016
 run_test \
     "outside-repository" \
     0 \

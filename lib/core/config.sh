@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=2034
+
+##### Global variables are set here
+
+# Saving to a variable for easy use in messages.
+program_name="$(basename "$0")"
+
+install_path="/usr/local/bin"
+
+bios_or_uefi="UEFI"        # Set to "BIOS" to install for BIOS systems.
+                           # Use "BIOS" when "UEFI" is not available.
+cat /sys/firmware/efi/fw_platform_size >/dev/null 2>&1 || bios_or_uefi="BIOS"
+
+disk_to_install="/dev/vda" # Only matters when using "BIOS".
+bootloader_id="ArchLinux"  # Only matters when using "UEFI".
+efi_directory="/efi"
+
+aurhelper="yay"
+
+# 'verbose=false' should only print messages from the script and suppress all
+# the commands that are being executed.
+# 'verbose=true' should be as verbose as possible; printing the output
+# of all commands that get run.
+verbose=false
+# When 'verbose=false' where should the suppressed output go?
+# This could be log file or just plain '/dev/null/' to destroy the messages.
+cmd_suffix=">/dev/null 2>&1"
+# 'quite=true' should silence any output from the script.
+quiet=false
+
+# URL to dotfiles repository.
+dotfiles_url="https://github.com/themamiza/dotfiles"
+# Dotfiles repository can have different name e.g. voidrice <https://github.com/lukesmithxyz/voidrice>.
+dotfiles_name="$(basename "$dotfiles_url")"
+
+# TODO: Document the csv file specs.
+# The script expects a programs csv file present in the same directory.
+programs_filename="programs.csv"
+programs_file="$MAIS_ROOT/$programs_filename"
+
+# Path to a tmp file which will just contain name of programs to install.
+programs_to_install="/tmp/programs.tmp"
+# URL to raw programs.csv file. Must follow format that's specified in 'programs.csv'.
+programs_file_url="https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/programs.csv"
