@@ -41,12 +41,20 @@ functions=(
     sync_file
     perform_backup
 
+    ensure_programs_file
+    clean_programs_file
+    install_package
+    suckless_install
+    doomemacs_install
+    install_programs
+
     install_dotfiles
 
     command_backup
     command_update_mirrors
     command_install_dotfiles
     command_install_aurhelper
+    command_install_programs
 )
 
 for function_name in "${functions[@]}"; do
