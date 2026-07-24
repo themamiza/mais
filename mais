@@ -633,7 +633,7 @@ ask_hostname() {
 }
 
 install_essentials() {
-    local essential_programs=("base-devel" "git" "rsync" "keyd")
+    local essential_programs=("base-devel" "git" "rsync")
 
     sprint "Installing essential programs."
     for p in "${essential_programs[@]}"; do

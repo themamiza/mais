@@ -17,7 +17,7 @@
 # Terminal Emulator
                 |            | kitty                            | "A modern, hackable, featureful, OpenGL-based terminal emulator"
                 | EXTRA      | alacritty                        | "A cross-platform, GPU-accelerated terminal emulator"
-Suckless        | DWM        | themamiza/st                     | 
+Suckless        | DWM        | themamiza/st                     | "A simple virtual terminal emulator for X."
 
 # Browser
 AUR             |            | brave-bin                        | "Web browser that blocks ads and trackers by default (binary release)"
@@ -33,8 +33,13 @@ AUR             |            | brave-bin                        | "Web browser t
 
 # Window Manager / Compositor
                 | HYPRLAND   | hyprland                         | "a highly customizable dynamic tiling Wayland compositor"
+                | HYPRLAND   | hyprshutdown                     | "A graceful shutdown utility for Hyprland"
+
 Suckless        | DWM        | themamiza/dwm                    | "A dynamic window manager for X"
                 | X11        | xcompmgr                         | "Composite window effect manager for X.org"
+
+# Wayland
+                | EXTRA      | wlr-randr                        | "Utility to manage outputs of a Wayland compositor"
 
 # X11
                 | X11        | xorg-xinput                      | "Small commandline tool to configure devices"
@@ -45,12 +50,16 @@ Suckless        | DWM        | themamiza/dwm                    | "A dynamic win
                 | X11        | arandr                           | "Provide a simple visual front end for XRandR 1.2."
                 | X11        | xcolor                           | "Lightweight color picker for X11"
 
+# Keyboard
+                |            | keyd                             | "A key remapping daemon for linux"
+
 # Clipboard
                 | WAYLAND    | wl-clipboard                     | "Command-line copy/paste utilities for Wayland"
                 | X11        | xclip                            | "Command line interface to the X11 clipboard"
 
 # Lock Screen
-                | WAYLAND    | waylock                          | "A simple screenlocker for wayland compositors"
+                | HYPRLAND   | hyprlock                         | "hyprland’s GPU-accelerated screen locking utility"
+#               | WAYLAND    | waylock                          | "A simple screenlocker for wayland compositors"
                 | DWM        | slock                            | "A simple screen locker for X"
 
 # Wallpaper
@@ -72,6 +81,8 @@ Suckless        | DWM        | lukesmithxyz/dwmblocks           | "N/A"
                 |            | pipewire-pulse                   | "Low-latency audio/video router and processor - PulseAudio replacement"
                 |            | wireplumber                      | "Session / policy manager implementation for PipeWire"
                 |            | qpwgraph                         | "PipeWire Graph Qt GUI Interface"
+                |            | wiremix                          | "A simple TUI audio mixer for PipeWire"
+
 
 # Image Viewer
                 | X11        | nsxiv                            | "Neo (or New or Not) Simple (or Small or Suckless) X Image Viewer"
@@ -99,9 +110,11 @@ Suckless        | DWM        | lukesmithxyz/dwmblocks           | "N/A"
                 |            | openssh                          | "SSH protocol implementation for remote login, command execution and file transfer"
                 |            | sshpass                          | "Fool ssh into accepting an interactive password non-interactively"
                 |            | proxychains-ng                   | "A hook preloader that allows to redirect TCP traffic of existing dynamically linked programs through one or more SOCKS or HTTP proxies"
+AUR             |            | v2rayn-bin                       | "A GUI client for Windows and Linux, support Xray core and others"
 
 # File Manager
                 |            | yazi                             | "Blazing fast terminal file manager written in Rust, based on async I/O"
+                | EXTRA      | lf                               | "A terminal file manager inspired by ranger"
                 | EXTRA      | thunar                           | "Modern, fast and easy-to-use file manager for Xfce"
                 | EXTRA      | thunar-volman                    | "Automatic management of removable drives and media for Thunar"
                 | EXTRA      | tumbler                          | "Thumbnail service implementing the thumbnail management D-Bus specification"
@@ -122,6 +135,8 @@ Suckless        | DWM        | lukesmithxyz/dwmblocks           | "N/A"
                 |            | tesseract-data-eng               | "Tesseract OCR data (eng)"
 
 # Shell
+                |            | base-devel                       | "Basic tools to build Arch Linux packages"
+                |            | moreutils                        | "A growing collection of the unix tools that nobody thought to write thirty years ago"
                 |            | dash                             | "POSIX compliant shell that aims to be as small as possible"
                 |            | zsh                              | "A very advanced and programmable command interpreter (shell) for UNIX"
                 |            | zsh-autosuggestions              | "Fish-like autosuggestions for zsh"
@@ -135,6 +150,7 @@ AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and
                 |            | unrar-free                       | "Free utility to extract files from RAR archives"
 
 # Misc.
+                |            | git                              | "the fast distributed version control system"
                 |            | fzf                              | "Command-line fuzzy finder"
                 |            | pass                             | "Stores, retrieves, generates, and synchronizes passwords securely"
                 |            | tmux                             | "Terminal multiplexer"
@@ -155,18 +171,22 @@ AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and
                 | EXTRA      | inxi                             | "Full featured CLI system information tool"
                 | EXTRA      | pacman-contrib                   | "Contributed scripts and tools for pacman systems"
                 | EXTRA      | pkgfile                          | "A tool to search for files in official repository packages"
+AUR             | EXTRA      | c-lolcat                         | "High-performance implementation of lolcat"
+
+AUR             | EXTRA      | dupeguru                         | "Find duplicate files with various contents, using perceptual diff for pictures"
 
 
 # Filesystem
                 |            | dosfstools                       | "DOS filesystem utilities"
-                |            | ntfs-3g                          | "NTFS filesystem driver and utilities"
+                |            | ntfs-3g                          | "NTFS FUSE driver"
+                |            | ntfsprogs                        | "NTFS userspace utilities"
 AUR             | EXTRA      | simple-mtpfs                     | "A FUSE filesystem that supports reading/writing from MTP devices"
 
 # Virtual Machine
                 | VIRT       | qemu-full                        | "A full QEMU setup"
                 | VIRT       | libvirt                          | "API for controlling virtualization engines (openvz,kvm,qemu,virtualbox,xen,etc)"
                 | VIRT       | dnsmasq                          | "Lightweight, easy to configure DNS forwarder and DHCP server"
-                | VIRT       | iptables-nft                     | "Linux kernel packet control tool (using nft interface)"
+                | VIRT       | iptables-nft                     | "N/A"
                 | VIRT       | openbsd-netcat                   | "TCP/IP swiss army knife. OpenBSD variant."
                 | VIRT       | virt-manager                     | "Desktop user interface for managing virtual machines"
 
@@ -177,6 +197,8 @@ AUR             | EXTRA      | simple-mtpfs                     | "A FUSE filesy
                 |            | ttf-iosevka-nerd                 | "Patched font Iosevka from nerd fonts library"
                 |            | ttf-ubuntu-font-family           | "Ubuntu font family"
                 |            | noto-fonts-emoji                 | "Google Noto Color Emoji font"
+                |            | ttf-cascadia-code-nerd           | "Patched font Cascadia Code (Caskaydia) from nerd fonts library"
+                |            | ttf-cascadia-mono-nerd           | "Patched font Cascadia Mono (Caskaydia) from nerd fonts library"
 
 # Theme
 AUR             |            | dracula-gtk-theme-git            | "Dark theme for GTK"
@@ -184,7 +206,7 @@ AUR             |            | dracula-gtk-theme-git            | "Dark theme fo
 AUR             |            | catppuccin-gtk-theme-macchiato   | "Soothing pastel theme for GTK - Macchiato"
 # AUR             | EXTRA      | alacritty-theme-git              | "Collection of Alacritty color schemes." # Broken install
                 |            | nwg-look                         | "GTK settings editor adapted to work on wlroots-based compositors"
-AUR             |            | xcursor-breeze                   | "KDE Plasma 6 'Breeze' cursor theme. This package is for usage in non-KDE Plasma desktops."
+AUR             |            | xcursor-breeze                   | "N/A"
                 |            | kvantum                          | "SVG-based theme engine for Qt6 (including config tool and extra themes)"
                 |            | kvantum-qt5                      | "SVG-based theme engine for Qt5"
 
@@ -214,8 +236,9 @@ AUR             |            | xcursor-breeze                   | "KDE Plasma 6 
 # Communication
                 | EXTRA      | telegram-desktop                 | "Official Telegram Desktop client"
 
-# Computation
+# Electrical Engineering
                 | EXTRA      | octave                           | "A high-level language, primarily intended for numerical computations"
+AUR             | EXTRA      | ltspice                          | "SPICE simulator, schematic capture and waveform viewer."
 
 # Game
                 | EXTRA      | jre21-openjdk                    | "OpenJDK Java 21 full runtime environment"
