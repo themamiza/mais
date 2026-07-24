@@ -34,6 +34,7 @@ functions=(
     is_archlinux
     pacman_install
     aur_install
+    install_essentials
     install_aurhelper
     update_mirrors
 
@@ -45,6 +46,7 @@ functions=(
     command_backup
     command_update_mirrors
     command_install_dotfiles
+    command_install_aurhelper
 )
 
 for function_name in "${functions[@]}"; do

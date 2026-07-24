@@ -87,6 +87,7 @@ syntax_files=(
     "$TEST_ROOT/lib/commands/backup.sh"
     "$TEST_ROOT/lib/commands/update-mirrors.sh"
     "$TEST_ROOT/lib/commands/install-dotfiles.sh"
+    "$TEST_ROOT/lib/commands/install-aurhelper.sh"
 )
 
 for shell_file in "${syntax_files[@]}"; do

@@ -29,6 +29,7 @@ mais_load_module "lib/distro/arch.sh"
 mais_load_module "lib/commands/backup.sh"
 mais_load_module "lib/commands/update-mirrors.sh"
 mais_load_module "lib/commands/install-dotfiles.sh"
+mais_load_module "lib/commands/install-aurhelper.sh"
 
 ### Functions ###
 
@@ -462,19 +463,6 @@ install_programs() {
     done <"$programs_to_install"
 }
 
-install_essentials() {
-    local essential_programs=("base-devel" "git" "rsync")
-
-    sprint "Installing essential programs."
-    for p in "${essential_programs[@]}"; do
-        if check_installed "$p"; then
-            sprint "'$p' is already installed."
-        else
-            pacman_install "$p" "Installing $p which is required to install and configure other packages."
-        fi
-    done
-}
-
 configure_grub() {
     # TODO: This message could be more verbose
     sprint "Configuring grub."
@@ -667,14 +655,7 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
 
 [[ -n "$args_install_dotfiles" ]] && command_install_dotfiles
 
-[ -n "$args_install_aurhelper" ] && {
-    isRoot || eprint "Only root can install packages."
-    wheel_can_sudo
-    ask_username
-    install_essentials
-    install_aurhelper
-    #exit # TODO: check out other options, sometimes we exit after running option and sometimes we don't
-}
+[[ -n "$args_install_aurhelper" ]] && command_install_aurhelper
 
 [ -n "$args_install_programs" ] && {
     isRoot || eprint "Only root can install packages."

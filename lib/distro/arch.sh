@@ -41,6 +41,19 @@ install_aurhelper() {
     sudo -u "$username" sh -c "makepkg --noconfirm -si $cmd_suffix"
 }
 
+install_essentials() {
+    local essential_programs=("base-devel" "git" "rsync")
+
+    sprint "Installing essential programs."
+    for p in "${essential_programs[@]}"; do
+        if check_installed "$p"; then
+            sprint "'$p' is already installed."
+        else
+            pacman_install "$p" "Installing $p which is required to install and configure other packages."
+        fi
+    done
+}
+
 update_mirrors() {
     reflector --country Germany --latest 16 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 }
