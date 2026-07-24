@@ -318,8 +318,8 @@ arch_install_run_in_chroot() {
     local bootloader_id="$6"
     local efi_directory="$7"
     local disk_to_install="$8"
-    local cmd_suffix"$9"
-    local program_name"${10}"
+    local cmd_suffix="$9"
+    local program_name="${10}"
     
     # TODO: Should this be done during initial installation?
     # if command -v nvim >/dev/null 2>&1; then
@@ -712,8 +712,8 @@ configure_keyd() {
 capslock = esc
 esc = capslock\n" > /etc/keyd/default.conf
 
-    systemctl enable --now keyd
-    keyd reload
+    eval "systemctl enable --now keyd $cmd_suffix"
+    eval "keyd reload $cmd_suffix"
 }
 
 sync_file() {
@@ -791,8 +791,8 @@ while [[ $# -gt 0 ]]; do
             ;;
 
         "install-dotfiles")
-            args_install_dotfiles=true; shift
-            [ -n "$2" ] && dotfiles_url="$2" && shift && continue
+            args_install_dotfiles=true 
+            [ -n "$2" ] && dotfiles_url="$2" && shift 2 && continue
             ;;
 
         "install-aurhelper")
@@ -840,7 +840,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
 
-        "-h"|"hostname")
+        "-h"|"--hostname")
             if [ -z "$2" ]; then
                 eprint "'-h' -> You should provide a hostname."
             fi
@@ -901,6 +901,7 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     ask_username
     install_essentials
     install_aurhelper
+    #exit # TODO: check out other options, sometimes we exit after running option and sometimes we don't
 }
 
 [ -n "$args_install_programs" ] && {
