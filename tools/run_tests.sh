@@ -30,14 +30,18 @@ printf 'Checking extracted function locations...\n'
 
 functions=(
     check_installed
+
     is_archlinux
     pacman_install
     aur_install
     install_aurhelper
     update_mirrors
+
     sync_file
     perform_backup
+
     command_backup
+    command_update_mirrors
 )
 
 for function_name in "${functions[@]}"; do
