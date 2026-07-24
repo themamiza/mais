@@ -23,6 +23,9 @@ mais_load_module "lib/core/prompt.sh"
 mais_load_module "lib/core/run.sh"
 mais_load_module "lib/core/sudo.sh"
 
+mais_load_module "lib/distro/detect.sh"
+mais_load_module "lib/distro/arch.sh"
+
 ### Functions ###
 
 # Helper function to report incorrect usage.
@@ -109,18 +112,6 @@ print_help() {
 Written by: drogoniza@gmail.com
 " "$program_name" "$program_name"
 }
-
-# Checks a given name against both the executable and package names.
-check_installed() {
-    # Check if a command is available.
-    command -v "$1" >/dev/null 2>&1 && return 0
-    # Check if a package is available.
-    pacman -Q "$1" >/dev/null 2>&1 && return 0
-    # Return false otherwise.
-    return 1
-}
-
-is_archlinux() { check_installed "pacman" && return 0 || return 1; }
 
 # In case of there not being a 'programs.csv' download it.
 ensure_programs_file() {
@@ -393,35 +384,6 @@ install_package() {
     done <<<"$package_info"
 }
 
-install_aurhelper() {
-    check_installed "$aurhelper" && nprint "Found '$aurhelper'." && return 0
-    
-    nprint "Installing '$aurhelper'."
-    local src="/home/$username/.local/src/$aurhelper"
-    local git_url="https://aur.archlinux.org/$aurhelper.git"
-
-    sudo -u "$username" mkdir -p "/home/$username/.local/src"
-
-    # shellcheck disable=2086
-    if ! sudo -u "$username" sh -c "git clone --depth 1 --single-branch --no-tags '$git_url' '$src' $cmd_suffix"; then
-        cd "$src" || exit 1
-        sudo -u "$username" sh -c "git pull --force origin master $cmd_suffix"
-    fi
-    cd "$src" || exit 1
-    # shellcheck disable=2086
-    sudo -u "$username" sh -c "makepkg --noconfirm -si $cmd_suffix"
-}
-
-pacman_install() {
-    nprint "Installing $1 -> $2"
-    eval "pacman -S --noconfirm '$1' $cmd_suffix"
-}
-
-aur_install() {
-    nprint "Installing $1 -> $2"
-    sudo -u "$username" sh -c "$aurhelper -S --noconfirm $1 $cmd_suffix"
-}
-
 # bugged
 suckless_install() {
     check_installed "$(basename "$1")" && return 0
@@ -665,8 +627,6 @@ perform_backup() {
     wprint "== Backup anything browser related (extension settings, downloads, bookmarks, sync, ...) manually!"
 }
 
-update_mirrors() { reflector --country Germany --latest 16 --protocol https --sort rate --save /etc/pacman.d/mirrorlist; }
-
 ### Handling arguments ###
 
 if [[ $# -lt 1 ]]; then
@@ -694,7 +654,7 @@ while [[ $# -gt 0 ]]; do
         "install-aurhelper")
             [ -z "$2" ] && eprint "\`install-aurhelper\` -> you should provide a 'aurhelper' (yay, paru)."
             args_install_aurhelper=true 
-            # shellcheck disable=2015
+            # shellcheck disable=2015,2034
             re_match "$2" "^(yay|paru)$" && aurhelper="$2" || eprint "'$2' is not a valid aurhelper."
             shift 2
             ;;
