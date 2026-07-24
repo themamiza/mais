@@ -40,8 +40,11 @@ functions=(
     sync_file
     perform_backup
 
+    install_dotfiles
+
     command_backup
     command_update_mirrors
+    command_install_dotfiles
 )
 
 for function_name in "${functions[@]}"; do

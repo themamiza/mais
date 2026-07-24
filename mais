@@ -28,6 +28,7 @@ mais_load_module "lib/distro/arch.sh"
 
 mais_load_module "lib/commands/backup.sh"
 mais_load_module "lib/commands/update-mirrors.sh"
+mais_load_module "lib/commands/install-dotfiles.sh"
 
 ### Functions ###
 
@@ -461,38 +462,6 @@ install_programs() {
     done <"$programs_to_install"
 }
 
-# TODO: Check if this function is fully verbosified.
-install_dotfiles() {
-    local srcdir
-    sprint "Installing dotfiles."
-
-    # Mainly for my convenience.
-    if [ -d "/home/$username/rp/dotfiles" ]; then
-        sprint "Found local dotfiles."
-        srcdir="/home/$username/rp/dotfiles/"
-    else
-        sprint "Cloning remote repository."
-        srcdir="/home/$username/.local/src/$dotfiles_name/"
-        sudo -u "$username" mkdir -p "/home/$username/.local/src"
-        sudo -u "$username" sh -c "git clone --depth 1 --single-branch --no-tags $dotfiles_url /home/$username/.local/src/$dotfiles_name $cmd_suffix" ||
-            {
-                cd "/home/$username/.local/src/$dotfiles_name" || exit 1
-                sudo -u "$username" sh -c "git pull --force origin master $cmd_suffix"
-            }
-        cd "/home/$username/.local/src/$dotfiles_name" || exit 1
-    fi
-
-    sudo -u "$username" rsync -a "$srcdir" "/home/$username"
-
-    # Remove extra files
-    rm "/home/$username/.gitignore" "/home/$username/.gitmodules" "/home/$username/LICENSE" "/home/$username/README.md"
-
-    rm -rf "/home/$username/.git"
-
-    # Symbolic links to useful applications
-    [ -f /opt/v2rayn-bin/v2rayN ] && sudo -u "$username" ln -sf /opt/v2rayn-bin/v2rayN "/home/$username/.local/bin/v2rayn"
-}
-
 install_essentials() {
     local essential_programs=("base-devel" "git" "rsync")
 
@@ -598,6 +567,7 @@ while [[ $# -gt 0 ]]; do
 
         "install-dotfiles")
             args_install_dotfiles=true 
+            # shellcheck disable=2034
             [ -n "$2" ] && dotfiles_url="$2" && shift 2 && continue
             ;;
 
@@ -695,13 +665,7 @@ isRoot && [ -n "$SUDO_USER" ] && username="$SUDO_USER"
     exit
 }
 
-[ -n "$args_install_dotfiles" ] && {
-    isRoot && wheel_can_sudo
-    ask_username
-    install_essentials || eprint "Could not install essential programs.\nHint: Run as root."
-    install_dotfiles
-    exit
-}
+[[ -n "$args_install_dotfiles" ]] && command_install_dotfiles
 
 [ -n "$args_install_aurhelper" ] && {
     isRoot || eprint "Only root can install packages."
