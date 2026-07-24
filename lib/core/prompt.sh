@@ -6,7 +6,7 @@ yes_no() {
     local answer
 
     printf "%s" "$1"
-    read -r answer
+    read -r answer || return 1
     [[ "$answer" == [yY] ]]
 }
 

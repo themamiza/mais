@@ -2,10 +2,7 @@
 
 set -uo pipefail
 
-TEST_ROOT="$(
-    cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 || exit 1
-    pwd -P
-)"
+TEST_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd -P)" || exit 1
 readonly TEST_ROOT
 
 readonly MAIS="$TEST_ROOT/mais"

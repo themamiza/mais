@@ -9,10 +9,7 @@
 
 set -eo pipefail
 
-MAIS_ROOT="$(
-    cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 || exit 1
-    pwd -P
-)"
+MAIS_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)" || exit 1
 readonly MAIS_ROOT
 
 # Bootstrap the module loader.
