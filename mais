@@ -6,6 +6,15 @@
 
 set -eo pipefail
 
+readonly MAIS_ROOT="$(
+    cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1
+    pwd -P
+)"
+
+# Bootstrap the module loader.
+# shellcheck source=lib/core/loader.sh
+source "$MAIS_ROOT/lib/core/loader.sh"
+
 ### Global variables ###
 
 # Saving to a variable for easy use in messages.
@@ -45,9 +54,11 @@ dotfiles_url="https://github.com/themamiza/dotfiles"
 # Dotfiles repository can have different name e.g. voidrice <https://github.com/lukesmithxyz/voidrice>.
 dotfiles_name="$(basename "$dotfiles_url")"
 
-# The script expects a 'programs.csv' file present in the same directory.
-# Check 'programs.csv' for formatting.
-programs_file="programs.csv"
+# TODO: Document the csv file specs.
+# The script expects a programs csv file present in the same directory.
+programs_filename="programs.csv"
+programs_file="$MAIS_ROOT/$programs_filename"
+
 # Path to a tmp file which will just contain name of programs to install.
 programs_to_install="/tmp/programs.tmp"
 # URL to raw programs.csv file. Must follow format that's specified in 'programs.csv'.
@@ -217,16 +228,27 @@ wheel_can_sudo() {
 
 # In case of there not being a 'programs.csv' download it.
 ensure_programs_file() {
-    # Look for a local programs_file
-    [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/$programs_file" ] && return 0
+    local data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/mais"
+    local data_file="$data_dir/$programs_filename"
 
-    # Also look in the same directory for the file
-    [ -f "$programs_file" ] && return 0
+    # Prefer the programs file included in the development repository.
+    if [[ -f "$programs_file" ]]; then
+        return 0
+    fi
 
-    nprint "'$programs_file' not found. Downloading it..."
+    # Fall back to a previously downloaded manifest.
+    if [[ -f "$data_file" ]]; then
+        programs_file="$data_file"
+        return 0
+    fi
 
-    if ! eval "curl -fssL $programs_file_url -o $programs_file $cmd_suffix"; then
-        eprint "Failed to downlaod '$programs_file' from '$programs_file_url'."
+    nprint "'$programs_filename' not found. Downloading it..."
+
+    mkdir -p "$data_dir"
+    programs_file="$data_file"
+
+    if ! eval "curl -fssL '$programs_file_url' -o '$programs_file' $cmd_suffix"; then
+        eprint "Failed to download '$programs_filename' from '$programs_file_url'."
     fi
 }
 

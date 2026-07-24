@@ -1,1 +1,5 @@
-programs.csv.clean
+# Generated standalone release
+/release/
+
+# Generated package from `update-pkg-desc`
+/programs.csv.clean
