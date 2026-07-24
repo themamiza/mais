@@ -79,6 +79,7 @@ syntax_files=(
     "$TEST_ROOT/lib/core/validate.sh"
     "$TEST_ROOT/lib/core/prompt.sh"
     "$TEST_ROOT/lib/core/run.sh"
+    "$TEST_ROOT/lib/core/sudo.sh"
 )
 
 for shell_file in "${syntax_files[@]}"; do
