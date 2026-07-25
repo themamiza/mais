@@ -89,6 +89,8 @@ syntax_files=(
     "$TEST_ROOT/lib/distro/detect.sh"
     "$TEST_ROOT/lib/distro/arch.sh"
 
+    "$TEST_ROOT/lib/cli/parser.sh"
+
     "$TEST_ROOT/lib/commands/arch-install.sh"
     "$TEST_ROOT/lib/commands/backup.sh"
     "$TEST_ROOT/lib/commands/update-mirrors.sh"
@@ -144,6 +146,76 @@ run_test \
     stderr \
     "Can't use '-v' with '-q'." \
     "$MAIS" help --verbose --quiet
+
+run_test \
+    "verbose-before-command" \
+    0 \
+    stdout \
+    "Usage:" \
+    "$MAIS" --verbose help
+
+run_test \
+    "verbose-after-command" \
+    0 \
+    stdout \
+    "Usage:" \
+    "$MAIS" help --verbose
+
+run_test \
+    "complete-command-before-option" \
+    0 \
+    stdout \
+    "Usage:" \
+    "$MAIS" install-aurhelper yay --verbose help
+
+run_test \
+    "option-cannot-split-required-argument" \
+    1 \
+    stderr \
+    "should provide an 'aurhelper'" \
+    "$MAIS" help install-aurhelper --verbose yay
+
+run_test \
+    "option-cannot-split-partition-mode" \
+    1 \
+    stderr \
+    "should provide a 'partition_mode'" \
+    "$MAIS" help arch-install --verbose vm
+
+run_test \
+    "optional-dotfiles-argument-omitted" \
+    0 \
+    stdout \
+    "Usage:" \
+    "$MAIS" install-dotfiles --verbose help
+
+run_test \
+    "detached-dotfiles-argument" \
+    1 \
+    stderr \
+    "Invalid option" \
+    "$MAIS" help install-dotfiles --verbose https://example.com/dotfiles
+
+run_test \
+    "optional-program-tag-omitted" \
+    0 \
+    stdout \
+    "Usage:" \
+    "$MAIS" install-programs --verbose help
+
+run_test \
+    "detached-program-tag" \
+    1 \
+    stderr \
+    "Invalid option" \
+    "$MAIS" help install-programs --verbose DEV
+
+run_test \
+    "options-without-command" \
+    1 \
+    stderr \
+    "No command was provided." \
+    "$MAIS" --verbose
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 

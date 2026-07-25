@@ -92,6 +92,11 @@ functions=(
 
     clean_home
 
+    cli_is_command
+    cli_has_optional_argument
+    invalid_option
+    parse_arguments
+
     command_arch_install
     command_backup
     command_update_mirrors
