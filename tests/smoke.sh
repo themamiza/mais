@@ -90,6 +90,7 @@ syntax_files=(
     "$TEST_ROOT/lib/commands/install-aurhelper.sh"
     "$TEST_ROOT/lib/commands/install-programs.sh"
     "$TEST_ROOT/lib/commands/configure.sh"
+    "$TEST_ROOT/lib/commands/experimental-clean-home.sh"
 )
 
 for shell_file in "${syntax_files[@]}"; do

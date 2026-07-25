@@ -56,12 +56,15 @@ functions=(
     configure_proxychains
     configure_keyd
 
+    clean_home
+
     command_backup
     command_update_mirrors
     command_install_dotfiles
     command_install_aurhelper
     command_install_programs
     command_configure
+    command_experimental_clean_home
 )
 
 for function_name in "${functions[@]}"; do
