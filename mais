@@ -360,9 +360,13 @@ while [[ $# -gt 0 ]]; do
             ;;
 
         "install-dotfiles")
-            args_install_dotfiles=true 
-            # shellcheck disable=2034
-            [ -n "$2" ] && dotfiles_url="$2" && shift 2 && continue
+            args_install_dotfiles=true; shift
+
+            if [[ $# -gt 0 && "$1" != -* ]]; then
+                # shellcheck disable=2034
+                dotfiles_url="$1"
+                shift
+            fi
             ;;
 
         "install-aurhelper")
