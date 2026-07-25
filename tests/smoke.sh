@@ -89,6 +89,7 @@ syntax_files=(
     "$TEST_ROOT/lib/distro/detect.sh"
     "$TEST_ROOT/lib/distro/arch.sh"
 
+    "$TEST_ROOT/lib/commands/arch-install.sh"
     "$TEST_ROOT/lib/commands/backup.sh"
     "$TEST_ROOT/lib/commands/update-mirrors.sh"
     "$TEST_ROOT/lib/commands/install-dotfiles.sh"

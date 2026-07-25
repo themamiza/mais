@@ -65,6 +65,13 @@ functions=(
     install_aurhelper
     update_mirrors
 
+    ensure_mount_point
+    partition_main
+    partition_x220
+    partition_vm
+    arch_install_run_in_chroot
+    arch_install
+
     sync_file
     perform_backup
 
@@ -85,6 +92,7 @@ functions=(
 
     clean_home
 
+    command_arch_install
     command_backup
     command_update_mirrors
     command_install_dotfiles
