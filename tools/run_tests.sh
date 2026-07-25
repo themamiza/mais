@@ -92,6 +92,7 @@ functions=(
     command_install_programs
     command_configure
     command_experimental_clean_home
+    command_install
 )
 
 for function_name in "${functions[@]}"; do

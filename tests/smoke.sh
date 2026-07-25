@@ -96,6 +96,7 @@ syntax_files=(
     "$TEST_ROOT/lib/commands/install-programs.sh"
     "$TEST_ROOT/lib/commands/configure.sh"
     "$TEST_ROOT/lib/commands/experimental-clean-home.sh"
+    "$TEST_ROOT/lib/commands/install.sh"
 )
 
 for shell_file in "${syntax_files[@]}"; do
