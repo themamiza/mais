@@ -5,7 +5,12 @@ set -uo pipefail
 TEST_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd -P)" || exit 1
 readonly TEST_ROOT
 
-readonly MAIS="$TEST_ROOT/mais"
+MAIS="${1:-$TEST_ROOT/mais}"
+readonly MAIS
+[[ -f "$MAIS" ]] || {
+    printf 'Script under test not found: %s\n' "$MAIS" >&2
+    exit 1
+}
 TEST_TMP="$(mktemp -d)" || exit 1
 readonly TEST_TMP
 

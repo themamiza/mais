@@ -12,6 +12,7 @@ set -eo pipefail
 MAIS_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)" || exit 1
 readonly MAIS_ROOT
 
+# BEGIN MAIS MODULE LOADER
 # Bootstrap the module loader.
 # shellcheck source=lib/core/loader.sh
 source "$MAIS_ROOT/lib/core/loader.sh"
@@ -33,6 +34,7 @@ mais_load_module "lib/commands/install-aurhelper.sh"
 mais_load_module "lib/commands/install-programs.sh"
 mais_load_module "lib/commands/configure.sh"
 mais_load_module "lib/commands/experimental-clean-home.sh"
+# END MAIS MODULE LOADER
 
 ### Functions ###
 

@@ -5,6 +5,20 @@ set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd -P)" || exit 1
 readonly ROOT
 
+release=false
+
+case "${1:-}" in
+    "")
+        ;;
+    "--release")
+        release=true
+        ;;
+    *)
+        printf 'Usage: %s [--release]\n' "$(basename "$0")" >&2
+        exit 1
+        ;;
+esac
+
 files=("$ROOT/mais")
 
 while IFS= read -r -d '' file; do
@@ -16,8 +30,21 @@ for file in "${files[@]}"; do
     bash -n "$file"
 done
 
-printf 'Running smoke tests...\n'
-"$ROOT/tests/smoke.sh"
+if $release; then
+    printf 'Building standalone release...\n'
+    "$ROOT/tools/build.sh"
+
+    [[ -x "$ROOT/release/mais" ]] || {
+        printf 'Standalone release was not created or is not executable.\n' >&2
+        exit 1
+    }
+
+    printf 'Running release smoke tests...\n'
+    "$ROOT/tests/smoke.sh" "$ROOT/release/mais"
+else
+    printf 'Running modular smoke tests...\n'
+    "$ROOT/tests/smoke.sh" "$ROOT/mais"
+fi
 
 printf 'Running ShellCheck...\n'
 command -v shellcheck >/dev/null 2>&1 || {
