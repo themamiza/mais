@@ -50,11 +50,18 @@ functions=(
 
     install_dotfiles
 
+    configure_grub
+    configure_pacman
+    configure_makepkg
+    configure_proxychains
+    configure_keyd
+
     command_backup
     command_update_mirrors
     command_install_dotfiles
     command_install_aurhelper
     command_install_programs
+    command_configure
 )
 
 for function_name in "${functions[@]}"; do
