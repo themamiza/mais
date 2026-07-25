@@ -36,11 +36,11 @@ dotfiles_url="https://github.com/themamiza/dotfiles"
 dotfiles_name="$(basename "$dotfiles_url")"
 
 # TODO: Document the csv file specs.
-# The script expects a programs csv file present in the same directory.
+# The development repository stores the programs file under data/.
 programs_filename="programs.csv"
-programs_file="$MAIS_ROOT/$programs_filename"
+programs_file="$MAIS_ROOT/data/$programs_filename"
 
 # Path to a tmp file which will just contain name of programs to install.
 programs_to_install="/tmp/programs.tmp"
-# URL to raw programs.csv file. Must follow format that's specified in 'programs.csv'.
-programs_file_url="https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/programs.csv"
+# Remote programs file used by the standalone release.
+programs_file_url="https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/data/programs.csv"

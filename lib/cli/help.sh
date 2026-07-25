@@ -42,7 +42,7 @@ print_help() {
 
                 Install programs from a 'programs.csv' file
 
-                Read 'programs.csv' for more information about tags and the file itself
+                Read 'data/programs.csv' for more information about tags and the file itself
                 
                 
         configure           Do various system configurations (See README.md for details)

@@ -2,4 +2,4 @@
 /release/
 
 # Generated package from `update-pkg-desc`
-/programs.csv.clean
+/data/programs.csv.clean
