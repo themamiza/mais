@@ -92,10 +92,13 @@ functions=(
 
     clean_home
 
+    print_help
     cli_is_command
     cli_has_optional_argument
     invalid_option
     parse_arguments
+    resolve_runtime_defaults
+    dispatch_commands
 
     command_arch_install
     command_backup
