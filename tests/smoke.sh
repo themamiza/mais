@@ -76,6 +76,28 @@ run_test() {
     ((passed++))
 }
 
+run_parser() {
+    bash -c '
+        set -e
+
+        MAIS_ROOT="$1"
+        shift
+
+        source "$MAIS_ROOT/lib/core/config.sh"
+        source "$MAIS_ROOT/lib/core/log.sh"
+        source "$MAIS_ROOT/lib/core/validate.sh"
+        source "$MAIS_ROOT/lib/cli/help.sh"
+        source "$MAIS_ROOT/lib/cli/parser.sh"
+
+        parse_arguments "$@"
+
+        printf "aurhelper=%s\n" "${aurhelper:-}"
+        printf "programs=%s\n" "${programs:-}"
+        printf "dotfiles_url=%s\n" "${dotfiles_url:-}"
+        printf "verbose=%s\n" "$verbose"
+    ' _ "$TEST_ROOT" "$@"
+}
+
 syntax_files=(
     "$MAIS"
     "$TEST_ROOT/lib/core/loader.sh"
@@ -167,50 +189,50 @@ run_test \
     "complete-command-before-option" \
     0 \
     stdout \
-    "Usage:" \
-    "$MAIS" install-aurhelper yay --verbose help
+    "aurhelper=yay" \
+    run_parser install-aurhelper yay --verbose
 
 run_test \
     "option-cannot-split-required-argument" \
     1 \
     stderr \
     "should provide an 'aurhelper'" \
-    "$MAIS" help install-aurhelper --verbose yay
+    "$MAIS" install-aurhelper --verbose yay
 
 run_test \
     "option-cannot-split-partition-mode" \
     1 \
     stderr \
     "should provide a 'partition_mode'" \
-    "$MAIS" help arch-install --verbose vm
+    "$MAIS" arch-install --verbose vm
 
 run_test \
     "optional-dotfiles-argument-omitted" \
     0 \
     stdout \
-    "Usage:" \
-    "$MAIS" install-dotfiles --verbose help
+    "dotfiles_url=https://github.com/themamiza/dotfiles" \
+    run_parser install-dotfiles --verbose
 
 run_test \
     "detached-dotfiles-argument" \
     1 \
     stderr \
     "Invalid option" \
-    "$MAIS" help install-dotfiles --verbose https://example.com/dotfiles
+    "$MAIS" install-dotfiles --verbose https://example.com/dotfiles
 
 run_test \
     "optional-program-tag-omitted" \
     0 \
     stdout \
-    "Usage:" \
-    "$MAIS" install-programs --verbose help
+    "programs=ALL" \
+    run_parser install-programs --verbose
 
 run_test \
     "detached-program-tag" \
     1 \
     stderr \
     "Invalid option" \
-    "$MAIS" help install-programs --verbose DEV
+    "$MAIS" install-programs --verbose DEV
 
 run_test \
     "options-without-command" \
@@ -218,6 +240,27 @@ run_test \
     stderr \
     "No command was provided." \
     "$MAIS" --verbose
+
+run_test \
+    "multiple-commands" \
+    1 \
+    stderr \
+    "Only one command can be provided" \
+    "$MAIS" help configure
+
+run_test \
+    "duplicate-command" \
+    1 \
+    stderr \
+    "Only one command can be provided" \
+    "$MAIS" help help
+
+run_test \
+    "option-between-commands" \
+    1 \
+    stderr \
+    "Only one command can be provided" \
+    "$MAIS" help --verbose configure
 
 # shellcheck disable=2016
 run_test \

@@ -36,6 +36,7 @@ cli_has_optional_argument() {
 
 parse_arguments() {
     local command_seen=false
+    local selected_command=""
 
     if [[ $# -lt 1 ]]; then
         print_help
@@ -43,16 +44,23 @@ parse_arguments() {
     fi
 
     while [[ $# -gt 0 ]]; do
+        if cli_is_command "$1"; then
+            if $command_seen; then
+                eprint "Only one command can be provided ('$selected_command' and '$1')."
+            fi
+
+            command_seen=true
+            selected_command="$1"
+        fi
+
         case "$1" in
             "help")
                 help=true
-                command_seen=true
                 shift
                 ;;
 
             "arch-install")
                 args_arch_install=true
-                command_seen=true
 
                 if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]] ||
                     cli_is_command "${2:-}"; then
@@ -69,7 +77,6 @@ parse_arguments() {
 
             "install-dotfiles")
                 args_install_dotfiles=true
-                command_seen=true
 
                 if cli_has_optional_argument "${2:-}"; then
                     dotfiles_url="$2"
@@ -82,10 +89,8 @@ parse_arguments() {
 
             "install-aurhelper")
                 args_install_aurhelper=true
-                command_seen=true
 
-                if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]] ||
-                    cli_is_command "${2:-}"; then
+                if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]] || cli_is_command "${2:-}"; then
                     eprint "\`install-aurhelper\` -> you should provide an 'aurhelper' (yay, paru)."
                 fi
 
@@ -99,7 +104,6 @@ parse_arguments() {
 
             "install-programs")
                 args_install_programs=true
-                command_seen=true
                 programs="ALL"
 
                 if cli_has_optional_argument "${2:-}"; then
@@ -116,19 +120,16 @@ parse_arguments() {
 
             "configure")
                 args_configure=true
-                command_seen=true
                 shift
                 ;;
 
             "experimental-clean-home")
                 args_clean_home=true
-                command_seen=true
                 shift
                 ;;
 
             "backup")
                 args_backup=true
-                command_seen=true
                 backup_name="backup_$(date "+%Y-%m-%d_%H:%M")"
 
                 if cli_has_optional_argument "${2:-}"; then
@@ -145,13 +146,11 @@ parse_arguments() {
 
             "update-mirrors")
                 args_update_mirrors=true
-                command_seen=true
                 shift
                 ;;
 
             "install")
                 args_install=true
-                command_seen=true
                 shift
                 ;;
 
