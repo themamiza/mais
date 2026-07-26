@@ -94,7 +94,7 @@ functions=(
 
     print_help
     cli_is_command
-    cli_has_optional_argument
+    cli_is_argument_value
     invalid_option
     parse_arguments
     resolve_runtime_defaults

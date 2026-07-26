@@ -27,7 +27,7 @@ cli_is_command() {
     return 1
 }
 
-cli_has_optional_argument() {
+cli_is_argument_value() {
     local value="${1:-}"
 
     [[ -n "$value" && "$value" != -* ]] || return 1
@@ -62,8 +62,7 @@ parse_arguments() {
             "arch-install")
                 args_arch_install=true
 
-                if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]] ||
-                    cli_is_command "${2:-}"; then
+                if [[ $# -lt 2 ]] || ! cli_is_argument_value "${2:-}"; then
                     eprint "\`arch-install\` -> you should provide a 'partition_mode' (vm, main, x220, mounted)."
                 fi
 
@@ -78,7 +77,7 @@ parse_arguments() {
             "install-dotfiles")
                 args_install_dotfiles=true
 
-                if cli_has_optional_argument "${2:-}"; then
+                if cli_is_argument_value "${2:-}"; then
                     dotfiles_url="$2"
                     dotfiles_name="$(basename "$dotfiles_url")"
                     shift 2
@@ -90,7 +89,7 @@ parse_arguments() {
             "install-aurhelper")
                 args_install_aurhelper=true
 
-                if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]] || cli_is_command "${2:-}"; then
+                if [[ $# -lt 2 ]] || ! cli_is_argument_value "${2:-}"; then
                     eprint "\`install-aurhelper\` -> you should provide an 'aurhelper' (yay, paru)."
                 fi
 
@@ -106,7 +105,7 @@ parse_arguments() {
                 args_install_programs=true
                 programs="ALL"
 
-                if cli_has_optional_argument "${2:-}"; then
+                if cli_is_argument_value "${2:-}"; then
                     if ! re_match "$2" "^(X11|DWM|WAYLAND|HYPRLAND|DEV|PYTHON|CLANG|LUA|BASH|JS|EXTRA|VIRT|ALL)$"; then
                         eprint "'$2' is not a valid tag."
                     fi
@@ -132,7 +131,7 @@ parse_arguments() {
                 args_backup=true
                 backup_name="backup_$(date "+%Y-%m-%d_%H:%M")"
 
-                if cli_has_optional_argument "${2:-}"; then
+                if cli_is_argument_value "${2:-}"; then
                     if ! re_match "$2" "$regex_valid_directory"; then
                         eprint "'$2' is not a valid backup name."
                     fi
@@ -166,7 +165,7 @@ parse_arguments() {
                 ;;
 
             "-u"|"--username")
-                if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]]; then
+                if [[ $# -lt 2 ]] || ! cli_is_argument_value "${2:-}"; then
                     eprint "'$1' -> You should provide a username."
                 fi
 
@@ -181,7 +180,7 @@ Give a username beginning with a letter, with only lowercase letters, - or _."
                 ;;
 
             "-h"|"--hostname")
-                if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]]; then
+                if [[ $# -lt 2 ]] || ! cli_is_argument_value "${2:-}"; then
                     eprint "'$1' -> You should provide a hostname."
                 fi
 
@@ -196,7 +195,7 @@ Give a hostname beginning with a letter, with only lowercase letters, - or _."
                 ;;
 
             "-t"|"--timezone")
-                if [[ $# -lt 2 || -z "${2:-}" || "$2" == -* ]]; then
+                if [[ $# -lt 2 ]] || ! cli_is_argument_value "${2:-}"; then
                     eprint "'$1' -> You should provide a timezone."
                 fi
 

@@ -91,6 +91,10 @@ run_parser() {
 
         parse_arguments "$@"
 
+        printf "username=%s\n" "${username:-}"
+        printf "hostname=%s\n" "${hostname:-}"
+        printf "timezone=%s\n" "${timezone:-}"
+
         printf "aurhelper=%s\n" "${aurhelper:-}"
         printf "programs=%s\n" "${programs:-}"
         printf "dotfiles_url=%s\n" "${dotfiles_url:-}"
@@ -261,6 +265,41 @@ run_test \
     stderr \
     "Only one command can be provided" \
     "$MAIS" help --verbose configure
+
+run_test \
+    "valid-username-before-command" \
+    0 \
+    stdout \
+    "username=testuser" \
+    run_parser --username testuser help
+
+run_test \
+    "command-cannot-be-username" \
+    1 \
+    stderr \
+    "You should provide a username" \
+    "$MAIS" help --username configure
+
+run_test \
+    "command-cannot-be-hostname" \
+    1 \
+    stderr \
+    "You should provide a hostname" \
+    "$MAIS" configure --hostname install
+
+run_test \
+    "command-cannot-be-timezone" \
+    1 \
+    stderr \
+    "You should provide a timezone" \
+    "$MAIS" help --timezone configure
+
+run_test \
+    "option-cannot-be-username" \
+    1 \
+    stderr \
+    "You should provide a username" \
+    "$MAIS" help --username --verbose
 
 # shellcheck disable=2016
 run_test \
