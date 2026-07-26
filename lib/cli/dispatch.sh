@@ -35,4 +35,6 @@ dispatch_commands() {
     [[ -n "$args_update_mirrors" ]] && command_update_mirrors
 
     [[ -n "$args_install" ]] && command_install
+
+    return 0
 }

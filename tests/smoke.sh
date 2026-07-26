@@ -219,6 +219,64 @@ run_test \
     "No command was provided." \
     "$MAIS" --verbose
 
+# shellcheck disable=2016
+run_test \
+   "successful-command-dispatch" \
+   0 \
+   stdout \
+   "dispatch completed" \
+   bash -c '
+       set -e
+       source "$1"
+
+       help=""
+       args_arch_install=""
+       args_install_dotfiles=""
+       args_install_aurhelper=""
+       args_install_programs=""
+       args_configure=true
+       args_clean_home=""
+       args_backup=""
+       args_update_mirrors=""
+       args_install=""
+
+       command_configure() {
+           return 0
+       }
+
+       dispatch_commands
+       printf "dispatch completed\n"
+   ' _ "$TEST_ROOT/lib/cli/dispatch.sh"
+
+# shellcheck disable=2016
+run_test \
+    "failed-command-dispatch" \
+    7 \
+    stderr \
+    "command failed" \
+    bash -c '
+        set -e
+        source "$1"
+
+        help=""
+        args_arch_install=""
+        args_install_dotfiles=""
+        args_install_aurhelper=""
+        args_install_programs=""
+        args_configure=true
+        args_clean_home=""
+        args_backup=""
+        args_update_mirrors=""
+        args_install=""
+
+        command_configure() {
+            printf "command failed\n" >&2
+            return 7
+        }
+
+        dispatch_commands
+    ' _ "$TEST_ROOT/lib/cli/dispatch.sh"
+
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 
 (( failed == 0 ))
