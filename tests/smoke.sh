@@ -102,6 +102,91 @@ run_parser() {
     ' _ "$TEST_ROOT" "$@"
 }
 
+run_program_selection() {
+    local tag="$1"
+
+    bash -c '
+        set -e
+
+        source "$1"
+
+        programs_file="$2/programs.csv"
+        programs_to_install="$2/programs.tmp"
+
+        cat >"$programs_file.clean" <<EOF
+|X11|xorg-server|"X11 server"
+Suckless|DWM|dwm|"Window manager"
+|WAYLAND|wl-clipboard|"Wayland clipboard"
+|HYPRLAND|hyprland|"Wayland compositor"
+|DEV|emacs|"Development editor"
+|PYTHON|python|"Python language"
+|VIRT|qemu-full|"Virtual machine package"
+|EXTRA|virt-viewer|"Description mentions VIRT"
+||base-package|"Always installed"
+EOF
+
+        lspci() {
+            return 1
+        }
+
+        selected=()
+
+        install_package() {
+            selected+=("$1")
+        }
+
+        install_programs "$3"
+
+        printf "selected=<%s>\n" "${selected[*]}"
+    ' _ \
+        "$TEST_ROOT/lib/commands/install-programs.sh" \
+        "$TEST_TMP" \
+        "$tag"
+}
+
+run_package_lookup() {
+    bash -c '
+        set -e
+
+        source "$1"
+
+        programs_file="$2/programs.csv"
+
+        cat >"$programs_file.clean" <<EOF
+|EXTRA|alacritty|"Terminal emulator"
+AUR|EXTRA|alacritty-theme-git|"Color themes"
+EOF
+
+        check_installed() {
+            return 1
+        }
+
+        calls=()
+
+        pacman_install() {
+            calls+=("pacman:$1")
+        }
+
+        aur_install() {
+            calls+=("aur:$1")
+        }
+
+        suckless_install() {
+            calls+=("suckless:$1")
+        }
+
+        doomemacs_install() {
+            calls+=("doom:$1")
+        }
+
+        install_package alacritty
+
+        printf "calls=<%s>\n" "${calls[*]}"
+    ' _ \
+        "$TEST_ROOT/lib/commands/install-programs.sh" \
+        "$TEST_TMP"
+}
+
 syntax_files=(
     "$MAIS"
     "$TEST_ROOT/lib/core/loader.sh"
@@ -237,6 +322,48 @@ run_test \
     stderr \
     "Invalid option" \
     "$MAIS" install-programs --verbose DEV
+
+run_test \
+    "virt-program-selection" \
+    0 \
+    stdout \
+    "selected=<qemu-full base-package>" \
+    run_program_selection VIRT
+
+run_test \
+    "dwm-program-selection" \
+    0 \
+    stdout \
+    "selected=<xorg-server dwm base-package>" \
+    run_program_selection DWM
+
+run_test \
+    "hyprland-program-selection" \
+    0 \
+    stdout \
+    "selected=<wl-clipboard hyprland base-package>" \
+    run_program_selection HYPRLAND
+
+run_test \
+    "dev-program-selection" \
+    0 \
+    stdout \
+    "selected=<emacs python base-package>" \
+    run_program_selection DEV
+
+run_test \
+    "all-program-selection" \
+    0 \
+    stdout \
+    "selected=<xorg-server dwm wl-clipboard hyprland emacs python qemu-full virt-viewer base-package>" \
+    run_program_selection ALL
+
+run_test \
+    "exact-package-lookup" \
+    0 \
+    stdout \
+    "calls=<pacman:alacritty>" \
+    run_package_lookup
 
 run_test \
     "options-without-command" \

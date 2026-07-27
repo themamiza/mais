@@ -51,8 +51,8 @@ get_programs_by_tag() {
 install_package() {
     check_installed "$1" && nprint "Found '$1'." && return 0
 
-    # TODO: This grep does not work properly: 'alacritty' matches 'alacritty-theme-git' too.
-    local package_info; package_info="$(grep "$1" "$programs_file.clean")"
+    local package_info
+    package_info="$(awk -F'|' -v package="$1" '$3 == package { print; exit }' "$programs_file.clean")"
 
     while IFS="|" read -r method _ _ description; do
         case "$method" in
