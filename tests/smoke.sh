@@ -187,6 +187,50 @@ EOF
         "$TEST_TMP"
 }
 
+run_git_sync() {
+    local repository_state="$1"
+
+    bash -c '
+        source "$1"
+
+        destination="$2/repository"
+        repository_state="$3"
+        calls=()
+
+        case "$repository_state" in
+            existing)
+                mkdir -p "$destination/.git"
+                ;;
+            non-git)
+                mkdir -p "$destination"
+                ;;
+        esac
+
+        run_cmd() {
+            case " $* " in
+                *" mkdir -p "*) calls+=("mkdir");;
+                *" git -C "*" pull --ff-only "*) calls+=("pull");;
+                *" git clone "*) calls+=("clone");;
+            esac
+        }
+
+        eprint() {
+            printf "%s\n" "$1" >&2
+            exit 1
+        }
+
+        sync_git_repo \
+            testuser \
+            https://example.com/repository.git \
+            "$destination"
+
+        printf "calls=<%s>\n" "${calls[*]}"
+    ' _ \
+        "$TEST_ROOT/lib/core/run.sh" \
+        "$TEST_TMP" \
+        "$repository_state"
+}
+
 syntax_files=(
     "$MAIS"
     "$TEST_ROOT/lib/core/loader.sh"
@@ -532,6 +576,27 @@ run_test \
 
         printf "status=%d\n" "$status"
     ' _ "$TEST_ROOT/lib/core/run.sh"
+
+run_test \
+    "git-sync-clones-missing-repository" \
+    0 \
+    stdout \
+    "calls=<mkdir clone>" \
+    run_git_sync missing
+
+run_test \
+    "git-sync-rejects-non-git-directory" \
+    1 \
+    stderr \
+    "exists but is not a Git repository" \
+    run_git_sync non-git
+
+run_test \
+    "git-sync-updates-existing-repository" \
+    0 \
+    stdout \
+    "calls=<mkdir pull>" \
+    run_git_sync existing
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 

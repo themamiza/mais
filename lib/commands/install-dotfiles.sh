@@ -12,15 +12,14 @@ install_dotfiles() {
         sprint "Found local dotfiles."
         srcdir="/home/$username/rp/dotfiles/"
     else
-        sprint "Cloning remote repository."
-        srcdir="/home/$username/.local/src/$dotfiles_name/"
-        sudo -u "$username" mkdir -p "/home/$username/.local/src"
-        sudo -u "$username" sh -c "git clone --depth 1 --single-branch --no-tags $dotfiles_url /home/$username/.local/src/$dotfiles_name $cmd_suffix" ||
-            {
-                cd "/home/$username/.local/src/$dotfiles_name" || exit 1
-                sudo -u "$username" sh -c "git pull --force origin master $cmd_suffix"
-            }
-        cd "/home/$username/.local/src/$dotfiles_name" || exit 1
+        local repo_dir
+
+        sprint "Cloning or updating remote repository."
+        repo_dir="/home/$username/.local/src/$dotfiles_name"
+
+        sync_git_repo "$username" "$dotfiles_url" "$repo_dir"
+
+        srcdir="$repo_dir/"
     fi
 
     sudo -u "$username" rsync -a "$srcdir" "/home/$username"

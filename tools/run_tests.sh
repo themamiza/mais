@@ -65,6 +65,10 @@ functions=(
     install_aurhelper
     update_mirrors
 
+    run_cmd
+    sync_git_repo
+    check_internet_connection
+
     ensure_mount_point
     partition_main
     partition_x220

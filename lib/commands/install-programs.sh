@@ -23,7 +23,7 @@ ensure_programs_file() {
     mkdir -p "$data_dir"
     programs_file="$data_file"
 
-    if ! eval "curl -fssL '$programs_file_url' -o '$programs_file' $cmd_suffix"; then
+    if ! run_cmd curl -fssL "$programs_file_url" -o "$programs_file"; then
         eprint "Failed to download '$programs_filename' from '$programs_file_url'."
     fi
 }
@@ -64,7 +64,6 @@ install_package() {
     done <<<"$package_info"
 }
 
-# bugged
 suckless_install() {
     check_installed "$(basename "$1")" && return 0
 
@@ -77,18 +76,10 @@ suckless_install() {
     local src; src="/home/$username/.local/src/$(basename "$repo")"
     local git_url="https://github.com/$repo.git"
 
-    sudo -u "$username" mkdir -p "/home/$username/.local/src"
+    sync_git_repo "$username" "$git_url" "$src"
 
-    # shellcheck disable=2086
-    if ! sudo -u "$username" sh -c "git clone --depth 1 --single-branch --no-tags '$git_url' '$src' $cmd_suffix"; then
-        cd "$src" || exit 1
-        sudo -u "$username" sh -c "git pull --force origin master $cmd_suffix"
-    fi
-    cd "$src" || exit 1
-    # shellcheck disable=2086
-    eval "make $cmd_suffix"
-    # shellcheck disable=2086
-    eval "make install $cmd_suffix"
+    run_cmd make -C "$src"
+    run_cmd make -C "$src" install
 }
 
 doomemacs_install() {
