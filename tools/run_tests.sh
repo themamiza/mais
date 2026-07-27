@@ -77,6 +77,7 @@ functions=(
 
     ensure_programs_file
     clean_programs_file
+    get_programs_by_tag
     install_package
     suckless_install
     doomemacs_install

@@ -41,6 +41,13 @@ clean_programs_file() {
         ' "$programs_file.clean"
 }
 
+get_programs_by_tag() {
+    local tag_regex="$1"
+    local cleaned_file="$2"
+
+    awk -F'|' -v tag_regex="$tag_regex" '$2 ~ tag_regex { print $3 }' "$cleaned_file"
+}
+
 install_package() {
     check_installed "$1" && nprint "Found '$1'." && return 0
 
@@ -95,31 +102,26 @@ install_programs() {
     # Grab programs and add to tmp file based on the tag that is provided.
     # case matches the tags to it's children.
     case "$1" in
-        "X11")      grep -E "X11"                          "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "DWM")      grep -E "X11|DWM"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "WAYLAND")  grep -E "WAYLAND"                      "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "HYPRLAND") grep -E "WAYLAND|HYPRLAND"             "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "DEV")      grep -E "DEV|PYTHON|CLANG|LUA|BASH|JS" "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "PYTHON")   grep -E "PYTHON"                       "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "CLANG")    grep -E "CLANG"                        "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "LUA")      grep -E "LUA"                          "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "BASH")     grep -E "BASH"                         "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "JS")       grep -E "JS"                           "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "EXTRA")    grep -E "EXTRA"                        "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install";;
-        "ALL") cut -d"|" -f3 "$programs_file.clean" >> "$programs_to_install";;
+        "X11")      get_programs_by_tag "^X11$"                       "$programs_file.clean" >> "$programs_to_install";;
+        "DWM")      get_programs_by_tag "^(X11|DWM)$"                 "$programs_file.clean" >> "$programs_to_install";;
+        "WAYLAND")  get_programs_by_tag "^WAYLAND$"                   "$programs_file.clean" >> "$programs_to_install";;
+        "HYPRLAND") get_programs_by_tag "^(WAYLAND|HYPRLAND)$"        "$programs_file.clean" >> "$programs_to_install";;
+        "DEV")      get_programs_by_tag "^(DEV|PYTHON|CLANG|LUA|BASH|JS)$" "$programs_file.clean" >> "$programs_to_install";;
+        "PYTHON")   get_programs_by_tag "^PYTHON$"                    "$programs_file.clean" >> "$programs_to_install";;
+        "CLANG")    get_programs_by_tag "^CLANG$"                     "$programs_file.clean" >> "$programs_to_install";;
+        "LUA")      get_programs_by_tag "^LUA$"                       "$programs_file.clean" >> "$programs_to_install";;
+        "BASH")     get_programs_by_tag "^BASH$"                      "$programs_file.clean" >> "$programs_to_install";;
+        "JS")       get_programs_by_tag "^JS$"                        "$programs_file.clean" >> "$programs_to_install";;
+        "VIRT")     get_programs_by_tag "^VIRT$"                      "$programs_file.clean" >> "$programs_to_install";;
+        "EXTRA")    get_programs_by_tag "^EXTRA$"                     "$programs_file.clean" >> "$programs_to_install";;
+        "ALL")      cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install";;
     esac
 
     # Also grab lines that have no tag set.
-    awk -F'|' '
-      {
-        original_line = $0
-      }
-      NF && $1 !~ /^#/ {
-        field2 = $2
-        gsub(/^[ \t]+|[ \t]+$/, "", field2)
-        if (field2 == "") print original_line
-      }
-    ' "$programs_file.clean" | cut -d"|" -f3 >> "$programs_to_install"
+    if [[ "$1" != "ALL" ]]; then
+        get_programs_by_tag "^$" "$programs_file.clean" >> "$programs_to_install"
+    fi
+    # TODO: For a specific tag, untagged programs are still always included.
 
     # Install nvidia drivers if there's an nvidia gpu
     if lspci | grep -qi nvidia; then
