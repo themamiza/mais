@@ -7,12 +7,20 @@ isRoot() {
     [ "$(id -u)" == 0 ]
 }
 
+run_cmd() {
+    if $verbose; then
+        "$@"
+    else
+        "$@" > /dev/null 2>&1
+    fi
+}
+
 check_internet_connection() {
     local target="google.com"
 
-    if eval "curl -sSf https://$target -o /dev/null $cmd_suffix"; then
+    if run_cmd curl -sSf "https://$target" -o /dev/null; then
         return 0
-    elif eval "ping -c1 -W1 $target $cmd_suffix"; then
+    elif run_cmd ping -c1 -W1 "$target"; then
         return 0
     else
         return 1

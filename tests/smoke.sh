@@ -486,6 +486,53 @@ run_test \
         dispatch_commands
     ' _ "$TEST_ROOT/lib/cli/dispatch.sh"
 
+# shellcheck disable=2016
+run_test \
+    "run-command-suppresses-output" \
+    0 \
+    stdout \
+    "output=<>" \
+    bash -c '
+        source "$1"
+
+        verbose=false
+        output="$(run_cmd bash -c "printf visible; printf error >&2")"
+
+        printf "output=<%s>\n" "$output"
+    ' _ "$TEST_ROOT/lib/core/run.sh"
+
+# shellcheck disable=2016
+run_test \
+    "run-command-shows-output" \
+    0 \
+    stdout \
+    "output=<visible>" \
+    bash -c '
+        source "$1"
+
+        verbose=true
+        output="$(run_cmd printf visible)"
+
+        printf "output=<%s>\n" "$output"
+    ' _ "$TEST_ROOT/lib/core/run.sh"
+
+# shellcheck disable=2016
+run_test \
+    "run-command-preserves-status" \
+    0 \
+    stdout \
+    "status=7" \
+    bash -c '
+        source "$1"
+
+        verbose=false
+
+        run_cmd bash -c "exit 7"
+        status=$?
+
+        printf "status=%d\n" "$status"
+    ' _ "$TEST_ROOT/lib/core/run.sh"
+
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 
 (( failed == 0 ))
