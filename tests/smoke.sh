@@ -501,6 +501,83 @@ EOF
     ' _ "$TEST_ROOT" "$TEST_TMP"
 }
 
+run_grub_existing_resume_configuration() {
+    bash -c '
+        source "$1/lib/core/validate.sh"
+        source "$1/lib/commands/configure/grub.sh"
+
+        test_dir="$2/grub-existing-resume"
+        rm -rf "$test_dir"
+        mkdir -p "$test_dir"
+
+        grub_defaults_file="$test_dir/default-grub"
+        grub_mkinitcpio_file="$test_dir/mkinitcpio.conf"
+        grub_output_file="$test_dir/grub.cfg"
+        grub_power_state_file="$test_dir/power-state"
+        grub_image_size_file="$test_dir/image-size"
+        grub_meminfo_file="$test_dir/meminfo"
+        grub_swaps_file="$test_dir/swaps"
+
+        cat > "$grub_defaults_file" <<EOF
+GRUB_TIMEOUT=5
+GRUB_DEFAULT=0
+GRUB_CMDLINE_LINUX_DEFAULT="resume=UUID=old-uuid loglevel=3"
+EOF
+
+        printf "HOOKS=(base udev autodetect resume fsck)\n" \
+            > "$grub_mkinitcpio_file"
+
+        printf "freeze mem disk\n" \
+            > "$grub_power_state_file"
+
+        printf "%d\n" "$((4 * 1024 * 1024 * 1024))" \
+            > "$grub_image_size_file"
+
+        printf "MemTotal: 16777216 kB\n" \
+            > "$grub_meminfo_file"
+
+        cat > "$grub_swaps_file" <<EOF
+Filename Type Size Used Priority
+/dev/sda2 partition 6291456 0 -2
+EOF
+
+        grub_block_type() {
+            printf "part\n"
+        }
+
+        grub_swap_uuid() {
+            printf "test-swap-uuid\n"
+        }
+
+        sprint() {
+            :
+        }
+
+        wprint() {
+            printf "warning=<%s>\n" "$1"
+        }
+
+        run_cmd() {
+            :
+        }
+
+        configure_grub
+
+        grub_line="$(
+            grep "^GRUB_CMDLINE_LINUX_DEFAULT=" \
+                "$grub_defaults_file"
+        )"
+
+        resume_count="$(
+            grep -o "resume=" <<< "$grub_line" |
+                wc -l
+        )"
+
+        printf "grub=<%s>\n" "$grub_line"
+        printf "resume-count=<%s>\n" "$resume_count"
+    ' _ "$TEST_ROOT" "$TEST_TMP"
+}
+
 run_grub_without_swap() {
     bash -c '
         source "$1/lib/core/validate.sh"
@@ -1046,6 +1123,21 @@ run_test \
     stdout \
     "grub-mkconfig -o" \
     run_grub_hibernation_configuration
+
+run_test \
+    "grub-replaces-existing-resume-uuid" \
+    0 \
+    stdout \
+    'grub=<GRUB_CMDLINE_LINUX_DEFAULT="'\
+'resume=UUID=test-swap-uuid loglevel=3">' \
+    run_grub_existing_resume_configuration
+
+run_test \
+    "grub-does-not-duplicate-resume-option" \
+    0 \
+    stdout \
+    "resume-count=<1>" \
+    run_grub_existing_resume_configuration
 
 run_test \
     "grub-regenerated-without-swap" \

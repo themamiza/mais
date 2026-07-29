@@ -23,7 +23,6 @@ bytes_to_gb() {
 
 can_hibernate() {
     [[ -r "$grub_power_state_file" ]] || return 1
-    [[ -r "$grub_image_size_file" ]] || return 1
 
     grep -qw disk "$grub_power_state_file"
 }
@@ -33,7 +32,7 @@ hibernation_required_swap_gb() {
     local margin_bytes
 
     # Default to the image size that the kernel recommends.
-    read -r image_size_bytes < "$grub_image_size_file" || return 1
+    read -r image_size_bytes < "$grub_image_size_file" || true
 
     # If not able to read the default value use 2/5 of the RAM size.
     if ! is_number "$image_size_bytes" || (( image_size_bytes == 0 )); then
@@ -164,7 +163,7 @@ configure_grub() {
                 fi
 
                 if grep -qE '^GRUB_CMDLINE_LINUX_DEFAULT=.*resume=' "$grub_defaults_file"; then
-                    sed -Ei "/^GRUB_CMDLINE_LINUX_DEFAULT=/s#" "resume=[^ \"']+#resume=UUID=$swap_uuid#" "$grub_defaults_file"
+                    sed -Ei "/^GRUB_CMDLINE_LINUX_DEFAULT=/s#resume=[^ \"']+#resume=UUID=${swap_uuid}#" "$grub_defaults_file"
                 else
                     sed -Ei '/^GRUB_CMDLINE_LINUX_DEFAULT=/ { s/"$/ resume=UUID='"$swap_uuid"'"/; }' "$grub_defaults_file"
                 fi
