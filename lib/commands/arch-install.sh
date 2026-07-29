@@ -91,9 +91,10 @@ arch_install_run_in_chroot() {
     local efi_directory="$7"
     local disk_to_install="$8"
 
-    local verbose="$9"
-    local quiet="${10}"
-    local program_name="${11}"
+    # These need to be global so invoked functions can use them.
+    verbose="$9"
+    quiet="${10}"
+    program_name="${11}"
     
     # TODO: Should this be done during initial installation?
     # if command -v nvim >/dev/null 2>&1; then
@@ -146,7 +147,7 @@ arch_install_run_in_chroot() {
 
     wheel_can_sudo
 
-    sprint "Enabling NerworkManager."
+    sprint "Enabling NetworkManager."
     run_cmd systemctl enable NetworkManager
 
     # This should be the last thing done.
@@ -227,12 +228,12 @@ command_arch_install() {
     is_archlinux || eprint "Can only install an ArchLinux system."
     isRoot || eprint "Only root can install the system."
 
-    if [[ "$partiotion_mode" == "mounted" ]]; then
+    if [[ "$partition_mode" == "mounted" ]]; then
         mountpoint -q /mnt || eprint "'mounted' mode requires an existing filesystem mounted at '/mnt'."
     elif ensure_mount_point; then
         yes_no "Continuing will result in your data being lost. Continue? (Y/N): " || exit 0
 
-        case "$partiotion_mode" in
+        case "$partition_mode" in
             "vm") partition_vm;;
             "main") partition_main;;
             "x220") partition_x220;;

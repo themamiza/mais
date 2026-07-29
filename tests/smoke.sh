@@ -309,6 +309,64 @@ run_sudoers_install() {
     ' _ "$TEST_ROOT/lib/core/sudo.sh"
 }
 
+run_arch_install_dispatch() {
+    local mode="$1"
+    local mounted="${2:-true}"
+
+    bash -c '
+        source "$1"
+
+        partition_mode="$2"
+        mounted="$3"
+
+        is_archlinux() {
+            return 0
+        }
+
+        isRoot() {
+            return 0
+        }
+
+        ensure_mount_point() {
+            return 0
+        }
+
+        yes_no() {
+            return 0
+        }
+
+        mountpoint() {
+            [[ "$mounted" == true ]]
+        }
+
+        partition_vm() {
+            printf "partition=vm\n"
+        }
+
+        partition_main() {
+            printf "partition=main\n"
+        }
+
+        partition_x220() {
+            printf "partition=x220\n"
+        }
+
+        arch_install() {
+            printf "arch-install=yes\n"
+        }
+
+        eprint() {
+            printf "%s\n" "$1" >&2
+            exit 1
+        }
+
+        command_arch_install
+    ' _ \
+        "$TEST_ROOT/lib/commands/arch-install.sh" \
+        "$mode" \
+        "$mounted"
+}
+
 syntax_files=(
     "$MAIS"
     "$TEST_ROOT/lib/core/loader.sh"
@@ -724,6 +782,20 @@ run_test \
     stdout \
     "record=<install -m 0440 /dev/stdin /tmp/mais-sudoers|%wheel ALL=(ALL) NOPASSWD: ALL>" \
     run_sudoers_install
+
+run_test \
+    "arch-install-dispatches-vm-partitioning" \
+    0 \
+    stdout \
+    "partition=vm" \
+    run_arch_install_dispatch vm
+
+run_test \
+    "mounted-mode-requires-mounted-root" \
+    1 \
+    stderr \
+    "requires an existing filesystem mounted at '/mnt'" \
+    run_arch_install_dispatch mounted false
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 
