@@ -14,14 +14,6 @@
 # 3. Package name
 # 4. Description
 
-# Terminal Emulator
-                |            | kitty                            | "A modern, hackable, featureful, OpenGL-based terminal emulator"
-                | EXTRA      | alacritty                        | "A cross-platform, GPU-accelerated terminal emulator"
-Suckless        | DWM        | themamiza/st                     | "A simple virtual terminal emulator for X."
-
-# Browser
-AUR             |            | brave-bin                        | "Web browser that blocks ads and trackers by default (binary release)"
-
 # Windowing System
                 | X11        | xorg-server                      | "Xorg X server"
                 | X11        | xorg-xinit                       | "X.Org initialisation program"
@@ -30,16 +22,6 @@ AUR             |            | brave-bin                        | "Web browser t
                 | X11        | libxinerama                      | "X11 Xinerama extension library"
                 | X11        | fribidi                          | "A Free Implementation of the Unicode Bidirectional Algorithm"
                 | X11        | xf86-video-intel                 | "X.org Intel i810/i830/i915/945G/G965+ video drivers"
-
-# Window Manager / Compositor
-                | HYPRLAND   | hyprland                         | "a highly customizable dynamic tiling Wayland compositor"
-                | HYPRLAND   | hyprshutdown                     | "A graceful shutdown utility for Hyprland"
-
-Suckless        | DWM        | themamiza/dwm                    | "A dynamic window manager for X"
-                | X11        | xcompmgr                         | "Composite window effect manager for X.org"
-
-# Wayland
-                | EXTRA      | wlr-randr                        | "Utility to manage outputs of a Wayland compositor"
 
 # X11
                 | X11        | xorg-xinput                      | "Small commandline tool to configure devices"
@@ -50,8 +32,26 @@ Suckless        | DWM        | themamiza/dwm                    | "A dynamic win
                 | X11        | arandr                           | "Provide a simple visual front end for XRandR 1.2."
                 | X11        | xcolor                           | "Lightweight color picker for X11"
 
+Suckless        | DWM        | themamiza/dwm                    | "A dynamic window manager for X"
+                | X11        | xcompmgr                         | "Composite window effect manager for X.org"
+
+# Window Manager / Compositor
+                | HYPRLAND   | hyprland                         | "a highly customizable dynamic tiling Wayland compositor"
+                | HYPRLAND   | hyprshutdown                     | "A graceful shutdown utility for Hyprland"
+
+# Wayland
+                | EXTRA      | wlr-randr                        | "Utility to manage outputs of a Wayland compositor"
+
 # Keyboard
                 |            | keyd                             | "A key remapping daemon for linux"
+
+# Terminal Emulator
+                |            | kitty                            | "A modern, hackable, featureful, OpenGL-based terminal emulator"
+                | EXTRA      | alacritty                        | "A cross-platform, GPU-accelerated terminal emulator"
+Suckless        | DWM        | themamiza/st                     | "A simple virtual terminal emulator for X."
+
+# Browser
+AUR             |            | brave-bin                        | "Web browser that blocks ads and trackers by default (binary release)"
 
 # Clipboard
                 | WAYLAND    | wl-clipboard                     | "Command-line copy/paste utilities for Wayland"
@@ -68,7 +68,8 @@ Suckless        | DWM        | themamiza/dwm                    | "A dynamic win
 
 # Bar / Panel
                 | WAYLAND    | waybar                           | "Highly customizable Wayland bar for Sway and Wlroots based compositors"
-Suckless        | DWM        | lukesmithxyz/dwmblocks           | "N/A"
+Suckless        | DWM        | themamiza/dwmblocks              | "N/A"
+Suckless        | DWM        | themamiza/dmenu                  | "N/A"
 
 # Screenshot
                 | WAYLAND    | slurp                            | "Select a region in a Wayland compositor"
