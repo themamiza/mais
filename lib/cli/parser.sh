@@ -103,10 +103,10 @@ parse_arguments() {
 
             "install-programs")
                 args_install_programs=true
-                programs="ALL"
+                programs="all"
 
                 if cli_is_argument_value "${2:-}"; then
-                    if ! re_match "$2" "^(X11|DWM|WAYLAND|HYPRLAND|DEV|PYTHON|CLANG|LUA|BASH|JS|EXTRA|VIRT|ALL)$"; then
+                    if ! re_match "$2" "^(x11|dwm|wayland|hyprland|dev|python|clang|lua|bash|js|extra|virt|all)$"; then
                         eprint "'$2' is not a valid tag."
                     fi
 

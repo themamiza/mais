@@ -5,9 +5,9 @@
 # 2. Tag
 # Here is how the tags work: (Packages with no tag will always get installed!)
 #
-#      X11   WAYLAND        |-DEV-|-----|-----|-----|    EXTRA
+#      x11   wayland        |-dev-|-----|-----|-----|    extra
 #       |       |           |     |     |     |     |
-#      DWM   HYPRLAND    PYTHON CLANG  LUA   BASH  JS    VIRT
+#      dwm   hyprland    python clang  lua   bash  js    virt
 # 
 # Currently packages with no tags get pulled with all other tags.
 #
@@ -15,66 +15,66 @@
 # 4. Description
 
 # Windowing System
-                | X11        | xorg-server                      | "Xorg X server"
-                | X11        | xorg-xinit                       | "X.Org initialisation program"
-                | X11        | xorg-xset                        | "User preference utility for X"
-                | X11        | libxft                           | "FreeType-based font drawing library for X"
-                | X11        | libxinerama                      | "X11 Xinerama extension library"
-                | X11        | fribidi                          | "A Free Implementation of the Unicode Bidirectional Algorithm"
-                | X11        | xf86-video-intel                 | "X.org Intel i810/i830/i915/945G/G965+ video drivers"
+                | x11        | xorg-server                      | "Xorg X server"
+                | x11        | xorg-xinit                       | "X.Org initialisation program"
+                | x11        | xorg-xset                        | "User preference utility for X"
+                | x11        | libxft                           | "FreeType-based font drawing library for X"
+                | x11        | libxinerama                      | "X11 Xinerama extension library"
+                | x11        | fribidi                          | "A Free Implementation of the Unicode Bidirectional Algorithm"
+                | x11        | xf86-video-intel                 | "X.org Intel i810/i830/i915/945G/G965+ video drivers"
 
 # X11
-                | X11        | xorg-xinput                      | "Small commandline tool to configure devices"
-                | X11        | numlockx                         | "Turns on the numlock key in X11."
-                | X11        | xorg-xev                         | "Print contents of X events"
-                | X11        | xdotool                          | "Command-line X11 automation tool"
-                | X11        | unclutter                        | "A small program for hiding the mouse cursor"
-                | X11        | arandr                           | "Provide a simple visual front end for XRandR 1.2."
-                | X11        | xcolor                           | "Lightweight color picker for X11"
+                | x11        | xorg-xinput                      | "Small commandline tool to configure devices"
+                | x11        | numlockx                         | "Turns on the numlock key in X11."
+                | x11        | xorg-xev                         | "Print contents of X events"
+                | x11        | xdotool                          | "Command-line X11 automation tool"
+                | x11        | unclutter                        | "A small program for hiding the mouse cursor"
+                | x11        | arandr                           | "Provide a simple visual front end for XRandR 1.2."
+                | x11        | xcolor                           | "Lightweight color picker for X11"
 
-Suckless        | DWM        | themamiza/dwm                    | "A dynamic window manager for X"
-                | X11        | xcompmgr                         | "Composite window effect manager for X.org"
+Suckless        | dwm        | themamiza/dwm                    | "A dynamic window manager for X"
+                | x11        | xcompmgr                         | "Composite window effect manager for X.org"
 
 # Window Manager / Compositor
-                | HYPRLAND   | hyprland                         | "a highly customizable dynamic tiling Wayland compositor"
-                | HYPRLAND   | hyprshutdown                     | "A graceful shutdown utility for Hyprland"
+                | hyprland   | hyprland                         | "a highly customizable dynamic tiling Wayland compositor"
+                | hyprland   | hyprshutdown                     | "A graceful shutdown utility for Hyprland"
 
 # Wayland
-                | EXTRA      | wlr-randr                        | "Utility to manage outputs of a Wayland compositor"
+                | extra      | wlr-randr                        | "Utility to manage outputs of a Wayland compositor"
 
 # Keyboard
                 |            | keyd                             | "A key remapping daemon for linux"
 
 # Terminal Emulator
                 |            | kitty                            | "A modern, hackable, featureful, OpenGL-based terminal emulator"
-                | EXTRA      | alacritty                        | "A cross-platform, GPU-accelerated terminal emulator"
-Suckless        | DWM        | themamiza/st                     | "A simple virtual terminal emulator for X."
+                | extra      | alacritty                        | "A cross-platform, GPU-accelerated terminal emulator"
+Suckless        | dwm        | themamiza/st                     | "A simple virtual terminal emulator for X."
 
 # Browser
 AUR             |            | brave-bin                        | "Web browser that blocks ads and trackers by default (binary release)"
 
 # Clipboard
-                | WAYLAND    | wl-clipboard                     | "Command-line copy/paste utilities for Wayland"
-                | X11        | xclip                            | "Command line interface to the X11 clipboard"
+                | wayland    | wl-clipboard                     | "Command-line copy/paste utilities for Wayland"
+                | x11        | xclip                            | "Command line interface to the X11 clipboard"
 
 # Lock Screen
-                | HYPRLAND   | hyprlock                         | "hyprland’s GPU-accelerated screen locking utility"
-#               | WAYLAND    | waylock                          | "A simple screenlocker for wayland compositors"
-                | DWM        | slock                            | "A simple screen locker for X"
+                | hyprland   | hyprlock                         | "hyprland’s GPU-accelerated screen locking utility"
+#               | wayland    | waylock                          | "A simple screenlocker for wayland compositors"
+                | dwm        | slock                            | "A simple screen locker for X"
 
 # Wallpaper
-                | HYPRLAND   | hyprpaper                        | "a blazing fast wayland wallpaper utility with IPC controls"
-                | X11        | xwallpaper                       | "Wallpaper setting utility for X"
+                | hyprland   | hyprpaper                        | "a blazing fast wayland wallpaper utility with IPC controls"
+                | x11        | xwallpaper                       | "Wallpaper setting utility for X"
 
 # Bar / Panel
-                | WAYLAND    | waybar                           | "Highly customizable Wayland bar for Sway and Wlroots based compositors"
-Suckless        | DWM        | themamiza/dwmblocks              | "N/A"
-Suckless        | DWM        | themamiza/dmenu                  | "N/A"
+                | wayland    | waybar                           | "Highly customizable Wayland bar for Sway and Wlroots based compositors"
+Suckless        | dwm        | themamiza/dwmblocks              | "N/A"
+Suckless        | dwm        | themamiza/dmenu                  | "N/A"
 
 # Screenshot
-                | WAYLAND    | slurp                            | "Select a region in a Wayland compositor"
-                | WAYLAND    | grim                             | "Screenshot utility for Wayland"
-                | X11        | scrot                            | "Simple command-line screenshot utility for X"
+                | wayland    | slurp                            | "Select a region in a Wayland compositor"
+                | wayland    | grim                             | "Screenshot utility for Wayland"
+                | x11        | scrot                            | "Simple command-line screenshot utility for X"
 
 # Audio
                 |            | pipewire                         | "Low-latency audio/video router and processor"
@@ -86,8 +86,8 @@ Suckless        | DWM        | themamiza/dmenu                  | "N/A"
 
 
 # Image Viewer
-                | X11        | nsxiv                            | "Neo (or New or Not) Simple (or Small or Suckless) X Image Viewer"
-                | WAYLAND    | swayimg                          | "A lightweight image viewer for Wayland display servers"
+                | x11        | nsxiv                            | "Neo (or New or Not) Simple (or Small or Suckless) X Image Viewer"
+                | wayland    | swayimg                          | "A lightweight image viewer for Wayland display servers"
 
 # Video Player
                 |            | mpv                              | "a free, open source, and cross-platform media player"
@@ -95,10 +95,10 @@ Suckless        | DWM        | themamiza/dmenu                  | "N/A"
 # Image Manipulation
                 |            | imagemagick                      | "An image viewing/manipulation program"
                 |            | ffmpegthumbnailer                | "Lightweight video thumbnailer that can be used by file managers"
-                | EXTRA      | gimp                             | "GNU Image Manipulation Program"
+                | extra      | gimp                             | "GNU Image Manipulation Program"
 
 # Video Manipulation
-                | EXTRA      | obs-studio                       | "Free, open source software for live streaming and recording"
+                | extra      | obs-studio                       | "Free, open source software for live streaming and recording"
                 |            | ffmpeg                           | "Complete solution to record, convert and stream audio and video"
 
 # Bluetooth
@@ -115,12 +115,12 @@ AUR             |            | v2rayn-bin                       | "A GUI client 
 
 # File Manager
                 |            | yazi                             | "Blazing fast terminal file manager written in Rust, based on async I/O"
-                | EXTRA      | lf                               | "A terminal file manager inspired by ranger"
-                | EXTRA      | thunar                           | "Modern, fast and easy-to-use file manager for Xfce"
-                | EXTRA      | thunar-volman                    | "Automatic management of removable drives and media for Thunar"
-                | EXTRA      | tumbler                          | "Thumbnail service implementing the thumbnail management D-Bus specification"
-                | EXTRA      | gvfs                             | "Virtual filesystem implementation for GIO"
-                | EXTRA      | gvfs-mtp                         | "Virtual filesystem implementation for GIO - MTP backend (Android, media player)"
+                | extra      | lf                               | "A terminal file manager inspired by ranger"
+                | extra      | thunar                           | "Modern, fast and easy-to-use file manager for Xfce"
+                | extra      | thunar-volman                    | "Automatic management of removable drives and media for Thunar"
+                | extra      | tumbler                          | "Thumbnail service implementing the thumbnail management D-Bus specification"
+                | extra      | gvfs                             | "Virtual filesystem implementation for GIO"
+                | extra      | gvfs-mtp                         | "Virtual filesystem implementation for GIO - MTP backend (Android, media player)"
 
 # Notification
                 |            | libnotify                        | "Library for sending desktop notifications"
@@ -128,7 +128,7 @@ AUR             |            | v2rayn-bin                       | "A GUI client 
 
 # Calculator
                 |            | bc                               | "An arbitrary precision calculator language"
-                | EXTRA      | qalculate-gtk                    | "GTK frontend for libqalculate"
+                | extra      | qalculate-gtk                    | "GTK frontend for libqalculate"
 
 # PDF
                 |            | zathura                          | "Minimalistic document viewer"
@@ -142,9 +142,9 @@ AUR             |            | v2rayn-bin                       | "A GUI client 
                 |            | zsh                              | "A very advanced and programmable command interpreter (shell) for UNIX"
                 |            | zsh-autosuggestions              | "Fish-like autosuggestions for zsh"
 AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and extended zsh-syntax-highlighting"
-                | BASH       | bash-completion                  | "Programmable completion for the bash shell"
-                | BASH       | bash-language-server             | "Bash language server implementation based on Tree Sitter and its grammar for Bash"
-                | BASH       | shellcheck                       | "Shell script analysis tool"
+                | bash       | bash-completion                  | "Programmable completion for the bash shell"
+                | bash       | bash-language-server             | "Bash language server implementation based on Tree Sitter and its grammar for Bash"
+                | bash       | shellcheck                       | "Shell script analysis tool"
 
 # Archive Management
                 |            | 7zip                             | "File archiver for extremely high compression"
@@ -159,37 +159,37 @@ AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and
                 |            | man-db                           | "A utility for reading man pages"
                 |            | man-pages                        | "Linux man pages"
                 |            | htop                             | "Interactive process viewer"
-                | EXTRA      | btop                             | "A monitor of system resources, bpytop ported to C++"
+                | extra      | btop                             | "A monitor of system resources, bpytop ported to C++"
                 |            | rsync                            | "A fast and versatile file copying tool for remote and local files"
 
 # Extras
-                | EXTRA      | reflector                        | "A Python 3 module and script to retrieve and filter the latest Pacman mirror list."
-                | EXTRA      | bat                              | "Cat clone with syntax highlighting and git integration"
-                | EXTRA      | eza                              | "A modern replacement for ls (community fork of exa)"
-                | EXTRA      | fd                               | "Simple, fast and user-friendly alternative to find"
-                | EXTRA      | ripgrep                          | "A search tool that combines the usability of ag with the raw speed of grep"
-                | EXTRA      | yt-dlp                           | "A youtube-dl fork with additional features and fixes"
-                | EXTRA      | inxi                             | "Full featured CLI system information tool"
-                | EXTRA      | pacman-contrib                   | "Contributed scripts and tools for pacman systems"
-                | EXTRA      | pkgfile                          | "A tool to search for files in official repository packages"
-AUR             | EXTRA      | c-lolcat                         | "High-performance implementation of lolcat"
+                | extra      | reflector                        | "A Python 3 module and script to retrieve and filter the latest Pacman mirror list."
+                | extra      | bat                              | "Cat clone with syntax highlighting and git integration"
+                | extra      | eza                              | "A modern replacement for ls (community fork of exa)"
+                | extra      | fd                               | "Simple, fast and user-friendly alternative to find"
+                | extra      | ripgrep                          | "A search tool that combines the usability of ag with the raw speed of grep"
+                | extra      | yt-dlp                           | "A youtube-dl fork with additional features and fixes"
+                | extra      | inxi                             | "Full featured CLI system information tool"
+                | extra      | pacman-contrib                   | "Contributed scripts and tools for pacman systems"
+                | extra      | pkgfile                          | "A tool to search for files in official repository packages"
+AUR             | extra      | c-lolcat                         | "High-performance implementation of lolcat"
 
-AUR             | EXTRA      | dupeguru                         | "Find duplicate files with various contents, using perceptual diff for pictures"
+AUR             | extra      | dupeguru                         | "Find duplicate files with various contents, using perceptual diff for pictures"
 
 
 # Filesystem
                 |            | dosfstools                       | "DOS filesystem utilities"
                 |            | ntfs-3g                          | "NTFS FUSE driver"
                 |            | ntfsprogs                        | "NTFS userspace utilities"
-AUR             | EXTRA      | simple-mtpfs                     | "A FUSE filesystem that supports reading/writing from MTP devices"
+AUR             | extra      | simple-mtpfs                     | "A FUSE filesystem that supports reading/writing from MTP devices"
 
 # Virtual Machine
-                | VIRT       | qemu-full                        | "A full QEMU setup"
-                | VIRT       | libvirt                          | "API for controlling virtualization engines (openvz,kvm,qemu,virtualbox,xen,etc)"
-                | VIRT       | dnsmasq                          | "Lightweight, easy to configure DNS forwarder and DHCP server"
-                | VIRT       | iptables-nft                     | "N/A"
-                | VIRT       | openbsd-netcat                   | "TCP/IP swiss army knife. OpenBSD variant."
-                | VIRT       | virt-manager                     | "Desktop user interface for managing virtual machines"
+                | virt       | qemu-full                        | "A full QEMU setup"
+                | virt       | libvirt                          | "API for controlling virtualization engines (openvz,kvm,qemu,virtualbox,xen,etc)"
+                | virt       | dnsmasq                          | "Lightweight, easy to configure DNS forwarder and DHCP server"
+                | virt       | iptables-nft                     | "N/A"
+                | virt       | openbsd-netcat                   | "TCP/IP swiss army knife. OpenBSD variant."
+                | virt       | virt-manager                     | "Desktop user interface for managing virtual machines"
 
 
 # Font
@@ -205,44 +205,44 @@ AUR             | EXTRA      | simple-mtpfs                     | "A FUSE filesy
 AUR             |            | dracula-gtk-theme-git            | "Dark theme for GTK"
                 |            | breeze-icons                     | "Breeze icon theme"
 AUR             |            | catppuccin-gtk-theme-macchiato   | "Soothing pastel theme for GTK - Macchiato"
-# AUR             | EXTRA      | alacritty-theme-git              | "Collection of Alacritty color schemes." # Broken install
+# AUR             | extra      | alacritty-theme-git              | "Collection of Alacritty color schemes." # Broken install
                 |            | nwg-look                         | "GTK settings editor adapted to work on wlroots-based compositors"
 AUR             |            | xcursor-breeze                   | "N/A"
                 |            | kvantum                          | "SVG-based theme engine for Qt6 (including config tool and extra themes)"
                 |            | kvantum-qt5                      | "SVG-based theme engine for Qt5"
 
 # C
-                | CLANG      | clang                            | "C language family frontend for LLVM"
-                | CLANG      | cmake                            | "A cross-platform open-source make system"
+                | clang      | clang                            | "C language family frontend for LLVM"
+                | clang      | cmake                            | "A cross-platform open-source make system"
 
 # Python
-                | PYTHON     | python                           | "The Python programming language"
-                | PYTHON     | python-lsp-server                | "Fork of the python-language-server project, maintained by the Spyder IDE team and the community"
-                | PYTHON     | python-pip                       | "The PyPA recommended tool for installing Python packages"
-                | PYTHON     | python-pipenv                    | "Sacred Marriage of Pipfile, Pip, & Virtualenv."
-                | PYTHON     | ipython                          | "Enhanced Interactive Python shell"
+                | python     | python                           | "The Python programming language"
+                | python     | python-lsp-server                | "Fork of the python-language-server project, maintained by the Spyder IDE team and the community"
+                | python     | python-pip                       | "The PyPA recommended tool for installing Python packages"
+                | python     | python-pipenv                    | "Sacred Marriage of Pipfile, Pip, & Virtualenv."
+                | python     | ipython                          | "Enhanced Interactive Python shell"
 
 
 # Lua
-                | LUA        | lua-language-server              | "Lua Language Server coded by Lua"
+                | lua        | lua-language-server              | "Lua Language Server coded by Lua"
 
 # Javascript
-                | JS         | nodejs                           | "Evented I/O for V8 javascript ("Current" release)"
-                | JS         | typescript                       | "JavaScript with syntax for types"
-                | JS         | typescript-language-server       | "Language Server Protocol (LSP) implementation for TypeScript using tsserver"
+                | js         | nodejs                           | "Evented I/O for V8 javascript ("Current" release)"
+                | js         | typescript                       | "JavaScript with syntax for types"
+                | js         | typescript-language-server       | "Language Server Protocol (LSP) implementation for TypeScript using tsserver"
 
 # Emacs
-                | DEV        | emacs                            | "The extensible, customizable, self-documenting real-time display editor"
+                | dev        | emacs                            | "The extensible, customizable, self-documenting real-time display editor"
 
 # Communication
-                | EXTRA      | telegram-desktop                 | "Official Telegram Desktop client"
+                | extra      | telegram-desktop                 | "Official Telegram Desktop client"
 
 # Electrical Engineering
-                | EXTRA      | octave                           | "A high-level language, primarily intended for numerical computations"
-AUR             | EXTRA      | ltspice                          | "SPICE simulator, schematic capture and waveform viewer."
+                | extra      | octave                           | "A high-level language, primarily intended for numerical computations"
+AUR             | extra      | ltspice                          | "SPICE simulator, schematic capture and waveform viewer."
 
 # Game
-                | EXTRA      | jre21-openjdk                    | "OpenJDK Java 21 full runtime environment"
+                | extra      | jre21-openjdk                    | "OpenJDK Java 21 full runtime environment"
 
 # win2usb Dependencies
 AUR             |            | ms-sys                           | "Write Microsoft-compatible boot records (MBR and PBR)"

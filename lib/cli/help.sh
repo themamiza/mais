@@ -38,9 +38,12 @@ print_help() {
 
                 The script prefers 'yay' and will install it on it's own when needed
 
-        install-programs [TAG]
+        install-programs [tag]
 
                 Install programs from a 'programs.csv' file
+
+                'tag' should be one of 'x11', 'dwm', 'wayland', 'hyprland',
+                'dev', 'python', 'clang', 'lua', 'bash', 'js', 'extra', 'virt' or 'all'
 
                 Read 'data/programs.csv' for more information about tags and the file itself
                 

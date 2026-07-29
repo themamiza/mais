@@ -93,23 +93,23 @@ install_programs() {
     # Grab programs and add to tmp file based on the tag that is provided.
     # case matches the tags to it's children.
     case "$1" in
-        "X11")      get_programs_by_tag "^X11$"                       "$programs_file.clean" >> "$programs_to_install";;
-        "DWM")      get_programs_by_tag "^(X11|DWM)$"                 "$programs_file.clean" >> "$programs_to_install";;
-        "WAYLAND")  get_programs_by_tag "^WAYLAND$"                   "$programs_file.clean" >> "$programs_to_install";;
-        "HYPRLAND") get_programs_by_tag "^(WAYLAND|HYPRLAND)$"        "$programs_file.clean" >> "$programs_to_install";;
-        "DEV")      get_programs_by_tag "^(DEV|PYTHON|CLANG|LUA|BASH|JS)$" "$programs_file.clean" >> "$programs_to_install";;
-        "PYTHON")   get_programs_by_tag "^PYTHON$"                    "$programs_file.clean" >> "$programs_to_install";;
-        "CLANG")    get_programs_by_tag "^CLANG$"                     "$programs_file.clean" >> "$programs_to_install";;
-        "LUA")      get_programs_by_tag "^LUA$"                       "$programs_file.clean" >> "$programs_to_install";;
-        "BASH")     get_programs_by_tag "^BASH$"                      "$programs_file.clean" >> "$programs_to_install";;
-        "JS")       get_programs_by_tag "^JS$"                        "$programs_file.clean" >> "$programs_to_install";;
-        "VIRT")     get_programs_by_tag "^VIRT$"                      "$programs_file.clean" >> "$programs_to_install";;
-        "EXTRA")    get_programs_by_tag "^EXTRA$"                     "$programs_file.clean" >> "$programs_to_install";;
-        "ALL")      cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install";;
+        "x11")      get_programs_by_tag "^x11$"                       "$programs_file.clean" >> "$programs_to_install";;
+        "dwm")      get_programs_by_tag "^(x11|dwm)$"                 "$programs_file.clean" >> "$programs_to_install";;
+        "wayland")  get_programs_by_tag "^wayland$"                   "$programs_file.clean" >> "$programs_to_install";;
+        "hyprland") get_programs_by_tag "^(wayland|hyprland)$"        "$programs_file.clean" >> "$programs_to_install";;
+        "dev")      get_programs_by_tag "^(dev|python|clang|lua|bash|js)$" "$programs_file.clean" >> "$programs_to_install";;
+        "python")   get_programs_by_tag "^python$"                    "$programs_file.clean" >> "$programs_to_install";;
+        "clang")    get_programs_by_tag "^clang$"                     "$programs_file.clean" >> "$programs_to_install";;
+        "lua")      get_programs_by_tag "^lua$"                       "$programs_file.clean" >> "$programs_to_install";;
+        "bash")     get_programs_by_tag "^bash$"                      "$programs_file.clean" >> "$programs_to_install";;
+        "js")       get_programs_by_tag "^js$"                        "$programs_file.clean" >> "$programs_to_install";;
+        "virt")     get_programs_by_tag "^virt$"                      "$programs_file.clean" >> "$programs_to_install";;
+        "extra")    get_programs_by_tag "^extra$"                     "$programs_file.clean" >> "$programs_to_install";;
+        "all")      cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install";;
     esac
 
     # Also grab lines that have no tag set.
-    if [[ "$1" != "ALL" ]]; then
+    if [[ "$1" != "all" ]]; then
         get_programs_by_tag "^$" "$programs_file.clean" >> "$programs_to_install"
     fi
     # TODO: For a specific tag, untagged programs are still always included.

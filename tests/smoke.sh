@@ -114,14 +114,14 @@ run_program_selection() {
         programs_to_install="$2/programs.tmp"
 
         cat >"$programs_file.clean" <<EOF
-|X11|xorg-server|"X11 server"
-Suckless|DWM|dwm|"Window manager"
-|WAYLAND|wl-clipboard|"Wayland clipboard"
-|HYPRLAND|hyprland|"Wayland compositor"
-|DEV|emacs|"Development editor"
-|PYTHON|python|"Python language"
-|VIRT|qemu-full|"Virtual machine package"
-|EXTRA|virt-viewer|"Description mentions VIRT"
+|x11|xorg-server|"X11 server"
+Suckless|dwm|dwm|"Window manager"
+|wayland|wl-clipboard|"Wayland clipboard"
+|hyprland|hyprland|"Wayland compositor"
+|dev|emacs|"Development editor"
+|python|python|"Python language"
+|virt|qemu-full|"Virtual machine package"
+|extra|virt-viewer|"Description mentions VIRT"
 ||base-package|"Always installed"
 EOF
 
@@ -153,8 +153,8 @@ run_package_lookup() {
         programs_file="$2/programs.csv"
 
         cat >"$programs_file.clean" <<EOF
-|EXTRA|alacritty|"Terminal emulator"
-AUR|EXTRA|alacritty-theme-git|"Color themes"
+|extra|alacritty|"Terminal emulator"
+AUR|extra|alacritty-theme-git|"Color themes"
 EOF
 
         check_installed() {
@@ -359,50 +359,64 @@ run_test \
     "optional-program-tag-omitted" \
     0 \
     stdout \
-    "programs=ALL" \
+    "programs=all" \
     run_parser install-programs --verbose
+
+run_test \
+    "lowercase-program-tag" \
+    0 \
+    stdout \
+    "programs=dev" \
+    run_parser install-programs dev
+
+run_test \
+    "uppercase-program-tag-rejected" \
+    1 \
+    stderr \
+    "'DEV' is not a valid tag" \
+    "$MAIS" install-programs DEV
 
 run_test \
     "detached-program-tag" \
     1 \
     stderr \
     "Invalid option" \
-    "$MAIS" install-programs --verbose DEV
+    "$MAIS" install-programs --verbose dev
 
 run_test \
     "virt-program-selection" \
     0 \
     stdout \
     "selected=<qemu-full base-package>" \
-    run_program_selection VIRT
+    run_program_selection virt
 
 run_test \
     "dwm-program-selection" \
     0 \
     stdout \
     "selected=<xorg-server dwm base-package>" \
-    run_program_selection DWM
+    run_program_selection dwm
 
 run_test \
     "hyprland-program-selection" \
     0 \
     stdout \
     "selected=<wl-clipboard hyprland base-package>" \
-    run_program_selection HYPRLAND
+    run_program_selection hyprland
 
 run_test \
     "dev-program-selection" \
     0 \
     stdout \
     "selected=<emacs python base-package>" \
-    run_program_selection DEV
+    run_program_selection dev
 
 run_test \
     "all-program-selection" \
     0 \
     stdout \
     "selected=<xorg-server dwm wl-clipboard hyprland emacs python qemu-full virt-viewer base-package>" \
-    run_program_selection ALL
+    run_program_selection all
 
 run_test \
     "exact-package-lookup" \
