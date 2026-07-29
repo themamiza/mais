@@ -2,35 +2,54 @@
 
 # shellcheck disable=2154
 
-# TODO: Check if this function is fully verbosified.
+dotfiles_home_root="/home"
+dotfiles_v2rayn_binary="/opt/v2rayn-bin/v2rayN"
+
 install_dotfiles() {
-    local srcdir
+    local user_home="$dotfiles_home_root/$username"
+    local srcdir="$user_home/rp/dotfiles"
+    local rsync_options=(
+        -a
+        --exclude=/.git/
+        --exclude=/.gitignore
+        --exclude=/.gitmodules
+        --exclude=/LICENSE
+        --exclude=/README.md
+    )
+
     sprint "Installing dotfiles."
 
     # Mainly for my convenience.
-    if [ -d "/home/$username/rp/dotfiles" ]; then
+    if [ -d "$srcdir" ]; then
         sprint "Found local dotfiles."
-        srcdir="/home/$username/rp/dotfiles/"
     else
-        local repo_dir
+        local repo_dir="$user_home/.local/src/$dotfiles_name"
 
         sprint "Cloning or updating remote repository."
-        repo_dir="/home/$username/.local/src/$dotfiles_name"
+        sync_git_repo "$username" "$dotfiles_url" "$repo_dir" || return
 
-        sync_git_repo "$username" "$dotfiles_url" "$repo_dir"
-
-        srcdir="$repo_dir/"
+        srcdir="$repo_dir"
     fi
 
-    sudo -u "$username" rsync -a "$srcdir" "/home/$username"
-
-    # Remove extra files
-    rm "/home/$username/.gitignore" "/home/$username/.gitmodules" "/home/$username/LICENSE" "/home/$username/README.md"
-
-    rm -rf "/home/$username/.git"
+    run_cmd sudo -u "$username" rsync "${rsync_options[@]}" -- "$srcdir/" "$user_home/" || return
 
     # Symbolic links to useful applications
-    [ -f /opt/v2rayn-bin/v2rayN ] && sudo -u "$username" ln -sf /opt/v2rayn-bin/v2rayN "/home/$username/.local/bin/v2rayn"
+    if [[ -f "$dotfiles_v2rayn_binary" ]]; then
+        run_cmd sudo -u "$username" ln -sf -- "$dotfiles_v2rayn_binary" "$user_home/.local/bin/v2rayn" || return
+    fi
+
+    local wallpapers_link="$user_home/.local/share/wallpapers"
+
+    run_cmd sudo -u "$username" mkdir -p -- "$(dirname "$wallpapers_link")" || return
+
+    if [[ -e "$wallpapers_link" && ! -L "$wallpapers_link" ]]; then
+        wprint "'$wallpapers_link' exists and is not a symbolic link."
+        return 1
+    fi
+
+    run_cmd sudo -u "$username" ln -sfnT -- "$user_home/fl/Pix/Wallpapers" "$wallpapers_link" || return
+
+    return 0
 }
 
 
@@ -39,5 +58,4 @@ command_install_dotfiles() {
     ask_username
     install_essentials || eprint "Could not install essential programs.\nHint: Run as root."
     install_dotfiles
-    exit 0
 }

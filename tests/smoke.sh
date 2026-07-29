@@ -632,6 +632,168 @@ EOF
     ' _ "$TEST_ROOT" "$TEST_TMP"
 }
 
+run_dotfiles_install() {
+    local scenario="$1"
+
+    bash -c '
+        source "$1/lib/commands/install-dotfiles.sh"
+
+        test_dir="$2/dotfiles-$3"
+        scenario="$3"
+        rm -rf "$test_dir"
+        mkdir -p "$test_dir"
+
+        username=testuser
+        dotfiles_url=https://example.com/dotfiles.git
+        dotfiles_name=dotfiles
+        dotfiles_home_root="$test_dir/home"
+        dotfiles_v2rayn_binary="$test_dir/v2rayN"
+
+        user_home="$dotfiles_home_root/$username"
+        wallpapers_dir="$user_home/fl/Pix/Wallpapers"
+        wallpapers_link="$user_home/.local/share/wallpapers"
+
+        mkdir -p "$user_home" "$wallpapers_dir"
+
+        calls=()
+        rsync_excludes=no
+
+        sprint() {
+            :
+        }
+
+        wprint() {
+            printf "warning=<%s>\n" "$1" >&2
+        }
+
+        sync_git_repo() {
+            calls+=(sync)
+
+            if [[ "$scenario" == sync-failure ]]; then
+                return 7
+            fi
+
+            return 0
+        }
+
+        run_cmd() {
+            local action=other
+            local argument
+            local destination="${!#}"
+            local required_option
+            local found
+            local required_rsync_options=(
+                --exclude=/.git/
+                --exclude=/.gitignore
+                --exclude=/.gitmodules
+                --exclude=/LICENSE
+                --exclude=/README.md
+            )
+
+            for argument in "$@"; do
+                if [[ "$argument" == "rsync" ]]; then
+                    action=rsync
+                    break
+                fi
+
+                if [[ "$argument" == "mkdir" ]]; then
+                    action=wallpapers-parent
+                    break
+                fi
+
+                if [[ "$argument" == "ln" ]]; then
+                    if [[ "$destination" == "$wallpapers_link" ]]; then
+                        action=wallpapers-link
+                    else
+                        action=v2rayn-link
+                    fi
+
+                    break
+                fi
+            done
+
+            if [[ "$action" == "rsync" ]]; then
+                rsync_excludes=yes
+
+                for required_option in "${required_rsync_options[@]}"; do
+                    found=false
+
+                    for argument in "$@"; do
+                        if [[ "$argument" == "$required_option" ]]; then
+                            found=true
+                            break
+                        fi
+                    done
+
+                    $found || rsync_excludes=no
+                done
+            fi
+
+            calls+=("$action")
+
+            if [[ "$scenario" == "rsync-failure" &&
+                "$action" == "rsync" ]]; then
+            return 8
+            fi
+
+            if [[ "$scenario" == "link-failure" &&
+                "$action" == "wallpapers-link" ]]; then
+            return 9
+            fi
+
+            return 0
+        }
+
+        if [[ "$scenario" == local ]]; then
+            mkdir -p "$user_home/rp/dotfiles"
+        fi
+
+        if [[ "$scenario" == v2rayn ]]; then
+            touch "$dotfiles_v2rayn_binary"
+        fi
+
+        if [[ "$scenario" == wallpaper-conflict ]]; then
+            mkdir -p "$wallpapers_link"
+        fi
+
+        install_dotfiles
+        status=$?
+
+        printf "calls=<%s>\n" "${calls[*]}"
+        printf "rsync-excludes=<%s>\n" "$rsync_excludes"
+        exit "$status"
+    ' _ "$TEST_ROOT" "$TEST_TMP" "$scenario"
+}
+
+run_dotfiles_command_failure() {
+    bash -c '
+        source "$1/lib/commands/install-dotfiles.sh"
+
+        isRoot() {
+            return 0
+        }
+
+        wheel_can_sudo() {
+            :
+        }
+
+        ask_username() {
+            :
+        }
+
+        install_essentials() {
+            :
+        }
+
+        install_dotfiles() {
+            printf "dotfiles=<failed>\n"
+            return 7
+        }
+
+        command_install_dotfiles
+    ' _ "$TEST_ROOT"
+}
+
 syntax_files=(
     "$MAIS"
     "$TEST_ROOT/lib/core/loader.sh"
@@ -1145,6 +1307,69 @@ run_test \
     stdout \
     "run=<grub-mkconfig -o" \
     run_grub_without_swap
+
+run_test \
+    "dotfiles-remote-install-succeeds" \
+    0 \
+    stdout \
+    "calls=<sync rsync wallpapers-parent wallpapers-link>" \
+    run_dotfiles_install remote
+
+run_test \
+    "dotfiles-rsync-excludes-repository-files" \
+    0 \
+    stdout \
+    "rsync-excludes=<yes>" \
+    run_dotfiles_install remote
+
+run_test \
+    "dotfiles-local-repository-skips-sync" \
+    0 \
+    stdout \
+    "calls=<rsync wallpapers-parent wallpapers-link>" \
+    run_dotfiles_install local
+
+run_test \
+    "dotfiles-sync-failure-propagates" \
+    7 \
+    stdout \
+    "calls=<sync>" \
+    run_dotfiles_install sync-failure
+
+run_test \
+    "dotfiles-rsync-failure-propagates" \
+    8 \
+    stdout \
+    "calls=<sync rsync>" \
+    run_dotfiles_install rsync-failure
+
+run_test \
+    "dotfiles-wallpaper-link-is-created" \
+    0 \
+    stdout \
+    "wallpapers-link" \
+    run_dotfiles_install remote
+
+run_test \
+    "dotfiles-wallpaper-link-failure-propagates" \
+    9 \
+    stdout \
+    "calls=<sync rsync wallpapers-parent wallpapers-link>" \
+    run_dotfiles_install link-failure
+
+run_test \
+    "dotfiles-refuses-wallpaper-directory-conflict" \
+    1 \
+    stderr \
+    "exists and is not a symbolic link" \
+    run_dotfiles_install wallpaper-conflict
+
+run_test \
+    "dotfiles-optional-v2rayn-link-is-created" \
+    0 \
+    stdout \
+    "calls=<sync rsync v2rayn-link wallpapers-parent wallpapers-link>" \
+    run_dotfiles_install v2rayn
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 
