@@ -317,6 +317,111 @@ run_arch_install_dispatch() {
     ' _ "$TEST_ROOT" "$mode" "$mounted"
 }
 
+run_arch_install_bootstrap() {
+    local scenario="$1"
+
+    bash -c '
+        set -e
+
+        source "$1/lib/commands/arch-install.sh"
+
+        scenario="$2"
+        test_dir="$3/arch-bootstrap-$scenario"
+
+        rm -rf "$test_dir"
+        mkdir -p "$test_dir"
+
+        username=testuser
+        hostname=testhost
+        timezone=UTC
+        bios_or_uefi=UEFI
+        bootloader_id=GRUB
+        efi_directory=/efi
+        disk_to_install=/dev/vda
+        verbose=false
+        quiet=false
+        program_name=mais
+
+        arch_efi_platform_size_file="$test_dir/fw-platform-size"
+
+        if [[ "$scenario" == uefi ]]; then
+            touch "$arch_efi_platform_size_file"
+        fi
+
+        yes_no() {
+            return 0
+        }
+
+        ask_username() {
+            :
+        }
+
+        ask_hostname() {
+            :
+        }
+
+        read() {
+            local variable="${!#}"
+
+            printf -v "$variable" "%s" test-password
+        }
+
+        check_internet_connection() {
+            return 0
+        }
+
+        sprint() {
+            :
+        }
+
+        nprint() {
+            :
+        }
+
+        wprint() {
+            :
+        }
+
+        pacstrap() {
+            shift 2
+
+            if [[ "$scenario" == failure ]]; then
+                printf "pacstrap=<failed>\n"
+                return 7
+            fi
+
+            local package
+            local packages=" $* "
+            local required=yes
+            local efibootmgr=no
+
+            for package in \
+                base \
+                linux-lts \
+                linux-firmware \
+                grub \
+                networkmanager \
+                sudo \
+                neovim
+            do
+                [[ "$packages" == *" $package "* ]] ||
+                    required=no
+            done
+
+            [[ "$packages" == *" efibootmgr "* ]] &&
+                efibootmgr=yes
+
+            printf "required=<%s> efibootmgr=<%s>\n" \
+                "$required" \
+                "$efibootmgr"
+
+            exit 0
+        }
+
+        arch_install
+    ' _ "$TEST_ROOT" "$scenario" "$TEST_TMP"
+}
+
 run_grub_helpers() {
     bash -c '
         source "$1/lib/core/validate.sh"
@@ -735,6 +840,27 @@ run_test \
     stderr \
     "requires an existing filesystem mounted at '/mnt'" \
     run_arch_install_dispatch mounted false
+
+run_test \
+    "arch-install-bootstraps-required-packages" \
+    0 \
+    stdout \
+    "required=<yes> efibootmgr=<no>" \
+    run_arch_install_bootstrap bios
+
+run_test \
+    "arch-install-uefi-includes-efibootmgr" \
+    0 \
+    stdout \
+    "required=<yes> efibootmgr=<yes>" \
+    run_arch_install_bootstrap uefi
+
+run_test \
+    "arch-install-propagates-pacstrap-failure" \
+    7 \
+    stdout \
+    "pacstrap=<failed>" \
+    run_arch_install_bootstrap failure
 
 run_test \
     "grub-hibernation-calculation" \

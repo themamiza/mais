@@ -2,6 +2,9 @@
 
 # shellcheck disable=2154
 
+# Tests replace this path to simulate BIOS and UEFI systems.
+arch_efi_platform_size_file="/sys/firmware/efi/fw_platform_size"
+
 ensure_mount_point() {
     if mountpoint -q /mnt; then
         wprint "'/mnt' is already in use."
@@ -191,7 +194,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
 
     # TODO: Print configuration before installing.
     
-    [[ -r /sys/firmware/efi/fw_platform_size ]] || bios_or_uefi="BIOS"
+    [[ -r "$arch_efi_platform_size_file" ]] || bios_or_uefi="BIOS"
 
     sprint "Checking internet connection...\n"
     check_internet_connection || eprint "Can't reach the web."
