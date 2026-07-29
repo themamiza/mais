@@ -138,7 +138,7 @@ arch_install_run_in_chroot() {
 
     nprint "Creating new user '$username'."
     if ! id "$username" >/dev/null 2>&1; then
-        useradd --create-home --user-group --groups wheel --shell /bin/bash "$username"
+        useradd --create-home --user-group --groups wheel --shell /bin/zsh "$username"
     fi
 
     sprint "Changing password for new user."
@@ -197,7 +197,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     check_internet_connection || eprint "Can't reach the web."
     sprint "Internet connection is available.\n"
 
-    base_packages=(base linux-lts linux-firmware grub networkmanager sudo neovim)
+    base_packages=(base linux-lts linux-firmware grub networkmanager sudo neovim zsh)
     [ "$bios_or_uefi" = "UEFI" ] && base_packages+=(efibootmgr)
     sprint "Bootstraping the system...\n"
     pacstrap -K /mnt "${base_packages[@]}"
