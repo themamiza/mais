@@ -155,7 +155,6 @@ parse_arguments() {
 
             "-v"|"--verbose")
                 verbose=true
-                cmd_suffix=""
                 shift
                 ;;
 

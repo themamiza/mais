@@ -8,13 +8,13 @@ clean_home() {
     # default to not remove so user can just press enter and be done with it.
     # possibly provide option to remove or not remove by default.
     # TODO: bluetooth history could be useful. try and see if can keep only the last one.
-    eval "rm -rf \
-    /home/$username/.cache/breezy \
-    /home/$username/.cache/deno \
-    /home/$username/.recently-used \
-    /home/$username/.java \
-    /home/$username/.mono \
-    $cmd_suffix" || true
+    run_cmd rm -rf \
+    "/home/$username/.cache/breezy" \
+    "/home/$username/.cache/deno" \
+    "/home/$username/.recently-used" \
+    "/home/$username/.java" \
+    "/home/$username/.mono" \
+    || true
 
 
     # Harmlesss

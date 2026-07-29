@@ -78,8 +78,8 @@ start=,size=\n" | sfdisk /dev/vda --wipe always
 }
 
 # Why do I pass all the variables as arguments? Explained in `arch_install`.
-# args: username pass1 hostname timezone bios_or_uefi bootloader_id efi_directory disk_to_install cmd_suffix
-# TODO: Fix `arch_install_run_in_chroot` not executing.
+# args: username pass1 hostname timezone bios_or_uefi bootloader_id 
+# efi_directory disk_to_install verbose quiet program_name
 arch_install_run_in_chroot() {
     # Renaming vars only for more readability.
     local username="$1"
@@ -90,8 +90,10 @@ arch_install_run_in_chroot() {
     local bootloader_id="$6"
     local efi_directory="$7"
     local disk_to_install="$8"
-    local cmd_suffix="$9"
-    local program_name="${10}"
+
+    local verbose="$9"
+    local quiet="${10}"
+    local program_name="${11}"
     
     # TODO: Should this be done during initial installation?
     # if command -v nvim >/dev/null 2>&1; then
@@ -114,7 +116,7 @@ arch_install_run_in_chroot() {
 
     sprint "Configuring locale."
     sed -i 's/^#\s*\(en_US.UTF-8\)/\1/' /etc/locale.gen
-    eval "locale-gen $cmd_suffix"
+    run_cmd locale-gen
     printf "LANG=en_US.UTF-8\n" > /etc/locale.conf
 
     sprint "Setting hostname to '$hostname'."
@@ -122,16 +124,16 @@ arch_install_run_in_chroot() {
 
     # TODO: Check if it's actually necessary to run this command.
     # nprint "Creating new initramfs."
-    # eval "mkinitcpio -P $cmd_suffix"
+    # run_cmd mkinitcpio -P
 
     sprint "Installing grub bootloader to /efi."
     case "$bios_or_uefi" in
-        "UEFI") eval "grub-install --target=x86_64-efi --efi-directory=$efi_directory --bootloader-id=$bootloader_id $cmd_suffix";;
-        "BIOS") eval "grub-install --target=i386-pc $disk_to_install";;
+        "UEFI") run_cmd grub-install --target=x86_64-efi --efi-directory="$efi_directory" --bootloader-id="$bootloader_id";;
+        "BIOS") run_cmd grub-install --target=i386-pc "$disk_to_install";;
     esac
 
     sprint "Re-creating grub configuration."
-    eval "grub-mkconfig -o /boot/grub/grub.cfg $cmd_suffix"
+    run_cmd grub-mkconfig -o /boot/grub/grub.cfg
 
     nprint "Creating new user '$username'."
     if ! id "$username" >/dev/null 2>&1; then
@@ -145,7 +147,7 @@ arch_install_run_in_chroot() {
     wheel_can_sudo
 
     sprint "Enabling NerworkManager."
-    eval "systemctl enable NetworkManager $cmd_suffix"
+    run_cmd systemctl enable NetworkManager
 
     # This should be the last thing done.
     if [ -f "/etc/installation.date" ]; then
@@ -186,7 +188,7 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
 
     # TODO: Print configuration before installing.
     
-    eval "cat /sys/firmware/efi/fw_platform_size $cmd_suffix" || bios_or_uefi="BIOS"
+    [[ -r /sys/firmware/efi/fw_platform_size ]] || bios_or_uefi="BIOS"
 
     sprint "Checking internet connection...\n"
     check_internet_connection || eprint "Can't reach the web."
@@ -205,14 +207,14 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     # Exporting the function to later be passed to arch-chroot as a command.
     # That is why all the variables are passed manually.
     # TODO: Investigate if it can be done any other way.
-    # arch_install_run_in_chroot() { # -> args: username pass1 hostname timezone bios_or_uefi bootloader_id efi_directory disk_to_install
-    local exported_functions=(arch_install_run_in_chroot wheel_can_sudo trap_cleanup_sudoers nprint sprint wprint)
+    # arch_install_run_in_chroot() { # -> args: username pass1 hostname timezone bios_or_uefi bootloader_id efi_directory disk_to_install verbose quiet program_name
+    local exported_functions=(arch_install_run_in_chroot run_cmd install_sudoers_file wheel_can_sudo trap_cleanup_sudoers yes_no nprint sprint wprint)
     for fn in "${exported_functions[@]}"; do
         # shellcheck disable=2163
         export -f "$fn"
     done
 
-    arch-chroot /mnt /bin/sh -c "arch_install_run_in_chroot '$username' '$pass1' '$hostname' '$timezone' '$bios_or_uefi' '$bootloader_id' '$efi_directory' '$disk_to_install' '$cmd_suffix' '$program_name'"
+    arch-chroot /mnt /bin/bash -c 'arch_install_run_in_chroot "$@"' _ "$username" "$pass1" "$hostname" "$timezone" "$bios_or_uefi" "$bootloader_id" "$efi_directory" "$disk_to_install" "$verbose" "$quiet" "$program_name"
 
     unset pass1 pass2
     yes_no "The system should be ready to reboot, Continue (Y/N): " || exit 0
@@ -223,9 +225,18 @@ command_arch_install() {
     is_archlinux || eprint "Can only install an ArchLinux system."
     isRoot || eprint "Only root can install the system."
 
-    ensure_mount_point &&
-        yes_no "Continuing will result in your data being lost. Continue? (Y/N): " && eval "partition_$partition_mode"
+    if [[ "$partiotion_mode" == "mounted" ]]; then
+        mountpoint -q /mnt || eprint "'mounted' mode requires an existing filesystem mounted at '/mnt'."
+    elif ensure_mount_point; then
+        yes_no "Continuing will result in your data being lost. Continue? (Y/N): " || exit 0
+
+        case "$partiotion_mode" in
+            "vm") partition_vm;;
+            "main") partition_main;;
+            "x220") partition_x220;;
+        esac
+    fi
 
     arch_install
-    exit
+    exit 0
 }

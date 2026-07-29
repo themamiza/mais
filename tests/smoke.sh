@@ -233,6 +233,82 @@ run_git_sync() {
         "$repository_state"
 }
 
+run_arch_package_command() {
+    local operation="$1"
+
+    bash -c '
+        source "$1"
+
+        operation="$3"
+        log_file="$2/arch-package-$operation.log"
+        : > "$log_file"
+
+        username=testuser
+        aurhelper=yay
+
+        nprint() {
+            :
+        }
+
+        check_installed() {
+            return 1
+        }
+
+        run_cmd() {
+            printf "run:%s\n" "$*" >> "$log_file"
+        }
+
+        sync_git_repo() {
+            printf "sync:%s\n" "$*" >> "$log_file"
+        }
+
+        cd() {
+            printf "cd:%s\n" "$1" >> "$log_file"
+            return 0
+        }
+
+        case "$operation" in
+            pacman)
+                pacman_install example-package "Example package"
+                ;;
+            aur)
+                aur_install example-aur-package "Example AUR package"
+                ;;
+            aurhelper)
+                install_aurhelper
+                ;;
+            mirrors)
+                update_mirrors
+                ;;
+        esac
+
+        calls="$(tr "\n" ";" < "$log_file")"
+        calls="${calls%;}"
+
+        printf "calls=<%s>\n" "$calls"
+    ' _ \
+        "$TEST_ROOT/lib/distro/arch.sh" \
+        "$TEST_TMP" \
+        "$operation"
+}
+
+run_sudoers_install() {
+    bash -c '
+        source "$1"
+
+        run_cmd() {
+            local input
+            IFS= read -r input
+
+            printf "record=<%s|%s>\n" "$*" "$input"
+        }
+
+        install_sudoers_file \
+            /tmp/mais-sudoers \
+            "%wheel ALL=(ALL) NOPASSWD: ALL"
+    ' _ "$TEST_ROOT/lib/core/sudo.sh"
+}
+
 syntax_files=(
     "$MAIS"
     "$TEST_ROOT/lib/core/loader.sh"
@@ -426,6 +502,34 @@ run_test \
     run_package_lookup
 
 run_test \
+    "pacman-install-uses-run-command" \
+    0 \
+    stdout \
+    "calls=<run:pacman -S --noconfirm example-package>" \
+    run_arch_package_command pacman
+
+run_test \
+    "aur-install-uses-run-command" \
+    0 \
+    stdout \
+    "calls=<run:sudo -u testuser yay -S --noconfirm example-aur-package>" \
+    run_arch_package_command aur
+
+run_test \
+    "aurhelper-uses-git-sync-and-run-command" \
+    0 \
+    stdout \
+    "calls=<sync:testuser https://aur.archlinux.org/yay.git /home/testuser/.local/src/yay;cd:/home/testuser/.local/src/yay;run:sudo -u testuser makepkg --noconfirm -si>" \
+    run_arch_package_command aurhelper
+
+run_test \
+    "mirror-update-uses-run-command" \
+    0 \
+    stdout \
+    "calls=<run:reflector --country Germany --latest 16 --protocol https --sort rate --save /etc/pacman.d/mirrorlist>" \
+    run_arch_package_command mirrors
+
+run_test \
     "options-without-command" \
     1 \
     stderr \
@@ -613,6 +717,13 @@ run_test \
     stdout \
     "calls=<mkdir pull>" \
     run_git_sync existing
+
+run_test \
+    "sudoers-file-uses-command-input" \
+    0 \
+    stdout \
+    "record=<install -m 0440 /dev/stdin /tmp/mais-sudoers|%wheel ALL=(ALL) NOPASSWD: ALL>" \
+    run_sudoers_install
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 

@@ -53,6 +53,22 @@ command -v shellcheck >/dev/null 2>&1 || {
 }
 shellcheck "${files[@]}"
 
+printf 'Checking for unsafe shell-string execution...\n'
+
+unsafe_shell_usage="$(
+    grep -RnsE \
+        'cmd_suffix|(^|[[:space:];])eval[[:space:]]' \
+        "$ROOT/mais" \
+        "$ROOT/lib" ||
+        true
+)"
+
+if [[ -n "$unsafe_shell_usage" ]]; then
+    printf "Unsafe shell-string execution found:\n%s\n" \
+        "$unsafe_shell_usage" >&2
+    exit 1
+fi
+
 printf 'Checking extracted function locations...\n'
 
 functions=(
@@ -64,6 +80,10 @@ functions=(
     install_essentials
     install_aurhelper
     update_mirrors
+
+    install_sudoers_file
+    trap_cleanup_sudoers
+    wheel_can_sudo
 
     run_cmd
     sync_git_repo

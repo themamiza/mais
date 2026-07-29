@@ -25,8 +25,7 @@ aurhelper="yay"
 # of all commands that get run.
 verbose=false
 # When 'verbose=false' where should the suppressed output go?
-# This could be log file or just plain '/dev/null/' to destroy the messages.
-cmd_suffix=">/dev/null 2>&1"
+# You can change the output path through "lib/core/run.sh - run_cmd()".
 # 'quite=true' should silence any output from the script.
 quiet=false
 

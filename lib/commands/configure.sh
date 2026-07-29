@@ -27,12 +27,12 @@ configure_grub() {
         sprint "Enabling hibernation."
         grep -q resume /etc/mkinitcpio.conf || {
             sed -i "/^HOOKS=(.*)$/s/)$/ resume)/" /etc/mkinitcpio.conf
-            eval "mkinitcpio -P $cmd_suffix"
+            run_cmd mkinitcpio -P
         }
         grep -q resume /etc/default/grub || {
             local swapuuid; swapuuid=$(blkid | grep swap | grep -Po " UUID=\".*?\"" | sed "s/ //;s/UUID=//;s/\"//g")
             sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=.*$/s/.$/ resume=UUID=$swapuuid\"/" /etc/default/grub
-            eval "grub-mkconfig -o /boot/grub/grub.cfg $cmd_suffix"
+            run_cmd grub-mkconfig -o /boot/grub/grub.cfg
         }
     else 
         wprint "Not enough swap for hibernation."
@@ -69,8 +69,8 @@ configure_keyd() {
 capslock = esc
 esc = capslock\n" > /etc/keyd/default.conf
 
-    eval "systemctl enable --now keyd $cmd_suffix"
-    eval "keyd reload $cmd_suffix"
+    run_cmd systemctl enable --now keyd
+    run_cmd keyd reload
 }
 
 command_configure() {
