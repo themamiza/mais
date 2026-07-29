@@ -193,9 +193,11 @@ run_git_sync() {
     bash -c '
         source "$1"
 
-        destination="$2/repository"
+        destination="$2/repository-$3"
         repository_state="$3"
         calls=()
+
+        rm -rf "$destination"
 
         case "$repository_state" in
             existing)
