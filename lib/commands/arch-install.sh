@@ -153,6 +153,8 @@ arch_install_run_in_chroot() {
     if [ -f "/etc/installation.date" ]; then
         wprint "'/etc/installation.date' already exists."
         yes_no "Do you wish to overwrite it? (Y/N): " && date > /etc/installation.date
+    else
+        date > /etc/installation.date
     fi
 }
 
