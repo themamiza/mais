@@ -14,31 +14,29 @@ check_installed() {
 
 pacman_install() {
     nprint "Installing $1 -> $2"
-    eval "pacman -S --noconfirm '$1' $cmd_suffix"
+    run_cmd pacman -S --noconfirm "$1"
 }
 
 aur_install() {
     nprint "Installing $1 -> $2"
-    sudo -u "$username" sh -c "$aurhelper -S --noconfirm $1 $cmd_suffix"
+    run_cmd sudo -u "$username" "$aurhelper" -S --noconfirm "$1"
 }
 
 install_aurhelper() {
     check_installed "$aurhelper" && nprint "Found '$aurhelper'." && return 0
-    
+
     nprint "Installing '$aurhelper'."
+
     local src="/home/$username/.local/src/$aurhelper"
     local git_url="https://aur.archlinux.org/$aurhelper.git"
 
-    sudo -u "$username" mkdir -p "/home/$username/.local/src"
+    sync_git_repo "$username" "$git_url" "$src"
 
-    # shellcheck disable=2086
-    if ! sudo -u "$username" sh -c "git clone --depth 1 --single-branch --no-tags '$git_url' '$src' $cmd_suffix"; then
+    # Run the makepkg in it's own subshell, don't want the main CWD to change.
+    (
         cd "$src" || exit 1
-        sudo -u "$username" sh -c "git pull --force origin master $cmd_suffix"
-    fi
-    cd "$src" || exit 1
-    # shellcheck disable=2086
-    sudo -u "$username" sh -c "makepkg --noconfirm -si $cmd_suffix"
+        run_cmd sudo -u "$username" makepkg --noconfirm -si
+    )
 }
 
 install_essentials() {
@@ -55,5 +53,10 @@ install_essentials() {
 }
 
 update_mirrors() {
-    reflector --country Germany --latest 16 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+    run_cmd reflector \
+        --country Germany \
+        --latest 16 \
+        --protocol https \
+        --sort rate \
+        --save /etc/pacman.d/mirrorlist
 }
