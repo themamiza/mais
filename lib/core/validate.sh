@@ -9,3 +9,6 @@ regex_valid_directory="^[^/\0]+$"
 
 # Match the string ($1) to the regular expression ($2)
 re_match() { [[ "$1" =~ $2 ]]; }
+
+# Check if the value provided passes as a number
+is_number() { re_match "$1" "^[0-9]+$"; }

@@ -109,6 +109,17 @@ functions=(
 
     install_dotfiles
 
+    is_number
+
+    bytes_to_gb
+    can_hibernate
+    hibernation_required_swap_gb
+    grub_block_type
+    grub_swap_uuid
+    largest_active_swap_partition
+    mkinitcpio_has_hook
+    ensure_mkinitcpio_resume_hook
+
     configure_grub
     configure_pacman
     configure_makepkg

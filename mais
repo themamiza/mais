@@ -37,7 +37,16 @@ mais_load_module "lib/commands/update-mirrors.sh"
 mais_load_module "lib/commands/install-dotfiles.sh"
 mais_load_module "lib/commands/install-aurhelper.sh"
 mais_load_module "lib/commands/install-programs.sh"
+
+# Load configuration functions before the configure command
+mais_load_module "lib/commands/configure/grub.sh"
+mais_load_module "lib/commands/configure/pacman.sh"
+mais_load_module "lib/commands/configure/makepkg.sh"
+mais_load_module "lib/commands/configure/proxychains.sh"
+mais_load_module "lib/commands/configure/keyd.sh"
+
 mais_load_module "lib/commands/configure.sh"
+
 mais_load_module "lib/commands/experimental-clean-home.sh"
 mais_load_module "lib/commands/install.sh"
 # END MAIS MODULE LOADER

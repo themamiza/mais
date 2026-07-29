@@ -367,6 +367,194 @@ run_arch_install_dispatch() {
         "$mounted"
 }
 
+run_grub_hibernation_helpers() {
+    bash -c '
+        source "$1/lib/core/validate.sh"
+        source "$1/lib/commands/configure/grub.sh"
+
+        test_dir="$2/grub-hibernation-helpers"
+        rm -rf "$test_dir"
+        mkdir -p "$test_dir"
+
+        grub_power_state_file="$test_dir/power-state"
+        grub_image_size_file="$test_dir/image-size"
+        grub_meminfo_file="$test_dir/meminfo"
+        grub_swaps_file="$test_dir/swaps"
+
+        printf "freeze mem disk\n" \
+            > "$grub_power_state_file"
+
+        printf "%d\n" "$((4 * 1024 * 1024 * 1024))" \
+            > "$grub_image_size_file"
+
+        printf "MemTotal: 16777216 kB\n" \
+            > "$grub_meminfo_file"
+
+        cat > "$grub_swaps_file" <<EOF
+Filename Type Size Used Priority
+/dev/zram0 partition 8388608 0 100
+/swapfile file 16777216 0 -2
+/dev/sda2 partition 4194304 0 -2
+/dev/nvme0n1p3 partition 6291456 0 -3
+EOF
+
+        grub_block_type() {
+            case "$1" in
+                /dev/zram0)
+                    printf "disk\n"
+                    ;;
+                *)
+                    printf "part\n"
+                    ;;
+            esac
+        }
+
+        printf "number=<%s>\n" \
+            "$(is_number 12345 && printf yes || printf no)"
+
+        printf "can-hibernate=<%s>\n" \
+            "$(can_hibernate && printf yes || printf no)"
+
+        printf "required=<%s>\n" \
+            "$(hibernation_required_swap_gb)"
+
+        printf "swap=<%s>\n" \
+            "$(largest_active_swap_partition)"
+    ' _ "$TEST_ROOT" "$TEST_TMP"
+}
+
+run_grub_hibernation_configuration() {
+    bash -c '
+        source "$1/lib/core/validate.sh"
+        source "$1/lib/commands/configure/grub.sh"
+
+        test_dir="$2/grub-hibernation-config"
+        rm -rf "$test_dir"
+        mkdir -p "$test_dir"
+
+        grub_defaults_file="$test_dir/default-grub"
+        grub_mkinitcpio_file="$test_dir/mkinitcpio.conf"
+        grub_output_file="$test_dir/grub.cfg"
+        grub_power_state_file="$test_dir/power-state"
+        grub_image_size_file="$test_dir/image-size"
+        grub_meminfo_file="$test_dir/meminfo"
+        grub_swaps_file="$test_dir/swaps"
+
+        cat > "$grub_defaults_file" <<EOF
+GRUB_TIMEOUT=5
+#GRUB_DISABLE_OS_PROBER=false
+GRUB_DEFAULT=0
+#GRUB_SAVEDEFAULT=true
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"
+EOF
+
+        printf "HOOKS=(base udev autodetect fsck)\n" \
+            > "$grub_mkinitcpio_file"
+
+        printf "freeze mem disk\n" \
+            > "$grub_power_state_file"
+
+        printf "%d\n" "$((4 * 1024 * 1024 * 1024))" \
+            > "$grub_image_size_file"
+
+        printf "MemTotal: 16777216 kB\n" \
+            > "$grub_meminfo_file"
+
+        cat > "$grub_swaps_file" <<EOF
+Filename Type Size Used Priority
+/dev/sda2 partition 6291456 0 -2
+EOF
+
+        grub_block_type() {
+            printf "part\n"
+        }
+
+        grub_swap_uuid() {
+            printf "test-swap-uuid\n"
+        }
+
+        sprint() {
+            :
+        }
+
+        wprint() {
+            printf "warning=<%s>\n" "$1"
+        }
+
+        calls=()
+
+        run_cmd() {
+            calls+=("$*")
+        }
+
+        configure_grub
+
+        printf "grub=<%s>\n" \
+            "$(grep "^GRUB_CMDLINE_LINUX_DEFAULT=" \
+                "$grub_defaults_file")"
+
+        printf "hooks=<%s>\n" \
+            "$(grep "^HOOKS=" "$grub_mkinitcpio_file")"
+
+        printf "calls=<%s>\n" \
+            "$(IFS=";"; printf "%s" "${calls[*]}")"
+    ' _ "$TEST_ROOT" "$TEST_TMP"
+}
+
+run_grub_without_swap() {
+    bash -c '
+        source "$1/lib/core/validate.sh"
+        source "$1/lib/commands/configure/grub.sh"
+
+        test_dir="$2/grub-without-swap"
+        rm -rf "$test_dir"
+        mkdir -p "$test_dir"
+
+        grub_defaults_file="$test_dir/default-grub"
+        grub_mkinitcpio_file="$test_dir/mkinitcpio.conf"
+        grub_output_file="$test_dir/grub.cfg"
+        grub_power_state_file="$test_dir/power-state"
+        grub_image_size_file="$test_dir/image-size"
+        grub_meminfo_file="$test_dir/meminfo"
+        grub_swaps_file="$test_dir/swaps"
+
+        cat > "$grub_defaults_file" <<EOF
+GRUB_TIMEOUT=5
+GRUB_DEFAULT=0
+GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+EOF
+
+        printf "HOOKS=(base udev fsck)\n" \
+            > "$grub_mkinitcpio_file"
+
+        printf "freeze mem disk\n" \
+            > "$grub_power_state_file"
+
+        printf "%d\n" "$((4 * 1024 * 1024 * 1024))" \
+            > "$grub_image_size_file"
+
+        printf "MemTotal: 16777216 kB\n" \
+            > "$grub_meminfo_file"
+
+        printf "Filename Type Size Used Priority\n" \
+            > "$grub_swaps_file"
+
+        sprint() {
+            :
+        }
+
+        wprint() {
+            :
+        }
+
+        run_cmd() {
+            printf "run=<%s>\n" "$*"
+        }
+
+        configure_grub
+    ' _ "$TEST_ROOT" "$TEST_TMP"
+}
+
 syntax_files=(
     "$MAIS"
     "$TEST_ROOT/lib/core/loader.sh"
@@ -390,6 +578,11 @@ syntax_files=(
     "$TEST_ROOT/lib/commands/install-dotfiles.sh"
     "$TEST_ROOT/lib/commands/install-aurhelper.sh"
     "$TEST_ROOT/lib/commands/install-programs.sh"
+    "$TEST_ROOT/lib/commands/configure/grub.sh"
+    "$TEST_ROOT/lib/commands/configure/pacman.sh"
+    "$TEST_ROOT/lib/commands/configure/makepkg.sh"
+    "$TEST_ROOT/lib/commands/configure/proxychains.sh"
+    "$TEST_ROOT/lib/commands/configure/keyd.sh"
     "$TEST_ROOT/lib/commands/configure.sh"
     "$TEST_ROOT/lib/commands/experimental-clean-home.sh"
     "$TEST_ROOT/lib/commands/install.sh"
@@ -796,6 +989,70 @@ run_test \
     stderr \
     "requires an existing filesystem mounted at '/mnt'" \
     run_arch_install_dispatch mounted false
+
+run_test \
+    "number-helper-accepts-digits" \
+    0 \
+    stdout \
+    "number=<yes>" \
+    run_grub_hibernation_helpers
+
+run_test \
+    "kernel-hibernation-support-detected" \
+    0 \
+    stdout \
+    "can-hibernate=<yes>" \
+    run_grub_hibernation_helpers
+
+run_test \
+    "hibernation-requirement-returned-in-gb" \
+    0 \
+    stdout \
+    "required=<4.500000>" \
+    run_grub_hibernation_helpers
+
+run_test \
+    "largest-plain-swap-partition-selected" \
+    0 \
+    stdout \
+    "swap=</dev/nvme0n1p3 6.000000>" \
+    run_grub_hibernation_helpers
+
+run_test \
+    "grub-adds-resume-uuid" \
+    0 \
+    stdout \
+    'grub=<GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3'\
+' resume=UUID=test-swap-uuid">' \
+    run_grub_hibernation_configuration
+
+run_test \
+    "mkinitcpio-resume-hook-added" \
+    0 \
+    stdout \
+    "hooks=<HOOKS=(base udev autodetect resume fsck)>" \
+    run_grub_hibernation_configuration
+
+run_test \
+    "hibernation-regenerates-initramfs" \
+    0 \
+    stdout \
+    "mkinitcpio -P" \
+    run_grub_hibernation_configuration
+
+run_test \
+    "grub-configuration-is-regenerated" \
+    0 \
+    stdout \
+    "grub-mkconfig -o" \
+    run_grub_hibernation_configuration
+
+run_test \
+    "grub-regenerated-without-swap" \
+    0 \
+    stdout \
+    "run=<grub-mkconfig -o" \
+    run_grub_without_swap
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 
