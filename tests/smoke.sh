@@ -262,6 +262,116 @@ run_sudoers_install() {
     ' _ "$TEST_ROOT"
 }
 
+run_install_release() {
+    local scenario="$1"
+
+    bash -c '
+        source "$1/lib/commands/install.sh"
+
+        scenario="$2"
+        test_dir="$3/install-$scenario"
+        install_path="$test_dir/bin"
+        destination="$install_path/mais"
+        program_name=mais
+
+        rm -rf "$test_dir"
+        mkdir -p "$install_path"
+        printf "old-release\n" >"$destination"
+
+        calls=()
+        installed=no
+
+        is_archlinux() {
+            return 0
+        }
+
+        isRoot() {
+            return 0
+        }
+
+        check_internet_connection() {
+            return 0
+        }
+
+        sprint() {
+            :
+        }
+
+        mktemp() {
+            rm -rf "$test_dir/download"
+            mkdir -p "$test_dir/download"
+            printf "%s\n" "$test_dir/download"
+        }
+
+        eprint() {
+            printf "error=<%s> calls=<%s> installed=<%s> content=<%s>\n" "$1" "${calls[*]}" "$installed" "$(cat "$destination")" >&2
+            exit 1
+        }
+
+        run_cmd() {
+            local command="$1"
+            shift
+
+            case "$command" in
+                curl)
+                    local url=
+                    local output=
+
+                    while (( $# )); do
+                        case "$1" in
+                            https://*)
+                                url="$1"
+                                shift
+                                ;;
+                            --output)
+                                output="$2"
+                                shift 2
+                                ;;
+                            *)
+                                shift
+                                ;;
+                        esac
+                    done
+
+                    local asset="${url##*/}"
+                    calls+=("curl:$asset")
+
+                    [[ "$scenario" == download-failure && "$asset" == mais ]] && return 7
+
+                    if [[ "$asset" == mais ]]; then
+                        printf "new-release\n" >"$output"
+                    elif [[ "$scenario" == checksum-failure ]]; then
+                        printf "%064d  mais\n" 0 >"$output"
+                    else
+                        (cd "${output%/*}" && sha256sum mais >"${output##*/}")
+                    fi
+                    ;;
+                install)
+                    local destination_argument="${!#}"
+                    local source_index=$(( $# - 1 ))
+                    local source_argument="${!source_index}"
+
+                    calls+=(install)
+
+                    [[ " $* " == *" -Dm755 "* ]] || return 9
+                    [[ "$destination_argument" == "$destination" ]] || return 9
+
+                    command cp "$source_argument" "$destination_argument"
+                    command chmod 755 "$destination_argument"
+                    installed=yes
+                    ;;
+                *)
+                    return 10
+                    ;;
+            esac
+        }
+
+        command_install
+
+        printf "calls=<%s> installed=<%s> content=<%s>\n" "${calls[*]}" "$installed" "$(cat "$destination")"
+    ' _ "$TEST_ROOT" "$scenario" "$TEST_TMP"
+}
+
 run_arch_install_dispatch() {
     local mode="$1"
     local mounted="${2:-true}"
@@ -826,6 +936,27 @@ run_test \
     stdout \
     "record=<install -m 0440 /dev/stdin /tmp/mais-sudoers|%wheel ALL=(ALL) NOPASSWD: ALL>" \
     run_sudoers_install
+
+run_test \
+    "install-downloads-verifies-and-installs" \
+    0 \
+    stdout \
+    "calls=<curl:mais curl:mais.sha256 install> installed=<yes> content=<new-release>" \
+    run_install_release success
+
+run_test \
+    "install-stops-on-download-failure" \
+    1 \
+    stderr \
+    "error=<Could not download the latest mais release.> calls=<curl:mais> installed=<no> content=<old-release>" \
+    run_install_release download-failure
+
+run_test \
+    "install-stops-on-checksum-failure" \
+    1 \
+    stderr \
+    "error=<Release checksum verification failed.> calls=<curl:mais curl:mais.sha256> installed=<no> content=<old-release>" \
+    run_install_release checksum-failure
 
 run_test \
     "arch-install-dispatches-vm" \
