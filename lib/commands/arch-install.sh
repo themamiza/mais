@@ -125,6 +125,7 @@ arch_install_run_in_chroot() {
 }
 
 arch_install() {
+    local bios_or_uefi
     local boot_disk=""
     local target_efi_directory="/mnt$efi_directory"
 

@@ -422,7 +422,6 @@ run_arch_install_bootstrap() {
         username=testuser
         hostname=testhost
         timezone=UTC
-        bios_or_uefi=UEFI
         bootloader_id=GRUB
         efi_directory=/efi
 
