@@ -440,6 +440,10 @@ run_arch_install_bootstrap() {
             touch "$arch_efi_platform_size_file"
         fi
 
+        mountpoint() {
+            return 0
+        }
+
         yes_no() {
             return 0
         }

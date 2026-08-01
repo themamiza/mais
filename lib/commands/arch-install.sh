@@ -55,10 +55,17 @@ arch_install_run_in_chroot() {
     # nprint "Creating new initramfs."
     # run_cmd mkinitcpio -P
 
-    sprint "Installing grub bootloader to /efi."
     case "$bios_or_uefi" in
-        "UEFI") run_cmd grub-install --target=x86_64-efi --efi-directory="$efi_directory" --bootloader-id="$bootloader_id";;
-        "BIOS") run_cmd grub-install --target=i386-pc "$boot_disk";;
+        "UEFI")
+            sprint "Installing GRUB to '$efi_directory'."
+            run_cmd grub-install \
+                --target=x86_64-efi --efi-directory="$efi_directory" --bootloader-id="$bootloader_id"
+            ;;
+        "BIOS")
+            sprint "Installing GRUB to '$boot_disk'."
+            run_cmd grub-install \
+                --target=i386-pc "$boot_disk"
+            ;;
     esac
 
     sprint "Re-creating grub configuration."
@@ -89,12 +96,23 @@ arch_install_run_in_chroot() {
 
 arch_install() {
     local boot_disk=""
+    local target_efi_directory="/mnt$efi_directory"
+
+    if [[ -r "$arch_efi_platform_size_file" ]]; then
+        bios_or_uefi="UEFI"
+
+        mountpoint -q -- "$target_efi_directory" || eprint "UEFI installation requires the EFI system partition mounted at '$target_efi_directory'."
+    else
+        bios_or_uefi="BIOS"
+        ask_boot_disk
+    fi
 
     printf "The rest of the installation assumes you have\n
 1. an internet connection. \`iwctl\`
 2. synchronized system clock. \`timedatectl set-ntp true\`
-3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`\n\n
-SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
+3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`
+4. mounted any additional filesystems below '/mnt'.\n\n
+SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
     yes_no "Continue (Y/N): " || exit 0
 
     ask_username
@@ -120,13 +138,6 @@ SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     fi
 
     # TODO: Print configuration before installing.
-    
-    if [[ -r "$arch_efi_platform_size_file" ]]; then
-        bios_or_uefi="UEFI"
-    else
-        bios_or_uefi="BIOS"
-        ask_boot_disk
-    fi
 
     sprint "Checking internet connection...\n"
     check_internet_connection || eprint "Can't reach the web."
