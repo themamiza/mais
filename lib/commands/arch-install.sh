@@ -5,6 +5,24 @@
 # Tests replace this path to simulate BIOS and UEFI systems.
 arch_efi_platform_size_file="/sys/firmware/efi/fw_platform_size"
 
+generate_fstab() {
+    local generated_fstab
+    generated_fstab="$(mktemp)"
+
+    if ! genfstab -U /mnt > "$generated_fstab"; then
+        rm -f "$generated_fstab"
+        eprint "Failed to generate fstab."
+    fi
+
+    if [[ ! -s "$generated_fstab" ]]; then
+        rm -f "$generated_fstab"
+        eprint "Generated fstab is empty."
+    fi
+
+    cat "$generated_fstab"
+    rm -f "$generated_fstab"
+}
+
 # Why do I pass all the variables as arguments? Explained in `arch_install`.
 # args: username pass1 hostname timezone bios_or_uefi bootloader_id 
 # efi_directory boot_disk verbose quiet program_name
@@ -145,12 +163,12 @@ SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
 
     base_packages=(base linux-lts linux-firmware grub networkmanager sudo neovim zsh)
     [ "$bios_or_uefi" = "UEFI" ] && base_packages+=(efibootmgr)
-    sprint "Bootstraping the system...\n"
+    sprint "Bootstrapping the system...\n"
     pacstrap -K /mnt "${base_packages[@]}"
     sprint "Done bootstrapping the system.\n"
 
     sprint "Generating fstab...\n"
-    genfstab -U /mnt >> /mnt/etc/fstab
+    generate_fstab > /mnt/etc/fstab
     sprint "fstab written to /mnt/etc/fstab.\n"
 
     # Exporting the function to later be passed to arch-chroot as a command.
