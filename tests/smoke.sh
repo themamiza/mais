@@ -455,18 +455,16 @@ run_arch_install_bootstrap() {
             :
         }
 
+        ask_password() {
+            pass1=test-password
+        }
+
         ask_hostname() {
             :
         }
 
         ask_timezone() {
             :
-        }
-
-        read() {
-            local variable="${!#}"
-
-            printf -v "$variable" "%s" test-password
         }
 
         check_internet_connection() {

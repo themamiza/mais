@@ -144,15 +144,7 @@ arch_install() {
     install_live_deps
 
     ask_username
-
-    # Get password for said user.
-    while true; do
-        printf "%s's password: " "$username" && read -rs pass1 && printf "\n"
-        printf "Retype password: " && read -rs pass2 && printf "\n"
-        [ -n "$pass1" ] && [ "$pass1" = "$pass2" ] && unset pass2 && break
-        wprint "Passwords do not match or are empty. Try again."
-    done
-
+    ask_password
     ask_hostname
     ask_timezone
 
@@ -177,7 +169,7 @@ arch_install() {
 4. mounted any additional filesystems below '/mnt'.\n
 SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
     if ! yes_no "Begin installation? (Y/N): "; then
-        unset pass1 pass2
+        unset pass1
         exit 0
     fi
     printf "\n"
@@ -207,10 +199,10 @@ SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
     sprint "Setting password for '$username'."
 
     if ! printf '%s:%s\n' "$username" "$pass1" | arch-chroot /mnt chpasswd; then
-        unset pass1 pass2
+        unset pass1
         eprint "Failed to set password for '$username'."
     fi
-    unset pass1 pass2
+    unset pass1
 
     yes_no "The system should be ready to reboot, Continue (Y/N): " || exit 0
     reboot

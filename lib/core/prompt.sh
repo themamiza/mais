@@ -26,6 +26,22 @@ ask_username() {
     done
 }
 
+ask_password() {
+    local pass2
+
+    while true; do
+        printf "%s's password: " "$username" && read -rs pass1 && printf "\n"
+        printf "Retype password: " && read -rs pass2 && printf "\n"
+
+        if [[ -n "$pass1" && "$pass1" == "$pass2" ]]; then
+            return 0
+        fi
+
+        unset pass1
+        wprint "Passwords do not match or are empty. Try again."
+    done
+}
+
 ask_hostname() {
     # Return if hostname is already set.
     [ -n "$hostname" ] && return

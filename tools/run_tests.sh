@@ -82,6 +82,7 @@ functions=(
     update_mirrors
 
     ask_username
+    ask_password
     ask_hostname
     ask_timezone
     ask_boot_disk
