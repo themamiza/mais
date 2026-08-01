@@ -483,6 +483,10 @@ run_arch_install_bootstrap() {
             :
         }
 
+        confirm_arch_install() {
+            return 0
+        }
+
         pacstrap() {
             shift 2
 

@@ -86,6 +86,7 @@ functions=(
     ask_hostname
     ask_timezone
     ask_boot_disk
+    confirm_arch_install
 
     install_sudoers_file
     trap_cleanup_sudoers

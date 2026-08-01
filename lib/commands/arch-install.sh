@@ -150,25 +150,7 @@ arch_install() {
 
     [[ "$bios_or_uefi" == "BIOS" ]] && ask_boot_disk
 
-    printf "\nInstallation configuration:\n
-\tUsername:\t%s
-\tHostname:\t%s
-\tTimezone:\t%s
-\tFirmware mode:\t%s\n" "$username" "$hostname" "$timezone" "$bios_or_uefi"
-
-    case "$bios_or_uefi" in
-        "UEFI") printf "\tEFI mount:\t/mnt%s\n\tBootloader ID:\t%s\n" "$efi_directory" "$bootloader_id";;
-        "BIOS") printf "\tGRUB target disk:\t%s\n" "$boot_disk";;
-    esac
-    printf "\n"
-
-    printf "The rest of the installation assumes you have\n
-1. an internet connection. \`iwctl\`
-2. synchronized system clock. \`timedatectl set-ntp true\`
-3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`
-4. mounted any additional filesystems below '/mnt'.\n
-SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
-    if ! yes_no "Begin installation? (Y/N): "; then
+    if ! confirm_arch_install "$bios_or_uefi" "$boot_disk"; then
         unset pass1
         exit 0
     fi
