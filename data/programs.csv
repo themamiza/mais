@@ -174,9 +174,6 @@ AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and
                 | extra      | pkgfile                          | "A tool to search for files in official repository packages"
 AUR             | extra      | c-lolcat                         | "High-performance implementation of lolcat"
 
-AUR             | extra      | dupeguru                         | "Find duplicate files with various contents, using perceptual diff for pictures"
-
-
 # Filesystem
                 |            | dosfstools                       | "DOS filesystem utilities"
                 |            | ntfs-3g                          | "NTFS FUSE driver"
@@ -204,10 +201,10 @@ AUR             | extra      | simple-mtpfs                     | "A FUSE filesy
 # Theme
 AUR             |            | dracula-gtk-theme-git            | "Dark theme for GTK"
                 |            | breeze-icons                     | "Breeze icon theme"
+                |            | breeze-cursors                   | "Breeze cursors"
 AUR             |            | catppuccin-gtk-theme-macchiato   | "Soothing pastel theme for GTK - Macchiato"
 # AUR             | extra      | alacritty-theme-git              | "Collection of Alacritty color schemes." # Broken install
                 |            | nwg-look                         | "GTK settings editor adapted to work on wlroots-based compositors"
-AUR             |            | xcursor-breeze                   | "N/A"
                 |            | kvantum                          | "SVG-based theme engine for Qt6 (including config tool and extra themes)"
                 |            | kvantum-qt5                      | "SVG-based theme engine for Qt5"
 
