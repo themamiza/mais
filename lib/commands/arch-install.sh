@@ -24,23 +24,22 @@ generate_fstab() {
 }
 
 # Why do I pass all the variables as arguments? Explained in `arch_install`.
-# args: username pass1 hostname timezone bios_or_uefi bootloader_id 
+# args: username hostname timezone bios_or_uefi bootloader_id 
 # efi_directory boot_disk verbose quiet program_name
 arch_install_run_in_chroot() {
     # Renaming vars only for more readability.
     local username="$1"
-    local pass1="$2"
-    local hostname="$3"
-    local timezone="$4"
-    local bios_or_uefi="$5"
-    local bootloader_id="$6"
-    local efi_directory="$7"
-    local boot_disk="$8"
+    local hostname="$2"
+    local timezone="$3"
+    local bios_or_uefi="$4"
+    local bootloader_id="$5"
+    local efi_directory="$6"
+    local boot_disk="$7"
 
     # These need to be global so invoked functions can use them.
-    verbose="$9"
-    quiet="${10}"
-    program_name="${11}"
+    verbose="$8"
+    quiet="$9"
+    program_name="${10}"
     
     # TODO: Should this be done during initial installation?
     # if command -v nvim >/dev/null 2>&1; then
@@ -93,10 +92,6 @@ arch_install_run_in_chroot() {
     if ! id "$username" >/dev/null 2>&1; then
         useradd --create-home --user-group --groups wheel --shell /bin/zsh "$username"
     fi
-
-    sprint "Changing password for new user."
-    echo "$username:$pass1" | chpasswd
-    unset pass1 pass2
 
     wheel_can_sudo
 
@@ -174,16 +169,23 @@ SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
     # Exporting the function to later be passed to arch-chroot as a command.
     # That is why all the variables are passed manually.
     # TODO: Investigate if it can be done any other way.
-    # arch_install_run_in_chroot() { # -> args: username pass1 hostname timezone bios_or_uefi bootloader_id efi_directory boot_disk verbose quiet program_name
     local exported_functions=(arch_install_run_in_chroot run_cmd install_sudoers_file wheel_can_sudo trap_cleanup_sudoers yes_no nprint sprint wprint)
     for fn in "${exported_functions[@]}"; do
         # shellcheck disable=2163
         export -f "$fn"
     done
 
-    arch-chroot /mnt /bin/bash -c 'arch_install_run_in_chroot "$@"' _ "$username" "$pass1" "$hostname" "$timezone" "$bios_or_uefi" "$bootloader_id" "$efi_directory" "$boot_disk" "$verbose" "$quiet" "$program_name"
+    # arch_install_run_in_chroot() { # -> args: username hostname timezone bios_or_uefi bootloader_id efi_directory boot_disk verbose quiet program_name
+    arch-chroot /mnt /bin/bash -c 'arch_install_run_in_chroot "$@"' _ "$username" "$hostname" "$timezone" "$bios_or_uefi" "$bootloader_id" "$efi_directory" "$boot_disk" "$verbose" "$quiet" "$program_name"
 
+    sprint "Setting password for '$username'."
+
+    if ! printf '%s:%s\n' "$username" "$pass1" | arch-chroot /mnt chpasswd; then
+        unset pass1 pass2
+        eprint "Failed to set password for '$username'."
+    fi
     unset pass1 pass2
+
     yes_no "The system should be ready to reboot, Continue (Y/N): " || exit 0
     reboot
 }
