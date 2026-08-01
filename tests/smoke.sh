@@ -425,7 +425,11 @@ run_arch_install_bootstrap() {
         bios_or_uefi=UEFI
         bootloader_id=GRUB
         efi_directory=/efi
-        disk_to_install=/dev/vda
+
+        ask_boot_disk() {
+            boot_disk=/dev/test-disk
+        }
+
         verbose=false
         quiet=false
         program_name=mais

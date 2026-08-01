@@ -81,6 +81,10 @@ functions=(
     install_aurhelper
     update_mirrors
 
+    ask_username
+    ask_hostname
+    ask_boot_disk
+
     install_sudoers_file
     trap_cleanup_sudoers
     wheel_can_sudo

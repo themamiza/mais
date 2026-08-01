@@ -13,7 +13,6 @@ bios_or_uefi="UEFI"        # Set to "BIOS" to install for BIOS systems.
                            # Use "BIOS" when "UEFI" is not available.
 cat /sys/firmware/efi/fw_platform_size >/dev/null 2>&1 || bios_or_uefi="BIOS"
 
-disk_to_install="/dev/vda" # Only matters when using "BIOS".
 bootloader_id="ArchLinux"  # Only matters when using "UEFI".
 efi_directory="/efi"
 
