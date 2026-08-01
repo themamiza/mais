@@ -126,7 +126,7 @@ arch_install() {
 3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`
 4. mounted any additional filesystems below '/mnt'.\n\n
 SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
-    yes_no "Continue (Y/N): " || exit 0
+    yes_no "Continue to configuration? (Y/N): " || exit 0
 
     ask_username
 
@@ -150,7 +150,24 @@ SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
         done
     fi
 
-    # TODO: Print configuration before installing.
+    printf "\nInstallation configuration:\n
+\tUsername:\t%s
+\tHostname:\t%s
+\tTimezone:\t%s
+\tFirmware mode:\t%s\n" "$username" "$hostname" "$timezone" "$bios_or_uefi"
+
+    case "$bios_or_uefi" in
+        "UEFI")
+            printf "\tEFI mount:\t/mnt%s\n\tBootloader ID:\t%s\n" "$efi_directory" "$bootloader_id";;
+
+        "BIOS") printf "\tGRUB target disk:\t%s\n" "$boot_disk";;
+    esac
+    printf "\n"
+
+    if ! yes_no "Begin installation? (Y/N): "; then
+        unset pass1 pass2
+        exit 0
+    fi
 
     sprint "Checking internet connection...\n"
     check_internet_connection || eprint "Can't reach the web."

@@ -11,6 +11,7 @@ resolve_runtime_defaults() {
 
     # Set hostname to current hostname if not already provided.
     [ -z "$hostname" ] && hostname="$(hostnamectl hostname 2>/dev/null || cat /etc/hostname)"
+    [[ "$hostname" == "archiso" ]] && unset hostname
 
     return 0
 }
