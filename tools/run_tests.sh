@@ -83,6 +83,7 @@ functions=(
 
     ask_username
     ask_hostname
+    ask_timezone
     ask_boot_disk
 
     install_sudoers_file
@@ -93,6 +94,7 @@ functions=(
     sync_git_repo
     check_internet_connection
 
+    install_live_deps
     arch_install_run_in_chroot
     arch_install
 

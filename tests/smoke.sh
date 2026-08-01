@@ -436,6 +436,10 @@ run_arch_install_bootstrap() {
 
         arch_efi_platform_size_file="$test_dir/fw-platform-size"
 
+        install_live_deps() {
+            :
+        }
+
         if [[ "$scenario" == uefi ]]; then
             touch "$arch_efi_platform_size_file"
         fi
@@ -453,6 +457,10 @@ run_arch_install_bootstrap() {
         }
 
         ask_hostname() {
+            :
+        }
+
+        ask_timezone() {
             :
         }
 

@@ -42,6 +42,29 @@ ask_hostname() {
     done
 }
 
+ask_timezone() {
+    local available_timezones
+    local selected_timezone
+
+    if [[ -n "$timezone" ]]; then
+        if [[ ! -f "/usr/share/zoneinfo/$timezone" ]]; then
+            eprint "Timezone '$timezone' is not valid."
+        fi
+
+        return 0
+    fi
+
+    available_timezones="$(timedatectl list-timezones)" || eprint "Failed to list available timezones."
+
+    if ! selected_timezone="$(printf "%s\n" "$available_timezones" | fzf --height=60% --layout=reverse --border --prompt="Timezone > ")"; then
+        eprint "Timezone selection was cancelled."
+    fi
+
+    [[ -n "$selected_timezone" ]] || eprint "No timezone was selected."
+
+    timezone="$selected_timezone"
+}
+
 ask_boot_disk() {
     while true; do
         printf "\nAvailable disks:\n"

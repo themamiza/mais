@@ -23,6 +23,23 @@ generate_fstab() {
     rm -f "$generated_fstab"
 }
 
+install_live_deps() {
+    local live_packages=(fzf)
+    local missing_packages=()
+
+    local package
+    for package in "${live_packages[@]}"; do
+        check_installed "$package" || missing_packages+=("$package")
+    done
+
+    (( ${#missing_packages[@]} == 0 )) && return 0
+
+    sprint "Preparing the live installation environment."
+    if ! run_cmd pacman -Sy --needed --noconfirm "${missing_packages[@]}"; then
+        eprint "Failed to prepare the live installation environment."
+    fi
+}
+
 # Why do I pass all the variables as arguments? Explained in `arch_install`.
 # args: username hostname timezone bios_or_uefi bootloader_id 
 # efi_directory boot_disk verbose quiet program_name
@@ -119,6 +136,12 @@ arch_install() {
         bios_or_uefi="BIOS"
     fi
 
+    sprint "Checking internet connection...\n"
+    check_internet_connection || eprint "Can't reach the web."
+    sprint "Internet connection is available.\n"
+
+    install_live_deps
+
     ask_username
 
     # Get password for said user.
@@ -130,16 +153,7 @@ arch_install() {
     done
 
     ask_hostname
-
-    # Change this so it uses fzf for easier access.
-    if [ -z "$timezone" ]; then
-        while true; do
-            printf "Timezone (Region/City) [UTC]: " && read -r timezone
-            timezone="${timezone:-UTC}"
-            [ -f "/usr/share/zoneinfo/$timezone" ] && break
-            wprint "Timezone not valid. A valid timezone looks like -> \"US/Eastern\""
-        done
-    fi
+    ask_timezone
 
     [[ "$bios_or_uefi" == "BIOS" ]] && ask_boot_disk
 
@@ -166,10 +180,6 @@ SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
         exit 0
     fi
     printf "\n"
-
-    sprint "Checking internet connection...\n"
-    check_internet_connection || eprint "Can't reach the web."
-    sprint "Internet connection is available.\n"
 
     base_packages=(base linux-lts linux-firmware grub networkmanager sudo neovim zsh)
     [ "$bios_or_uefi" = "UEFI" ] && base_packages+=(efibootmgr)
