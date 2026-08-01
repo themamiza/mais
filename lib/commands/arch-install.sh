@@ -5,81 +5,6 @@
 # Tests replace this path to simulate BIOS and UEFI systems.
 arch_efi_platform_size_file="/sys/firmware/efi/fw_platform_size"
 
-ensure_mount_point() {
-    if mountpoint -q /mnt; then
-        wprint "'/mnt' is already in use."
-        yes_no "Do you want to unmount before continuing? (Y/N): " && umount -R /mnt && return
-        nprint "Proceeding with existing mount points." && return 1
-    else
-        return 0
-    fi
-}
-
-# label -> label type: dos/gpt
-# size  -> measured in sectors; each sector being 512 bytes.
-partition_main() {
-    eprint "Not implemented!"
-}
-
-partition_x220() {
-    case "$bios_or_uefi" in
-        "UEFI")
-            printf "label: gpt
-start=,size=2000000,type=U
-start=,size=64000000
-start=,size=416000000
-start=,size=,type=S\n" | sfdisk /dev/sda --wipe always
-        mkfs.fat  -F 32 /dev/sda1
-        mkfs.ext4 -qF /dev/sda2
-        mkfs.ext4 -qF /dev/sda3
-        mkswap /dev/sda4
-
-        mount /dev/sda2 /mnt
-        mount --mkdir /dev/sda1 /mnt/efi
-        mount --mkdir /dev/sda3 /mnt/home
-        swapon /dev/sda4
-        ;;
-
-        "BIOS") printf "label: dos
-start=,size=64000000
-start=,size=\n" | sfdisk /dev/sda --wipe always
-        mkfs.ext4 -qF /dev/sda1
-        mkfs.ext4 -qF /dev/sda2
-
-        mount /dev/sda1 /mnt
-        mount --mkdir /dev/sda2 /mnt/home
-        ;;
-    esac
-}
-
-partition_vm() {
-    case "$bios_or_uefi" in
-        "UEFI") 
-            printf "label: gpt
-start=,size=2000000,type=U
-start=,size=64000000
-start=,size=\n" | sfdisk /dev/vda --wipe always
-        mkfs.fat  -F 32 /dev/vda1
-        mkfs.ext4 -qF /dev/vda2
-        mkfs.ext4 -qF /dev/vda3
-
-        mount /dev/vda2 /mnt
-        mount --mkdir /dev/vda1 /mnt/efi
-        mount --mkdir /dev/vda3 /mnt/home
-        ;;
-
-        "BIOS") printf "label: dos
-start=,size=64000000
-start=,size=\n" | sfdisk /dev/vda --wipe always
-        mkfs.ext4 -qF /dev/vda1
-        mkfs.ext4 -qF /dev/vda2
-
-        mount /dev/vda1 /mnt
-        mount --mkdir /dev/vda2 /mnt/home
-        ;;
-    esac
-}
-
 # Why do I pass all the variables as arguments? Explained in `arch_install`.
 # args: username pass1 hostname timezone bios_or_uefi bootloader_id 
 # efi_directory disk_to_install verbose quiet program_name
@@ -163,10 +88,10 @@ arch_install_run_in_chroot() {
 }
 
 arch_install() {
-    printf "The rest of the installation assumes you have
+    printf "The rest of the installation assumes you have\n
 1. an internet connection. \`iwctl\`
 2. synchronized system clock. \`timedatectl set-ntp true\`
-3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`\n
+3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`\n\n
 SHOULD NOT BE RAN ON AN EXISTING ARCH INSTALLAION!\n\n"
     yes_no "Continue (Y/N): " || exit 0
 
@@ -231,17 +156,7 @@ command_arch_install() {
     is_archlinux || eprint "Can only install an ArchLinux system."
     isRoot || eprint "Only root can install the system."
 
-    if [[ "$partition_mode" == "mounted" ]]; then
-        mountpoint -q /mnt || eprint "'mounted' mode requires an existing filesystem mounted at '/mnt'."
-    elif ensure_mount_point; then
-        yes_no "Continuing will result in your data being lost. Continue? (Y/N): " || exit 0
-
-        case "$partition_mode" in
-            "vm") partition_vm;;
-            "main") partition_main;;
-            "x220") partition_x220;;
-        esac
-    fi
+    mountpoint -q /mnt || eprint "\`arch-install\` requires an existing filesystem mounted at '/mnt'."
 
     arch_install
     exit 0

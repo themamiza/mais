@@ -89,10 +89,6 @@ functions=(
     sync_git_repo
     check_internet_connection
 
-    ensure_mount_point
-    partition_main
-    partition_x220
-    partition_vm
     arch_install_run_in_chroot
     arch_install
 

@@ -10,15 +10,17 @@ print_help() {
 
         help                    Print this help message and exit
 
-        arch-install partition_mode
+        arch-install
 
                 Install ArchLinux according to the **Installation Guide** https://wiki.archlinux.org/title/Installation_guide
 
                 The script will default to UEFI and fallback to BIOS if needed
-                
-                'partition_mode' should be one of 'vm', 'main', 'x220' or 'mounted' for a custom made partition table
 
-                You can read more about 'partition_mode's in README.md
+                The target root filesystem must already be formatted and
+                mounted at '/mnt'.
+
+                Mount additional filesystems such as the EFI system partition
+                and home partition under '/mnt' before running this command.
 
                 Designed to run on the live environment.
 

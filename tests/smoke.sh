@@ -372,15 +372,13 @@ run_install_release() {
     ' _ "$TEST_ROOT" "$scenario" "$TEST_TMP"
 }
 
-run_arch_install_dispatch() {
-    local mode="$1"
-    local mounted="${2:-true}"
+run_arch_install_command() {
+    local root_mounted="${1:-true}"
 
     bash -c '
         source "$1/lib/commands/arch-install.sh"
 
-        partition_mode="$2"
-        mounted="$3"
+        root_mounted="$2"
 
         is_archlinux() {
             return 0
@@ -390,28 +388,8 @@ run_arch_install_dispatch() {
             return 0
         }
 
-        ensure_mount_point() {
-            return 0
-        }
-
-        yes_no() {
-            return 0
-        }
-
         mountpoint() {
-            [[ "$mounted" == true ]]
-        }
-
-        partition_vm() {
-            printf "partition=<vm>\n"
-        }
-
-        partition_main() {
-            printf "partition=<main>\n"
-        }
-
-        partition_x220() {
-            printf "partition=<x220>\n"
+            [[ "$root_mounted" == true ]]
         }
 
         arch_install() {
@@ -424,7 +402,7 @@ run_arch_install_dispatch() {
         }
 
         command_arch_install
-    ' _ "$TEST_ROOT" "$mode" "$mounted"
+    ' _ "$TEST_ROOT" "$root_mounted"
 }
 
 run_arch_install_bootstrap() {
@@ -959,18 +937,18 @@ run_test \
     run_install_release checksum-failure
 
 run_test \
-    "arch-install-dispatches-vm" \
+    "arch-install-starts-with-prepared-filesystem" \
     0 \
     stdout \
-    "partition=<vm>" \
-    run_arch_install_dispatch vm
+    "install=<yes>" \
+    run_arch_install_command true
 
 run_test \
-    "mounted-mode-requires-root-mount" \
+    "arch-install-requires-mounted-root" \
     1 \
     stderr \
     "requires an existing filesystem mounted at '/mnt'" \
-    run_arch_install_dispatch mounted false
+    run_arch_install_command false
 
 run_test \
     "arch-install-bootstraps-required-packages" \

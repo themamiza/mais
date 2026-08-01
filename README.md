@@ -80,36 +80,24 @@ mais help
 
 ## Arch installation
 
-MAIS can bootstrap an Arch Linux system from the live installation
-environment:
+Before running the installer, partition and format the target disk manually.
+
+Mount the root filesystem at `/mnt` and mount any additional filesystems below
+it. On UEFI systems, mount the EFI system partition at `/mnt/efi`.
 
 ```bash
-sudo mais arch-install partition_mode
+sudo mais arch-install
 ```
-
-The available partition modes are:
-
-* `vm`: partitions `/dev/vda` for a virtual machine.
-* `x220`: partitions `/dev/sda` using the layout for my ThinkPad X220.
-* `mounted`: uses filesystems that are already mounted under `/mnt`.
-* `main`: reserved for the main workstation layout and not implemented yet.
-
-> [!NOTE]
-> Automatic partition modes are temporary and may be removed in a future
-> release. The `mounted` mode is the recommended general-purpose option.
 
 Values can be provided before installation to avoid some interactive prompts:
 
 ```bash
-sudo mais arch-install mounted \
+sudo mais arch-install \
     -u username -h hostname -t Region/City
 ```
 
 > [!CAUTION]
 > Do not run `arch-install` on an existing installation.
->
-> The automatic partition modes format disks and will destroy existing data.
-> Read the relevant partition function before confirming the operation.
 
 ## Installing programs
 

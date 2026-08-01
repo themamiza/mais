@@ -61,17 +61,7 @@ parse_arguments() {
 
             "arch-install")
                 args_arch_install=true
-
-                if [[ $# -lt 2 ]] || ! cli_is_argument_value "${2:-}"; then
-                    eprint "\`arch-install\` -> you should provide a 'partition_mode' (vm, main, x220, mounted)."
-                fi
-
-                if ! re_match "$2" "^(vm|main|x220|mounted)$"; then
-                    eprint "'$2' is not a valid partitioning mode."
-                fi
-
-                partition_mode="$2"
-                shift 2
+                shift
                 ;;
 
             "install-dotfiles")
