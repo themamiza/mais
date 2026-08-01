@@ -119,7 +119,7 @@ install_programs() {
 
     # Install nvidia drivers if there's an nvidia gpu
     if lspci | grep -qi nvidia; then
-        printf "nvidia-lts\nnvidia-settings\nnvidia-prime\n" >> "$programs_to_install"
+        printf "nvidia-open-lts\nnvidia-settings\nnvidia-prime\n" >> "$programs_to_install"
     fi
 
     while IFS= read -r program; do
