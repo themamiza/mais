@@ -117,16 +117,7 @@ arch_install() {
         mountpoint -q -- "$target_efi_directory" || eprint "UEFI installation requires the EFI system partition mounted at '$target_efi_directory'."
     else
         bios_or_uefi="BIOS"
-        ask_boot_disk
     fi
-
-    printf "The rest of the installation assumes you have\n
-1. an internet connection. \`iwctl\`
-2. synchronized system clock. \`timedatectl set-ntp true\`
-3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`
-4. mounted any additional filesystems below '/mnt'.\n\n
-SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
-    yes_no "Continue to configuration? (Y/N): " || exit 0
 
     ask_username
 
@@ -150,6 +141,8 @@ SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
         done
     fi
 
+    [[ "$bios_or_uefi" == "BIOS" ]] && ask_boot_disk
+
     printf "\nInstallation configuration:\n
 \tUsername:\t%s
 \tHostname:\t%s
@@ -157,17 +150,22 @@ SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
 \tFirmware mode:\t%s\n" "$username" "$hostname" "$timezone" "$bios_or_uefi"
 
     case "$bios_or_uefi" in
-        "UEFI")
-            printf "\tEFI mount:\t/mnt%s\n\tBootloader ID:\t%s\n" "$efi_directory" "$bootloader_id";;
-
+        "UEFI") printf "\tEFI mount:\t/mnt%s\n\tBootloader ID:\t%s\n" "$efi_directory" "$bootloader_id";;
         "BIOS") printf "\tGRUB target disk:\t%s\n" "$boot_disk";;
     esac
     printf "\n"
 
+    printf "The rest of the installation assumes you have\n
+1. an internet connection. \`iwctl\`
+2. synchronized system clock. \`timedatectl set-ntp true\`
+3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`
+4. mounted any additional filesystems below '/mnt'.\n
+SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
     if ! yes_no "Begin installation? (Y/N): "; then
         unset pass1 pass2
         exit 0
     fi
+    printf "\n"
 
     sprint "Checking internet connection...\n"
     check_internet_connection || eprint "Can't reach the web."
