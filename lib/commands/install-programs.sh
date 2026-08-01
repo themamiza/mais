@@ -4,15 +4,16 @@
 
 # Download programs.csv when it is not found locally.
 ensure_programs_file() {
-    local data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/mais"
-    local data_file="$data_dir/$programs_filename"
-
-    # Prefer the programs file included in the development repository.
     if [[ -f "$programs_file" ]]; then
         return 0
     fi
 
-    # Fall back to a previously downloaded programs file.
+    local user_home; user_home="$(getent passwd "$username" | cut -d: -f6)"
+    [[ -n "$user_home" ]] || eprint "Could not determine the home directory for '$username'."
+
+    local data_dir="$user_home/.local/share/mais"
+    local data_file="$data_dir/$programs_filename"
+
     if [[ -f "$data_file" ]]; then
         programs_file="$data_file"
         return 0
@@ -20,12 +21,13 @@ ensure_programs_file() {
 
     nprint "'$programs_filename' not found. Downloading it..."
 
-    mkdir -p "$data_dir"
-    programs_file="$data_file"
+    sudo -H -u "$username" mkdir -p -- "$data_dir" || eprint "Failed to create '$data_dir'."
 
-    if ! run_cmd curl -fssL "$programs_file_url" -o "$programs_file"; then
+    if ! sudo -H -u "$username" curl -fssL "$programs_file_url" -o "$data_file"; then 
+        rm -f -- "$data_file"
         eprint "Failed to download '$programs_filename' from '$programs_file_url'."
     fi
+    programs_file="$data_file"
 }
 
 clean_programs_file() { 
@@ -126,10 +128,10 @@ install_programs() {
 
 command_install_programs() {
     isRoot || eprint "Only root can install packages."
+    ask_username
     ensure_programs_file
     clean_programs_file
     wheel_can_sudo
-    ask_username
     install_essentials
     install_aurhelper
     install_programs "$programs"
