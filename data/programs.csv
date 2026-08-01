@@ -193,6 +193,7 @@ AUR             | extra      | simple-mtpfs                     | "A FUSE filesy
                 |            | ttc-iosevka                      | "Typeface family designed for coding, terminal use and technical documents"
                 |            | ttf-dejavu                       | "Font family based on the Bitstream Vera Fonts with a wider range of characters"
                 |            | ttf-iosevka-nerd                 | "Patched font Iosevka from nerd fonts library"
+                |            | ttf-firacode-nerd                | "Patched font Fira (Fura) Code from nerd fonts library"
                 |            | ttf-ubuntu-font-family           | "Ubuntu font family"
                 |            | noto-fonts-emoji                 | "Google Noto Color Emoji font"
                 |            | ttf-cascadia-code-nerd           | "Patched font Cascadia Code (Caskaydia) from nerd fonts library"
