@@ -8,7 +8,8 @@ ensure_programs_file() {
         return 0
     fi
 
-    local user_home; user_home="$(getent passwd "$username" | cut -d: -f6)"
+    local user_home
+    user_home="$(getent passwd "$username" | cut -d: -f6)" || eprint "Could not determine the home directory for '$username'."
     [[ -n "$user_home" ]] || eprint "Could not determine the home directory for '$username'."
 
     local data_dir="$user_home/.local/share/mais"
