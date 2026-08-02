@@ -97,9 +97,10 @@ run_parser() {
 
         parse_arguments "$@"
 
-        printf "programs=<%s> verbose=<%s>\n" \
+        printf "programs=<%s> verbose=<%s> tui=<%s>\n" \
             "${programs:-}" \
-            "$verbose"
+            "$verbose" \
+            "$tui"
     ' _ "$TEST_ROOT" "$@"
 }
 

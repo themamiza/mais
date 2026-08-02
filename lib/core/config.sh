@@ -24,6 +24,9 @@ verbose=false
 # 'quite=true' should silence any output from the script.
 quiet=false
 
+# Enable TUI (whiptail)
+tui=false
+
 # URL to dotfiles repository.
 dotfiles_url="https://github.com/themamiza/dotfiles"
 # Dotfiles repository can have different name e.g. voidrice <https://github.com/lukesmithxyz/voidrice>.
