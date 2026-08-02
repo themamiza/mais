@@ -116,24 +116,60 @@ ask_timezone() {
 }
 
 ask_boot_disk() {
+    local selected_boot_disk
+    local disk
+    local description
+    local menu_items=()
+
     while true; do
-        printf "\nAvailable disks:\n"
-        lsblk -dpno NAME,SIZE,MODEL,TYPE | awk '$NF == "disk"'
+        menu_items=()
 
-        printf "\nBIOS boot disk (for example /dev/sda): "
-        read -r boot_disk
+        while IFS=$'\t' read -r disk description; do
+            [[ -n "$disk" ]] || continue
+            menu_items+=("$disk" "$description")
+        done < <(lsblk -dpno NAME,SIZE,MODEL,TYPE |
+                    awk '
+                        $NF == "disk" {
+                            name = $1
+                            size = $2
 
-        if [[ ! -b "$boot_disk" ]]; then
-            wprint "'$boot_disk' is not a block device."
+                            $1 = ""
+                            $2 = ""
+                            $NF = ""
+
+                            sub(/^[[:space:]]+/, "")
+                            sub(/[[:space:]]+$/, "")
+
+                            description = size
+                            if (length($0))
+                                description = description " " $0
+
+                            print name "\t" description
+                        }')
+
+        if (( ${#menu_items[@]} == 0 )); then
+            ui_message "No disks found" "No whole disks are available for GRUB installation." || return 1
+            return 1
+        fi
+
+        if ! selected_boot_disk="$(ui_menu "BIOS boot disk" "Select the whole disk where GRUB will be installed:" "${menu_items[@]}")"; then
+            return 1
+        fi
+
+        if [[ ! -b "$selected_boot_disk" ]]; then
+            ui_message "Invalid boot disk" "'$selected_boot_disk' is not a block device." || return 1
             continue
         fi
 
-        if [[ "$(lsblk -dnro TYPE "$boot_disk" 2>/dev/null)" != "disk" ]]; then
-            wprint "'$boot_disk' is not a whole disk."
+        if [[ "$(lsblk -dnro TYPE "$selected_boot_disk" 2>/dev/null)" != "disk" ]]; then
+            ui_message "Invalid boot disk" "'$selected_boot_disk' is not a whole disk." || return 1
             continue
         fi
 
-        yes_no "Install GRUB to '$boot_disk'? (Y/N): " && return
+        if ui_yes_no "Confirm boot disk" "Install GRUB to '$selected_boot_disk'?"; then
+            boot_disk="$selected_boot_disk"
+            return 0
+        fi
     done
 }
 

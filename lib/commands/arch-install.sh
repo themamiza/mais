@@ -166,7 +166,12 @@ arch_install() {
         exit 0
     fi
 
-    [[ "$bios_or_uefi" == "BIOS" ]] && ask_boot_disk
+    if [[ "$bios_or_uefi" == "BIOS" ]]; then
+        if ! ask_boot_disk; then
+            unset pass1
+            exit 0
+        fi
+    fi
 
     if ! confirm_arch_install "$bios_or_uefi" "$boot_disk"; then
         unset pass1
