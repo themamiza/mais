@@ -41,8 +41,8 @@ tui_yes_no() {
         --backtitle "$tui_backtitle" \
         --title "$title" \
         --yesno "$message" \
-        12 \
-        70
+        20 \
+        76
 }
 
 # args: title message

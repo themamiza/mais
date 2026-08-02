@@ -209,7 +209,9 @@ arch_install() {
     fi
     unset pass1
 
-    yes_no "The system should be ready to reboot, Continue (Y/N): " || exit 0
+    ! ui_yes_no "Installation complete" "The system should be ready to reboot.
+
+    Reboot now?" && exit 0
     reboot
 }
 
