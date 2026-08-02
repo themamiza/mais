@@ -184,33 +184,26 @@ configure_arch_install() {
 
     while true; do
         menu_items=(
-            username "Current: $username"
-            password "Change account password"
-            hostname "Current: $hostname"
-            timezone "Current: $timezone"
+            "Username" "Current: $username"
+            "Password" "Change account password"
+            "Hostname" "Current: $hostname"
+            "Timezone" "Current: $timezone"
         )
 
         if [[ "$bios_or_uefi" == "BIOS" ]]; then
-            menu_items+=(boot_disk "Current: $boot_disk")
+            menu_items+=("Boot disk" "Current: $boot_disk")
         fi
 
-        menu_items+=(
-            continue "Review and begin installation"
-            cancel "Cancel installation"
-        )
-
-        if ! selected="$(ui_menu "Installation configuration" "Review or change the installation settings:" "${menu_items[@]}")"; then
-            return 1
+        if ! selected="$(ui_menu "Installation configuration" "Select a setting to edit. Press Cancel when done:" "${menu_items[@]}")"; then
+            return 0
         fi
 
         case "$selected" in
-            username) ask_username true || continue;;
-            password) ask_password || continue;;
-            hostname) ask_hostname true || continue;;
-            timezone) ask_timezone true || continue;;
-            boot_disk) ask_boot_disk || continue;;
-            continue) return 0;;
-            cancel) return 1;;
+            "Username") ask_username true || continue;;
+            "Password") ask_password || continue;;
+            "Hostname") ask_hostname true || continue;;
+            "Timezone") ask_timezone true || continue;;
+            "Boot disk") ask_boot_disk || continue;;
         esac
     done
 }
