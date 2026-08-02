@@ -89,6 +89,8 @@ Give a hostname beginning with a letter, with only lowercase letters, - or _." |
 ask_timezone() {
     local available_timezones
     local selected_timezone
+    local timezone_entry
+    local menu_items=()
 
     if [[ -n "$timezone" ]]; then
         if [[ ! -f "/usr/share/zoneinfo/$timezone" ]]; then
@@ -100,11 +102,15 @@ ask_timezone() {
 
     available_timezones="$(timedatectl list-timezones)" || eprint "Failed to list available timezones."
 
-    if ! selected_timezone="$(printf "%s\n" "$available_timezones" | fzf --height=60% --layout=reverse --border --prompt="Timezone > ")"; then
-        eprint "Timezone selection was cancelled."
-    fi
+    while IFS= read -r timezone_entry; do
+        [[ -n "$timezone_entry" ]] || continue
 
-    [[ -n "$selected_timezone" ]] || eprint "No timezone was selected."
+        menu_items+=("$timezone_entry" "")
+    done <<< "$available_timezones"
+
+    ! selected_timezone="$(ui_menu "Timezone" "Select the system timezone:" "${menu_items[@]}")" && return 1
+
+    [[ -n "$selected_timezone" ]] || return 1
 
     timezone="$selected_timezone"
 }

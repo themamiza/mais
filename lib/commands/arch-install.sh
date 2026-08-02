@@ -161,7 +161,10 @@ arch_install() {
         exit 0
     fi
 
-    ask_timezone
+    if ! ask_timezone; then
+        unset pass1
+        exit 0
+    fi
 
     [[ "$bios_or_uefi" == "BIOS" ]] && ask_boot_disk
 

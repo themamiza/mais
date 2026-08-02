@@ -85,16 +85,19 @@ functions=(
     text_password
     text_yes_no
     text_message
+    text_menu
 
     tui_input
     tui_password
     tui_yes_no
     tui_message
+    tui_menu
 
     ui_input
     ui_password
     ui_yes_no
     ui_message
+    ui_menu
 
     ask_username
     ask_password

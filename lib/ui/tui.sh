@@ -57,3 +57,20 @@ tui_message() {
         12 \
         70
 }
+
+# args: title message tag description [tag description ...]
+tui_menu() {
+    local title="$1"
+    local message="$2"
+    shift 2
+
+    whiptail \
+        --backtitle "$tui_backtitle" \
+        --title "$title" \
+        --menu "$message" \
+        20 \
+        76 \
+        12 \
+        "$@" \
+        3>&1 1>&2 2>&3
+}

@@ -33,3 +33,11 @@ ui_message() {
         text_message "$@"
     fi
 }
+
+ui_menu() {
+    if $tui; then
+        tui_menu "$@"
+    else
+        text_menu "$@"
+    fi
+}

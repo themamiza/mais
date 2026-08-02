@@ -52,3 +52,34 @@ text_message() {
 
     wprint "$message"
 }
+
+# args: title message tag description [tag description ...]
+text_menu() {
+    local title="$1"
+    local message="$2"
+    shift 2
+
+    local choices=()
+    local tag
+    local description
+    local selected
+
+    while (( $# >= 2 )); do
+        tag="$1"
+        description="$2"
+
+        choices+=("$tag"$'\t'"$description")
+        shift 2
+    done
+
+    (( ${#choices[@]} > 0 )) || return 1
+
+    ! selected="$(printf "%s\n" "${choices[@]}" | fzf \
+                                                    --height=60% \
+                                                    --layout=reverse \
+                                                    --border \
+                                                    --prompt="$title > " \
+                                                    --header="$message")" && return 1
+
+    printf "%s" "${selected%%$'\t'*}"
+}
