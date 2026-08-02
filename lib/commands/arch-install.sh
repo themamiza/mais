@@ -27,6 +27,10 @@ install_live_deps() {
     local live_packages=(fzf)
     local missing_packages=()
 
+    if $tui; then
+        live_packages+=(libnewt)
+    fi
+
     local package
     for package in "${live_packages[@]}"; do
         check_installed "$package" || missing_packages+=("$package")
