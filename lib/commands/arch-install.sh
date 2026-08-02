@@ -151,7 +151,10 @@ arch_install() {
         exit 0
     fi
 
-    ask_password
+    if ! ask_password; then
+        unset pass1
+        exit 0
+    fi
 
     if ! ask_hostname; then
         unset pass1

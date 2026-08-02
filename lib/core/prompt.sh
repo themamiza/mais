@@ -35,15 +35,33 @@ ask_password() {
     local pass2
 
     while true; do
-        printf "%s's password: " "$username" && read -rs pass1 && printf "\n"
-        printf "Retype password: " && read -rs pass2 && printf "\n"
+        unset pass1
+        pass2=""
 
-        if [[ -n "$pass1" && "$pass1" == "$pass2" ]]; then
+        if ! pass1="$(ui_password "Password" "$username's password")"; then
+            unset pass1
+            return 1
+        fi
+
+        if [[ -z "$pass1" ]]; then
+            unset pass1
+
+            ui_message "Invalid password" "Password cannot be empty. Try again." || return 1
+            continue
+        fi
+
+        if ! pass2="$(ui_password "Confirm password" "Retype password")"; then
+            unset pass1
+            return 1
+        fi
+
+        if [[ "$pass1" == "$pass2" ]]; then
             return 0
         fi
 
         unset pass1
-        wprint "Passwords do not match or are empty. Try again."
+
+        ui_message "Passwords do not match" "Passwords do not match. Try again." || return 1
     done
 }
 
