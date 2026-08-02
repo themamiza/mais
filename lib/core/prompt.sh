@@ -184,6 +184,8 @@ confirm_arch_install() {
         BIOS) printf -v boot_details 'GRUB target disk: %s' "$boot_disk";;
     esac
 
+    ! $tui && printf "\n"
+
     # shellcheck disable=2016
     printf -v message \
 'Installation configuration:
