@@ -40,6 +40,7 @@ tui_yes_no() {
     whiptail \
         --backtitle "$tui_backtitle" \
         --title "$title" \
+        --scrolltext \
         --yesno "$message" \
         20 \
         76

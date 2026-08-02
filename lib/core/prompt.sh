@@ -11,10 +11,13 @@ yes_no() {
 }
 
 ask_username() {
+    local force="${1:-false}"
     local selected_username
 
-    # Return if username is already set.
-    [[ -n "$username" ]] && return 0
+    # Return if username is already set and is not forced.
+    if [[ -n "$username" && "$force" != true ]]; then
+        return 0
+    fi
 
     while true; do
         ! selected_username="$(ui_input "Username" "Username")" && return 1
@@ -32,44 +35,44 @@ Give a username beginning with a letter, with only lowercase letters, - or _." |
 }
 
 ask_password() {
+    local selected_password
     local pass2
 
     while true; do
-        unset pass1
+        selected_password=""
         pass2=""
 
-        if ! pass1="$(ui_password "Password" "$username's password")"; then
-            unset pass1
+        if ! selected_password="$(ui_password "Password" "$username's password")"; then
             return 1
         fi
 
-        if [[ -z "$pass1" ]]; then
-            unset pass1
-
+        if [[ -z "$selected_password" ]]; then
             ui_message "Invalid password" "Password cannot be empty. Try again." || return 1
             continue
         fi
 
         if ! pass2="$(ui_password "Confirm password" "Retype password")"; then
-            unset pass1
             return 1
         fi
 
-        if [[ "$pass1" == "$pass2" ]]; then
+        # shellcheck disable=2034
+        if [[ "$selected_password" == "$pass2" ]]; then
+            pass1="$selected_password"
             return 0
         fi
-
-        unset pass1
 
         ui_message "Passwords do not match" "Passwords do not match. Try again." || return 1
     done
 }
 
 ask_hostname() {
+    local force="${1:-false}"
     local selected_hostname
 
-    # Return if hostname is already set.
-    [[ -n "$hostname" ]] && return 0
+    # Return if hostname is already set and is not forced.
+    if [[ -n "$hostname" && "$force" != true ]]; then
+        return 0
+    fi
 
     while true; do
         ! selected_hostname="$(ui_input "Hostname" "Hostname")" && return 1
@@ -87,12 +90,13 @@ Give a hostname beginning with a letter, with only lowercase letters, - or _." |
 }
 
 ask_timezone() {
+    local force="${1:-false}"
     local available_timezones
     local selected_timezone
     local timezone_entry
     local menu_items=()
 
-    if [[ -n "$timezone" ]]; then
+    if [[ -n "$timezone" && "$force" != true ]]; then
         if [[ ! -f "/usr/share/zoneinfo/$timezone" ]]; then
             eprint "Timezone '$timezone' is not valid."
         fi
@@ -170,6 +174,44 @@ ask_boot_disk() {
             boot_disk="$selected_boot_disk"
             return 0
         fi
+    done
+}
+
+configure_arch_install() {
+    local bios_or_uefi="$1"
+    local selected
+    local menu_items=()
+
+    while true; do
+        menu_items=(
+            username "Current: $username"
+            password "Change account password"
+            hostname "Current: $hostname"
+            timezone "Current: $timezone"
+        )
+
+        if [[ "$bios_or_uefi" == "BIOS" ]]; then
+            menu_items+=(boot_disk "Current: $boot_disk")
+        fi
+
+        menu_items+=(
+            continue "Review and begin installation"
+            cancel "Cancel installation"
+        )
+
+        if ! selected="$(ui_menu "Installation configuration" "Review or change the installation settings:" "${menu_items[@]}")"; then
+            return 1
+        fi
+
+        case "$selected" in
+            username) ask_username true || continue;;
+            password) ask_password || continue;;
+            hostname) ask_hostname true || continue;;
+            timezone) ask_timezone true || continue;;
+            boot_disk) ask_boot_disk || continue;;
+            continue) return 0;;
+            cancel) return 1;;
+        esac
     done
 }
 

@@ -432,6 +432,7 @@ run_arch_install_bootstrap() {
 
         verbose=false
         quiet=false
+        tui=false
         program_name=mais
 
         arch_efi_platform_size_file="$test_dir/fw-platform-size"

@@ -104,6 +104,7 @@ functions=(
     ask_hostname
     ask_timezone
     ask_boot_disk
+    configure_arch_install
     confirm_arch_install
 
     install_sudoers_file
