@@ -11,18 +11,23 @@ yes_no() {
 }
 
 ask_username() {
+    local selected_username
+
     # Return if username is already set.
-    [ -n "$username" ] && return
+    [[ -n "$username" ]] && return 0
 
     while true; do
-        printf "Username: "
-        read -r username
+        ! selected_username="$(ui_input "Username" "Username")" && return 1
 
-        if re_match "$username" "$regex_valid_username"; then
-            break
+        if re_match "$selected_username" "$regex_valid_username"; then
+            username="$selected_username"
+            return 0
         fi
 
-        wprint "Username '$username' is not valid.\nGive a username beginning with a letter, with only lowercase letters, - or _.\n"
+        ui_message "Invalid username" "Username '$selected_username' is not valid.
+
+Give a username beginning with a letter, with only lowercase letters, - or _." ||
+            return 1
     done
 }
 
@@ -43,18 +48,23 @@ ask_password() {
 }
 
 ask_hostname() {
+    local selected_hostname
+
     # Return if hostname is already set.
-    [ -n "$hostname" ] && return
+    [[ -n "$hostname" ]] && return 0
 
     while true; do
-        printf "Hostname: "
-        read -r hostname
+        ! selected_hostname="$(ui_input "Hostname" "Hostname")" && return 1
 
-        if re_match "$hostname" "$regex_valid_hostname"; then
-            break
+        if re_match "$selected_hostname" "$regex_valid_hostname"; then
+            hostname="$selected_hostname"
+            return 0
         fi
 
-        wprint "hostname '$hostname' is not valid.\nGive a hostname beginning with a letter, with only lowercase letters, - or _.\n"
+        ui_message "Invalid hostname" "Hostname '$selected_hostname' is not valid.
+
+Give a hostname beginning with a letter, with only lowercase letters, - or _." ||
+            return 1
     done
 }
 

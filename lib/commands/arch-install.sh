@@ -147,9 +147,17 @@ arch_install() {
 
     install_live_deps
 
-    ask_username
+    if ! ask_username; then
+        exit 0
+    fi
+
     ask_password
-    ask_hostname
+
+    if ! ask_hostname; then
+        unset pass1
+        exit 0
+    fi
+
     ask_timezone
 
     [[ "$bios_or_uefi" == "BIOS" ]] && ask_boot_disk
