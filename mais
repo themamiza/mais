@@ -20,6 +20,11 @@ source "$MAIS_ROOT/lib/core/loader.sh"
 mais_load_module "lib/core/config.sh"
 mais_load_module "lib/core/log.sh"
 mais_load_module "lib/core/validate.sh"
+
+mais_load_module "lib/ui/text.sh"
+mais_load_module "lib/ui/tui.sh"
+mais_load_module "lib/ui/ui.sh"
+
 mais_load_module "lib/core/prompt.sh"
 mais_load_module "lib/core/run.sh"
 mais_load_module "lib/core/sudo.sh"

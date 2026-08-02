@@ -81,6 +81,21 @@ functions=(
     install_aurhelper
     update_mirrors
 
+    text_input
+    text_password
+    text_yes_no
+    text_message
+
+    tui_input
+    tui_password
+    tui_yes_no
+    tui_message
+
+    ui_input
+    ui_password
+    ui_yes_no
+    ui_message
+
     ask_username
     ask_password
     ask_hostname
