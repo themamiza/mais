@@ -75,3 +75,21 @@ tui_menu() {
         "$@" \
         3>&1 1>&2 2>&3
 }
+
+# args: title message tag display_text [tag display_text ...]
+tui_menu_no_tags() {
+    local title="$1"
+    local message="$2"
+    shift 2
+
+    whiptail \
+        --backtitle "$tui_backtitle" \
+        --title "$title" \
+        --notags \
+        --menu "$message" \
+        20 \
+        76 \
+        12 \
+        "$@" \
+        3>&1 1>&2 2>&3
+}
