@@ -41,3 +41,11 @@ ui_menu() {
         text_menu "$@"
     fi
 }
+
+ui_menu_no_tags() {
+    if $tui; then
+        tui_menu_no_tags "$@"
+    else
+        text_menu "$@"
+    fi
+}

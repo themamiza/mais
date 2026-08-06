@@ -194,7 +194,7 @@ configure_arch_install() {
             menu_items+=(boot_disk "Boot disk        $boot_disk")
         fi
 
-        if ! selected="$(tui_menu_no_tags "Installation configuration" "Select a setting to edit. Press Cancel when done:" "${menu_items[@]}")"; then
+        if ! selected="$(ui_menu_no_tags "Installation configuration" "Select a setting to edit. Press Cancel when done:" "${menu_items[@]}")"; then
             return 0
         fi
 

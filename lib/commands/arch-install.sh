@@ -174,10 +174,7 @@ arch_install() {
     fi
 
     if $tui; then
-        if ! configure_arch_install "$bios_or_uefi"; then
-            unset pass1
-            exit 0
-        fi
+        configure_arch_install "$bios_or_uefi"
     fi
 
     if ! confirm_arch_install "$bios_or_uefi" "$boot_disk"; then

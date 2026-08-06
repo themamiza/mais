@@ -92,12 +92,14 @@ functions=(
     tui_yes_no
     tui_message
     tui_menu
+    tui_menu_no_tags
 
     ui_input
     ui_password
     ui_yes_no
     ui_message
     ui_menu
+    ui_menu_no_tags
 
     ask_username
     ask_password
