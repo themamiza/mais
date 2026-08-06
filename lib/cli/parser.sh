@@ -93,7 +93,6 @@ parse_arguments() {
 
             "install-programs")
                 args_install_programs=true
-                programs="all"
 
                 if cli_is_argument_value "${2:-}"; then
                     if ! re_match "$2" "^(x11|dwm|wayland|hyprland|dev|python|clang|lua|bash|js|extra|virt|default|all)$"; then

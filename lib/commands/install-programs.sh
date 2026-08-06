@@ -50,6 +50,14 @@ get_programs_by_tag() {
 
     awk -F'|' -v tag_regex="$tag_regex" '
         {
+            if ($2 == "") {
+                if ("" ~ tag_regex) {
+                    print $3
+                }
+
+                next
+            }
+
             tag_count = split($2, tags, ",")
 
             for (i = 1; i <= tag_count; i++) {
@@ -60,6 +68,27 @@ get_programs_by_tag() {
             }
         }
     ' "$cleaned_file"
+}
+
+# Resolve the tag name to a regex which points to itself and it's parents.
+program_tag_resolver() {
+    case "$1" in
+        x11)      printf '%s\n' '^x11$';;
+        dwm)      printf '%s\n' '^(x11|dwm)$';;
+        wayland)  printf '%s\n' '^wayland$';;
+        hyprland) printf '%s\n' '^(wayland|hyprland)$';;
+        dev)      printf '%s\n' '^(dev|python|clang|lua|bash|js)$';;
+        python)   printf '%s\n' '^python$';;
+        clang)    printf '%s\n' '^clang$';;
+        lua)      printf '%s\n' '^lua$';;
+        bash)     printf '%s\n' '^bash$';;
+        js)       printf '%s\n' '^js$';;
+        virt)     printf '%s\n' '^virt$';;
+        extra)    printf '%s\n' '^extra$';;
+        default)  printf '%s\n' '^default$';;
+        all)      printf '%s\n' '.*';;
+        *)        return 1;;
+    esac
 }
 
 install_package() {
@@ -101,31 +130,23 @@ doomemacs_install() {
 }
 
 install_programs() {
+    local tag_regex
+
     # Create an empty tmp file.
     : > "$programs_to_install"
 
-    # Grab programs and add to tmp file based on the tag that is provided.
-    # case matches the tags to it's children.
-    case "$1" in
-        "x11")      get_programs_by_tag "^x11$"                       "$programs_file.clean" >> "$programs_to_install";;
-        "dwm")      get_programs_by_tag "^(x11|dwm)$"                 "$programs_file.clean" >> "$programs_to_install";;
-        "wayland")  get_programs_by_tag "^wayland$"                   "$programs_file.clean" >> "$programs_to_install";;
-        "hyprland") get_programs_by_tag "^(wayland|hyprland)$"        "$programs_file.clean" >> "$programs_to_install";;
-        "dev")      get_programs_by_tag "^(dev|python|clang|lua|bash|js)$" "$programs_file.clean" >> "$programs_to_install";;
-        "python")   get_programs_by_tag "^python$"                    "$programs_file.clean" >> "$programs_to_install";;
-        "clang")    get_programs_by_tag "^clang$"                     "$programs_file.clean" >> "$programs_to_install";;
-        "lua")      get_programs_by_tag "^lua$"                       "$programs_file.clean" >> "$programs_to_install";;
-        "bash")     get_programs_by_tag "^bash$"                      "$programs_file.clean" >> "$programs_to_install";;
-        "js")       get_programs_by_tag "^js$"                        "$programs_file.clean" >> "$programs_to_install";;
-        "virt")     get_programs_by_tag "^virt$"                      "$programs_file.clean" >> "$programs_to_install";;
-        "extra")    get_programs_by_tag "^extra$"                     "$programs_file.clean" >> "$programs_to_install";;
-        "default")  get_programs_by_tag "^default$"                   "$programs_file.clean" >> "$programs_to_install";;
-        "all")      cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install";;
-    esac
 
-    # Also grab lines that have no tag set.
-    if [[ "$1" != "all" ]]; then
-        get_programs_by_tag "^$" "$programs_file.clean" >> "$programs_to_install"
+    # Grab programs and add to tmp file based on the tag that is provided.
+    if [[ "$1" == "all" ]]; then
+        cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install"
+    else
+        # program_tag_resolver matches the tags to it's children.
+        tag_regex="$(program_tag_resolver "$1")" || eprint "'$1' is not a valid program tag."
+
+        get_programs_by_tag "$tag_regex" "$programs_file.clean" >>"$programs_to_install"
+
+        # Also grab lines that have no tag set.
+        get_programs_by_tag "^$" "$programs_file.clean" >>"$programs_to_install"
     fi
 
     # Install nvidia drivers if there's an nvidia gpu
@@ -138,6 +159,10 @@ install_programs() {
     done <"$programs_to_install"
 }
 
+select_programs_tui() {
+    eprint "NOT IMPLEMENTED!"
+}
+
 command_install_programs() {
     isRoot || eprint "Only root can install packages."
     ask_username
@@ -146,5 +171,10 @@ command_install_programs() {
     wheel_can_sudo
     install_essentials
     install_aurhelper
-    install_programs "$programs"
+
+    if $tui; then
+        select_programs_tui
+    else
+        install_programs "${programs:-all}"
+    fi
 }

@@ -37,6 +37,8 @@ dotfiles_name="$(basename "$dotfiles_url")"
 programs_filename="programs.csv"
 programs_file="$MAIS_ROOT/data/$programs_filename"
 
+programs=""
+
 # Path to a tmp file which will just contain name of programs to install.
 programs_to_install="/tmp/programs.tmp"
 # Remote programs file used by the standalone release.
