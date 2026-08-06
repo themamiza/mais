@@ -9,7 +9,8 @@
 #       |       |           |     |     |     |     |
 #      dwm   hyprland    python clang  lua   bash  js    virt
 # 
-# Currently packages with no tags get pulled with all other tags.
+# Tags are comma separated.
+# Packages with no tags get pulled with all other tags.
 #
 # 3. Package name
 # 4. Description

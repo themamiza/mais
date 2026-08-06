@@ -194,10 +194,11 @@ run_program_selection() {
         programs_to_install="$2/programs.tmp"
 
         cat >"$programs_file.clean" <<EOF
-|wayland|wl-clipboard|"Wayland clipboard"
+|wayland,desktop|wl-clipboard|"Wayland clipboard"
 |hyprland|hyprland|"Wayland compositor"
-|dev|emacs|"Development editor"
+|default|default-package|"Default application"
 ||base-package|"Always installed"
+|notwayland|wrong-package|"Must not partially match"
 EOF
 
         lspci() {

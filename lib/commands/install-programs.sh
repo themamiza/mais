@@ -48,7 +48,18 @@ get_programs_by_tag() {
     local tag_regex="$1"
     local cleaned_file="$2"
 
-    awk -F'|' -v tag_regex="$tag_regex" '$2 ~ tag_regex { print $3 }' "$cleaned_file"
+    awk -F'|' -v tag_regex="$tag_regex" '
+        {
+            tag_count = split($2, tags, ",")
+
+            for (i = 1; i <= tag_count; i++) {
+                if (tags[i] ~ tag_regex) {
+                    print $3
+                    break
+                }
+            }
+        }
+    ' "$cleaned_file"
 }
 
 install_package() {
@@ -108,6 +119,7 @@ install_programs() {
         "js")       get_programs_by_tag "^js$"                        "$programs_file.clean" >> "$programs_to_install";;
         "virt")     get_programs_by_tag "^virt$"                      "$programs_file.clean" >> "$programs_to_install";;
         "extra")    get_programs_by_tag "^extra$"                     "$programs_file.clean" >> "$programs_to_install";;
+        "default")  get_programs_by_tag "^default$"                   "$programs_file.clean" >> "$programs_to_install";;
         "all")      cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install";;
     esac
 
@@ -115,7 +127,6 @@ install_programs() {
     if [[ "$1" != "all" ]]; then
         get_programs_by_tag "^$" "$programs_file.clean" >> "$programs_to_install"
     fi
-    # TODO: For a specific tag, untagged programs are still always included.
 
     # Install nvidia drivers if there's an nvidia gpu
     if lspci | grep -qi nvidia; then

@@ -96,7 +96,7 @@ parse_arguments() {
                 programs="all"
 
                 if cli_is_argument_value "${2:-}"; then
-                    if ! re_match "$2" "^(x11|dwm|wayland|hyprland|dev|python|clang|lua|bash|js|extra|virt|all)$"; then
+                    if ! re_match "$2" "^(x11|dwm|wayland|hyprland|dev|python|clang|lua|bash|js|extra|virt|default|all)$"; then
                         eprint "'$2' is not a valid tag."
                     fi
 
