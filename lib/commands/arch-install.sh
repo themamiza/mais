@@ -27,6 +27,10 @@ install_live_deps() {
     local live_packages=(fzf)
     local missing_packages=()
 
+    if $tui; then
+        live_packages+=(libnewt)
+    fi
+
     local package
     for package in "${live_packages[@]}"; do
         check_installed "$package" || missing_packages+=("$package")
@@ -143,12 +147,35 @@ arch_install() {
 
     install_live_deps
 
-    ask_username
-    ask_password
-    ask_hostname
-    ask_timezone
+    if ! ask_username; then
+        exit 0
+    fi
 
-    [[ "$bios_or_uefi" == "BIOS" ]] && ask_boot_disk
+    if ! ask_password; then
+        unset pass1
+        exit 0
+    fi
+
+    if ! ask_hostname; then
+        unset pass1
+        exit 0
+    fi
+
+    if ! ask_timezone; then
+        unset pass1
+        exit 0
+    fi
+
+    if [[ "$bios_or_uefi" == "BIOS" ]]; then
+        if ! ask_boot_disk; then
+            unset pass1
+            exit 0
+        fi
+    fi
+
+    if $tui; then
+        configure_arch_install "$bios_or_uefi"
+    fi
 
     if ! confirm_arch_install "$bios_or_uefi" "$boot_disk"; then
         unset pass1
@@ -186,7 +213,9 @@ arch_install() {
     fi
     unset pass1
 
-    yes_no "The system should be ready to reboot, Continue (Y/N): " || exit 0
+    ! ui_yes_no "Installation complete" "The system should be ready to reboot.
+
+    Reboot now?" && exit 0
     reboot
 }
 

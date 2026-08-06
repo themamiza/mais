@@ -96,6 +96,12 @@ sudo mais arch-install \
     -u username -h hostname -t Region/City
 ```
 
+There's optionally a TUI mode which you can enable with `--tui`
+```bash
+sudo mais arch-install --tui
+```
+TUI mode uses `whiptail` for it's dialogs.
+
 > [!CAUTION]
 > Do not run `arch-install` on an existing installation.
 

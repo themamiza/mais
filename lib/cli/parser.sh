@@ -153,6 +153,11 @@ parse_arguments() {
                 shift
                 ;;
 
+            "--tui")
+                tui=true
+                shift
+                ;;
+
             "-u"|"--username")
                 if [[ $# -lt 2 ]] || ! cli_is_argument_value "${2:-}"; then
                     eprint "'$1' -> You should provide a username."

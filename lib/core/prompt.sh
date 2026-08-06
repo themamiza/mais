@@ -11,58 +11,92 @@ yes_no() {
 }
 
 ask_username() {
-    # Return if username is already set.
-    [ -n "$username" ] && return
+    local force="${1:-false}"
+    local selected_username
+
+    # Return if username is already set and is not forced.
+    if [[ -n "$username" && "$force" != true ]]; then
+        return 0
+    fi
 
     while true; do
-        printf "Username: "
-        read -r username
+        ! selected_username="$(ui_input "Username" "Username")" && return 1
 
-        if re_match "$username" "$regex_valid_username"; then
-            break
+        if re_match "$selected_username" "$regex_valid_username"; then
+            username="$selected_username"
+            return 0
         fi
 
-        wprint "Username '$username' is not valid.\nGive a username beginning with a letter, with only lowercase letters, - or _.\n"
+        ui_message "Invalid username" "Username '$selected_username' is not valid.
+
+Give a username beginning with a letter, with only lowercase letters, - or _." ||
+            return 1
     done
 }
 
 ask_password() {
+    local selected_password
     local pass2
 
     while true; do
-        printf "%s's password: " "$username" && read -rs pass1 && printf "\n"
-        printf "Retype password: " && read -rs pass2 && printf "\n"
+        selected_password=""
+        pass2=""
 
-        if [[ -n "$pass1" && "$pass1" == "$pass2" ]]; then
+        if ! selected_password="$(ui_password "Password" "$username's password")"; then
+            return 1
+        fi
+
+        if [[ -z "$selected_password" ]]; then
+            ui_message "Invalid password" "Password cannot be empty. Try again." || return 1
+            continue
+        fi
+
+        if ! pass2="$(ui_password "Confirm password" "Retype password")"; then
+            return 1
+        fi
+
+        # shellcheck disable=2034
+        if [[ "$selected_password" == "$pass2" ]]; then
+            pass1="$selected_password"
             return 0
         fi
 
-        unset pass1
-        wprint "Passwords do not match or are empty. Try again."
+        ui_message "Passwords do not match" "Passwords do not match. Try again." || return 1
     done
 }
 
 ask_hostname() {
-    # Return if hostname is already set.
-    [ -n "$hostname" ] && return
+    local force="${1:-false}"
+    local selected_hostname
+
+    # Return if hostname is already set and is not forced.
+    if [[ -n "$hostname" && "$force" != true ]]; then
+        return 0
+    fi
 
     while true; do
-        printf "Hostname: "
-        read -r hostname
+        ! selected_hostname="$(ui_input "Hostname" "Hostname")" && return 1
 
-        if re_match "$hostname" "$regex_valid_hostname"; then
-            break
+        if re_match "$selected_hostname" "$regex_valid_hostname"; then
+            hostname="$selected_hostname"
+            return 0
         fi
 
-        wprint "hostname '$hostname' is not valid.\nGive a hostname beginning with a letter, with only lowercase letters, - or _.\n"
+        ui_message "Invalid hostname" "Hostname '$selected_hostname' is not valid.
+
+Give a hostname beginning with a letter, with only lowercase letters, - or _." ||
+            return 1
     done
 }
 
 ask_timezone() {
+    local force="${1:-false}"
     local available_timezones
     local selected_timezone
+    local timezone_entry
+    local menu_items=()
 
-    if [[ -n "$timezone" ]]; then
+    if [[ -n "$timezone" && "$force" != true ]]; then
         if [[ ! -f "/usr/share/zoneinfo/$timezone" ]]; then
             eprint "Timezone '$timezone' is not valid."
         fi
@@ -72,59 +106,146 @@ ask_timezone() {
 
     available_timezones="$(timedatectl list-timezones)" || eprint "Failed to list available timezones."
 
-    if ! selected_timezone="$(printf "%s\n" "$available_timezones" | fzf --height=60% --layout=reverse --border --prompt="Timezone > ")"; then
-        eprint "Timezone selection was cancelled."
-    fi
+    while IFS= read -r timezone_entry; do
+        [[ -n "$timezone_entry" ]] || continue
 
-    [[ -n "$selected_timezone" ]] || eprint "No timezone was selected."
+        menu_items+=("$timezone_entry" "")
+    done <<< "$available_timezones"
+
+    ! selected_timezone="$(ui_menu "Timezone" "Select the system timezone:" "${menu_items[@]}")" && return 1
+
+    [[ -n "$selected_timezone" ]] || return 1
 
     timezone="$selected_timezone"
 }
 
 ask_boot_disk() {
+    local selected_boot_disk
+    local disk
+    local description
+    local menu_items=()
+
     while true; do
-        printf "\nAvailable disks:\n"
-        lsblk -dpno NAME,SIZE,MODEL,TYPE | awk '$NF == "disk"'
+        menu_items=()
 
-        printf "\nBIOS boot disk (for example /dev/sda): "
-        read -r boot_disk
+        while IFS=$'\t' read -r disk description; do
+            [[ -n "$disk" ]] || continue
+            menu_items+=("$disk" "$description")
+        done < <(lsblk -dpno NAME,SIZE,MODEL,TYPE |
+                    awk '
+                        $NF == "disk" {
+                            name = $1
+                            size = $2
 
-        if [[ ! -b "$boot_disk" ]]; then
-            wprint "'$boot_disk' is not a block device."
+                            $1 = ""
+                            $2 = ""
+                            $NF = ""
+
+                            sub(/^[[:space:]]+/, "")
+                            sub(/[[:space:]]+$/, "")
+
+                            description = size
+                            if (length($0))
+                                description = description " " $0
+
+                            print name "\t" description
+                        }')
+
+        if (( ${#menu_items[@]} == 0 )); then
+            ui_message "No disks found" "No whole disks are available for GRUB installation." || return 1
+            return 1
+        fi
+
+        if ! selected_boot_disk="$(ui_menu "BIOS boot disk" "Select the whole disk where GRUB will be installed:" "${menu_items[@]}")"; then
+            return 1
+        fi
+
+        if [[ ! -b "$selected_boot_disk" ]]; then
+            ui_message "Invalid boot disk" "'$selected_boot_disk' is not a block device." || return 1
             continue
         fi
 
-        if [[ "$(lsblk -dnro TYPE "$boot_disk" 2>/dev/null)" != "disk" ]]; then
-            wprint "'$boot_disk' is not a whole disk."
+        if [[ "$(lsblk -dnro TYPE "$selected_boot_disk" 2>/dev/null)" != "disk" ]]; then
+            ui_message "Invalid boot disk" "'$selected_boot_disk' is not a whole disk." || return 1
             continue
         fi
 
-        yes_no "Install GRUB to '$boot_disk'? (Y/N): " && return
+        if ui_yes_no "Confirm boot disk" "Install GRUB to '$selected_boot_disk'?"; then
+            boot_disk="$selected_boot_disk"
+            return 0
+        fi
+    done
+}
+
+configure_arch_install() {
+    local bios_or_uefi="$1"
+    local selected
+    local menu_items=()
+
+    while true; do
+        menu_items=(
+            username  "Username        $username"
+            password  "Password        ********"
+            hostname  "Hostname        $hostname"
+            timezone  "Timezone        $timezone"
+        )
+
+        if [[ "$bios_or_uefi" == "BIOS" ]]; then
+            menu_items+=(boot_disk "Boot disk        $boot_disk")
+        fi
+
+        if ! selected="$(ui_menu_no_tags "Installation configuration" "Select a setting to edit. Press Cancel when done:" "${menu_items[@]}")"; then
+            return 0
+        fi
+
+        case "$selected" in
+            username) ask_username true || continue;;
+            password) ask_password || continue;;
+            hostname) ask_hostname true || continue;;
+            timezone) ask_timezone true || continue;;
+            boot_disk) ask_boot_disk || continue;;
+        esac
     done
 }
 
 confirm_arch_install() {
     local bios_or_uefi="$1"
     local boot_disk="$2"
-
-    printf "\nInstallation configuration:\n
-\tUsername:\t%s
-\tHostname:\t%s
-\tTimezone:\t%s
-\tFirmware mode:\t%s\n" "$username" "$hostname" "$timezone" "$bios_or_uefi"
+    local boot_details
+    local message
 
     case "$bios_or_uefi" in
-        "UEFI") printf "\tEFI mount:\t/mnt%s\n\tBootloader ID:\t%s\n" "$efi_directory" "$bootloader_id";;
-        "BIOS") printf "\tGRUB target disk:\t%s\n" "$boot_disk";;
+        UEFI) printf -v boot_details 'EFI mount: /mnt%s\nBootloader ID: %s' "$efi_directory" "$bootloader_id";;
+        BIOS) printf -v boot_details 'GRUB target disk: %s' "$boot_disk";;
     esac
-    printf "\n"
 
-    printf "The rest of the installation assumes you have\n
-1. an internet connection. \`iwctl\`
-2. synchronized system clock. \`timedatectl set-ntp true\`
-3. configured your filesystem and mounted your root at '/mnt'. \`fdisk\`
-4. mounted any additional filesystems below '/mnt'.\n
-SHOULD NOT BE RUN ON AN EXISTING ARCH INSTALLATION!\n\n"
+    ! $tui && printf "\n"
 
-    yes_no "Begin installation? (Y/N): "
+    # shellcheck disable=2016
+    printf -v message \
+'Installation configuration:
+
+Username: %s
+Hostname: %s
+Timezone: %s
+Firmware mode: %s
+%s
+
+The rest of the installation assumes you have:
+
+1. an internet connection (`iwctl`)
+2. synchronized the system clock (`timedatectl set-ntp true`)
+3. configured the filesystems and mounted root at `/mnt` (`fdisk`)
+4. mounted any additional filesystems below `/mnt`
+
+WARNING: Do not run this on an existing Arch installation.
+
+Begin installation?' \
+        "$username" \
+        "$hostname" \
+        "$timezone" \
+        "$bios_or_uefi" \
+        "$boot_details"
+
+    ui_yes_no "Confirm installation" "$message"
 }

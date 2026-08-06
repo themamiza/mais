@@ -75,6 +75,7 @@ print_help() {
 
         -q | --quiet            Be as quiet as possible
 
+        --tui                   Use the terminal user interface (whiptail)
 
         **Commands might interactively ask for information, you can avoid this by providing them at the command line**
 

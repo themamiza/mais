@@ -81,11 +81,32 @@ functions=(
     install_aurhelper
     update_mirrors
 
+    text_input
+    text_password
+    text_yes_no
+    text_message
+    text_menu
+
+    tui_input
+    tui_password
+    tui_yes_no
+    tui_message
+    tui_menu
+    tui_menu_no_tags
+
+    ui_input
+    ui_password
+    ui_yes_no
+    ui_message
+    ui_menu
+    ui_menu_no_tags
+
     ask_username
     ask_password
     ask_hostname
     ask_timezone
     ask_boot_disk
+    configure_arch_install
     confirm_arch_install
 
     install_sudoers_file
