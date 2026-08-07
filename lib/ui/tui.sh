@@ -93,3 +93,23 @@ tui_menu_no_tags() {
         "$@" \
         3>&1 1>&2 2>&3
 }
+
+# args: title message tag description status [tag description status ...]
+tui_checklist() {
+    local title="$1"
+    local message="$2"
+    tui_checklist_width=100
+
+    shift 2
+
+    whiptail \
+        --backtitle "$tui_backtitle" \
+        --title "$title" \
+        --separate-output \
+        --checklist "$message" \
+        24 \
+        "$tui_checklist_width" \
+        16 \
+        "$@" \
+        3>&1 1>&2 2>&3
+}

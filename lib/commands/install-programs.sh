@@ -129,6 +129,13 @@ doomemacs_install() {
     eprint "Not implemented!"
 }
 
+install_program_list() {
+    while IFS= read -r program; do
+        [[ -n "$program" ]] || continue
+        install_package "$program"
+    done <"$programs_to_install"
+}
+
 install_programs() {
     local tag_regex
 
@@ -154,26 +161,106 @@ install_programs() {
         printf "nvidia-open-lts\nnvidia-settings\nnvidia-prime\n" >> "$programs_to_install"
     fi
 
-    while IFS= read -r program; do
-        install_package "$program"
-    done <"$programs_to_install"
+    install_program_list
 }
 
 select_programs_tui() {
-    eprint "NOT IMPLEMENTED!"
+    local checklist_width=100
+    local max_package_width=0
+    local max_description_width
+    local cutoff
+    local tag_regex
+    local package
+    local description
+    local status
+    local menu_items=()
+    local -A preselected=()
+
+    if [[ -z "$programs" ]]; then
+        tag_regex="$(program_tag_resolver default)"
+    else
+        tag_regex="$(program_tag_resolver "$programs")" || eprint "'$programs' is not a valid program tag."
+    fi
+
+    # Mark packages belonging to the requested tag hierarchy.
+    while IFS= read -r package; do
+        [[ -n "$package" ]] || continue
+        preselected["$package"]=true
+    done < <(get_programs_by_tag "$tag_regex" "$programs_file.clean")
+
+    # Untagged packages are preselected for every choice except this is
+    # already naturally covered when the explicit tag is "all".
+    if [[ "$programs" != "all" ]]; then
+        while IFS= read -r package; do
+            [[ -n "$package" ]] || continue
+            preselected["$package"]=true
+        done < <(get_programs_by_tag "^$" "$programs_file.clean")
+    fi
+
+    while IFS="|" read -r _ _ package _; do
+        [[ -n "$package" ]] || continue
+
+        if (( ${#package} > max_package_width )); then
+            max_package_width=${#package}
+        fi
+    done <"$programs_file.clean"
+
+    # Account for borders, margins, checkbox and spacing between columns.
+    max_description_width=$((checklist_width - max_package_width - 14))
+
+    # Avoid excessively short descriptions.
+    if (( max_description_width < 20 )); then
+        max_description_width=20
+    fi
+
+    while IFS="|" read -r _ _ package description; do
+        [[ -n "$package" ]] || continue
+
+        description="${description#\"}"
+        description="${description%\"}"
+        if (( ${#description} > max_description_width )); then
+            cutoff=$((max_description_width - 3))
+            description="${description:0:cutoff}..."
+        fi
+
+        status=off
+        [[ -n "${preselected[$package]+set}" ]] && status=on
+
+        menu_items+=("$package" "$description" "$status")
+    done <"$programs_file.clean"
+
+    tui_checklist "Program selection" "Select programs to install:" "${menu_items[@]}"
 }
 
 command_install_programs() {
     isRoot || eprint "Only root can install packages."
+
+    if $tui && ! command -v whiptail >/dev/null 2>&1; then
+        eprint "whiptail is required for --tui. Install the libnewt package first."
+    fi
+
     ask_username
     ensure_programs_file
     clean_programs_file
+
+    if $tui; then
+        : >"$programs_to_install"
+
+        if ! select_programs_tui >"$programs_to_install"; then
+            : >"$programs_to_install"
+            return 0
+        fi
+
+        # Confirming an empty checklist is a successful no-op.
+        [[ -s "$programs_to_install" ]] || return 0
+    fi
+
     wheel_can_sudo
     install_essentials
     install_aurhelper
 
     if $tui; then
-        select_programs_tui
+        install_program_list
     else
         install_programs "${programs:-all}"
     fi
