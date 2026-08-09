@@ -70,7 +70,7 @@ get_programs_by_tag() {
     ' "$cleaned_file"
 }
 
-# Resolve the tag name to a regex which points to itself and it's parents.
+# Resolve a tag to its selection regex.
 program_tag_resolver() {
     case "$1" in
         x11)      printf '%s\n' '^x11$';;
@@ -142,21 +142,20 @@ install_programs() {
     # Create an empty tmp file.
     : > "$programs_to_install"
 
-
-    # Grab programs and add to tmp file based on the tag that is provided.
+    # Add programs matching the requested tag to the temporary list.
     if [[ "$1" == "all" ]]; then
         cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install"
     else
-        # program_tag_resolver matches the tags to it's children.
+        # Resolve the requested tag to its matching expression.
         tag_regex="$(program_tag_resolver "$1")" || eprint "'$1' is not a valid program tag."
 
         get_programs_by_tag "$tag_regex" "$programs_file.clean" >>"$programs_to_install"
 
-        # Also grab lines that have no tag set.
+        # Also include programs with no tag.
         get_programs_by_tag "^$" "$programs_file.clean" >>"$programs_to_install"
     fi
 
-    # Install nvidia drivers if there's an nvidia gpu
+    # Install NVIDIA drivers when an NVIDIA GPU is detected.
     if lspci | grep -qi nvidia; then
         printf "nvidia-open-lts\nnvidia-settings\nnvidia-prime\n" >> "$programs_to_install"
     fi
@@ -188,8 +187,8 @@ select_programs_tui() {
         preselected["$package"]=true
     done < <(get_programs_by_tag "$tag_regex" "$programs_file.clean")
 
-    # Untagged packages are preselected for every choice except this is
-    # already naturally covered when the explicit tag is "all".
+    # Preselect untagged packages unless "all" was explicitly requested,
+    # since "all" already matches every program.
     if [[ "$programs" != "all" ]]; then
         while IFS= read -r package; do
             [[ -n "$package" ]] || continue

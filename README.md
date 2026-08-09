@@ -2,8 +2,8 @@
 
 > [!WARNING]
 > MAIS is an actively developed personal project and may contain bugs,
-> incomplete functionality or destructive behavior. It is not intended for
-> production systems or unattended deployments. Review the code, keep backups
+> incomplete functionality, or destructive behavior. It is not intended for
+> production systems or unattended deployments. Review the code, keep backups,
 > and use it at your own risk.
 
 ## Installation
@@ -19,7 +19,7 @@ curl -fsSL https://github.com/themamiza/mais/releases/latest/download/mais | bas
 That's it.
 
 The bootstrap script downloads the latest published release, verifies its
-checksum and installs it to:
+checksum, and installs it to:
 
 ```text
 /usr/local/bin/mais
@@ -46,7 +46,7 @@ still downloaded from the latest published GitHub Release.
 
 ### Build and install from source
 
-Clone the repository, build the standalone executable and install that exact
+Clone the repository, build the standalone executable, and install that exact
 version:
 
 ```bash
@@ -56,8 +56,8 @@ cd mais
 sudo install -Dm755 release/mais /usr/local/bin/mais
 ```
 
-This method installs the code from the latest commit instead of
-downloading the latest published release.
+This method installs the code from the latest commit instead of downloading
+the latest published release.
 
 ## What is MAIS?
 
@@ -65,11 +65,11 @@ MAIS is a collection of Bash scripts used to install and configure Arch Linux
 systems.
 
 It can bootstrap a fresh Arch installation, install selected groups of
-programs, configure the system, install dotfiles, create backups and perform
+programs, configure the system, install dotfiles, create backups, and perform
 other repetitive setup tasks.
 
 MAIS is primarily designed for my own machines and preferences, but the
-program list, dotfiles repository and individual commands can be changed or
+program list, dotfiles repository, and individual commands can be changed or
 used independently.
 
 Run the following to see the available commands:
@@ -96,11 +96,13 @@ sudo mais arch-install \
     -u username -h hostname -t Region/City
 ```
 
-There's optionally a TUI mode which you can enable with `--tui`
+An optional TUI mode is available with `--tui`:
+
 ```bash
 sudo mais arch-install --tui
 ```
-TUI mode uses `whiptail` for it's dialogs.
+
+TUI mode uses `whiptail` for its dialogs.
 
 > [!CAUTION]
 > Do not run `arch-install` on an existing installation.
@@ -113,13 +115,13 @@ MAIS installs programs from
 Install every listed program:
 
 ```bash
-mais install-programs
+sudo mais install-programs
 ```
 
-Install only a selected tag:
+Install programs belonging to a selected tag:
 
 ```bash
-mais install-programs hyprland
+sudo mais install-programs hyprland
 ```
 
 The currently supported tags are:
@@ -130,22 +132,56 @@ The currently supported tags are:
  dwm   hyprland    python clang  lua   bash  js    virt
 ```
 
-Programs without a tag are installed with every selection.
+The additional `default` tag is used by the interactive program selector, and
+`all` selects every listed program.
+
+A program may have multiple comma-separated tags.
+
+Programs without a tag are included with tagged selections.
+
+### Interactive program selection
+
+Use `--tui` to display every program in an interactive checklist:
+
+```bash
+sudo mais install-programs --tui
+```
+
+Without an explicit tag, programs tagged `default` and programs without a tag
+are initially selected.
+
+A tag may also be supplied:
+
+```bash
+sudo mais install-programs hyprland --tui
+```
+
+The supplied tag determines the initial selection, but every program remains
+visible and can be selected or deselected before confirming.
+
+To begin with every program selected:
+
+```bash
+sudo mais install-programs all --tui
+```
+
+TUI mode requires `whiptail`.
 
 ### The `programs.csv` file
 
 The programs file has four fields separated by `|`:
 
-```
-installation method | tag | package name | description
+```text
+installation method | tags | package name | description
 ```
 
 For example:
 
-```
-AUR      | extra    | some-package-git | "Description of the package"
-Suckless | dwm      | username/dwm     | "A dynamic window manager"
-         | hyprland | hyprland         | "A Wayland compositor"
+```text
+AUR      | extra          | some-package-git | "Description of the package"
+Suckless | dwm            | username/dwm     | "A dynamic window manager"
+         | wayland,extra  | some-package     | "A package with multiple tags"
+         | hyprland       | hyprland         | "A Wayland compositor"
 ```
 
 The installation method can be:
@@ -155,7 +191,8 @@ The installation method can be:
 * `Suckless` for a supported source repository.
 * `DoomEmacs` for the Doom Emacs installation method.
 
-Lines beginning with `#` are comments and whitespace around fields is ignored.
+Lines beginning with `#` are comments and whitespace outside quoted strings
+is ignored.
 
 Programs are processed from the top of the file to the bottom, so packages may
 be ordered when one depends on another.
@@ -187,7 +224,7 @@ mais install-aurhelper yay
 mais install-aurhelper paru
 ```
 
-Configure GRUB, Pacman, Makepkg and supported optional programs:
+Configure GRUB, Pacman, Makepkg, and supported optional programs:
 
 ```bash
 sudo mais configure
@@ -229,13 +266,13 @@ implementation before using them.
 ## The script itself
 
 The development version of MAIS is split into modules for readability,
-testing and easier maintenance.
+testing, and easier maintenance.
 
 The main entry point is [`mais`](mais), while the implementation is divided
 between:
 
 ```text
-lib/cli/        command-line parsing, help and dispatch
+lib/cli/        command-line parsing, help, and dispatch
 lib/commands/   user commands
 lib/core/       shared helpers and configuration
 lib/distro/     distribution-specific operations

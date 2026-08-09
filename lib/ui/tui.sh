@@ -98,7 +98,7 @@ tui_menu_no_tags() {
 tui_checklist() {
     local title="$1"
     local message="$2"
-    tui_checklist_width=100
+    local tui_checklist_width=100
 
     shift 2
 

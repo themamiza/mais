@@ -1,16 +1,19 @@
 # Add comments like this. W h i t e s p a c e does not matter.
-
-# Here is what each field is in order:
-# 1. Installation method. Can be one of => Pacman/AUR/Suckless/DoomEmacs (defaults to 'Pacman')
-# 2. Tag
-# Here is how the tags work: (Packages with no tag will always get installed!)
+#
+# Fields:
+# 1. Installation method
+#    Pacman/AUR/Suckless/DoomEmacs. Blank defaults to Pacman.
+#
+# 2. Tags
+#    Multiple tags are separated by commas.
+#
+#    Current tag hierarchy:
 #
 #      x11   wayland        |-dev-|-----|-----|-----|    extra
 #       |       |           |     |     |     |     |
 #      dwm   hyprland    python clang  lua   bash  js    virt
-# 
-# Tags are comma separated.
-# Packages with no tags get pulled with all other tags.
+#
+#    Programs with no tag are included with tagged selections.
 #
 # 3. Package name
 # 4. Description
