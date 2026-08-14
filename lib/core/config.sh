@@ -40,6 +40,6 @@ programs_file="$MAIS_ROOT/data/$programs_filename"
 programs=""
 
 # Path to a tmp file which will just contain name of programs to install.
-programs_to_install="/tmp/programs.tmp"
+programs_to_install=""
 # Remote programs file used by the standalone release.
 programs_file_url="https://raw.githubusercontent.com/themamiza/mais/refs/heads/main/data/programs.csv"

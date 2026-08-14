@@ -216,16 +216,21 @@ command_install_programs() {
     ensure_programs_file
     clean_programs_file
 
+    programs_to_install="$(mktemp)" || eprint "Failed to create temporary programs file."
+
     if $tui; then
         : >"$programs_to_install"
 
         if ! select_programs_tui >"$programs_to_install"; then
-            : >"$programs_to_install"
+            rm -f -- "$programs_to_install"
             return 0
         fi
 
         # Confirming an empty checklist is a successful no-op.
-        [[ -s "$programs_to_install" ]] || return 0
+        if [[ ! -s "$programs_to_install" ]]; then
+            rm -f -- "$programs_to_install"
+            return 0
+        fi
     fi
 
     wheel_can_sudo
@@ -237,4 +242,6 @@ command_install_programs() {
     else
         install_programs "${programs:-all}"
     fi
+
+    rm -f -- "$programs_to_install"
 }
