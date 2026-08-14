@@ -105,7 +105,29 @@ suckless_install() {
 }
 
 doomemacs_install() {
-    eprint "Not implemented!"
+    local user_home
+    user_home="$(getent passwd "$username" | cut -d: -f6)" || eprint "Could not determine the home directory for '$username'."
+
+    [[ -n "$user_home" ]] || eprint "Could not determine the home directory for '$username'."
+
+    local doom_dir="$user_home/.config/emacs"
+    local doom_bin="$doom_dir/bin/doom"
+
+    # Doom creates .local during installation.
+    if [[ -x "$doom_bin" && -d "$doom_dir/.local" ]]; then
+        nprint "Found '$1'."
+        return 0
+    fi
+
+    nprint "Installing $1 -> $2"
+
+    sync_git_repo \
+        "$username" \
+        "https://github.com/doomemacs/doomemacs" \
+        "$doom_dir" ||
+        eprint "Failed to clone Doom Emacs."
+
+    run_cmd sudo -H -u "$username" "$doom_bin" install --force || eprint "Failed to install Doom Emacs."
 }
 
 install_program_list() {
