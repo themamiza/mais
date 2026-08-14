@@ -126,14 +126,7 @@ sudo mais install-programs hyprland
 
 The currently supported tags are:
 
-```text
- x11   wayland        |-dev-|-----|-----|-----|    extra
-  |       |           |     |     |     |     |
- dwm   hyprland    python clang  lua   bash  js    virt
-```
-
-The additional `default` tag is used by the interactive program selector, and
-`all` selects every listed program.
+dwm, hyprland, dev, python, clang, lua, bash, js, virt, extra
 
 A program may have multiple comma-separated tags.
 
@@ -147,8 +140,7 @@ Use `--tui` to display every program in an interactive checklist:
 sudo mais install-programs --tui
 ```
 
-Without an explicit tag, programs tagged `default` and programs without a tag
-are initially selected.
+Without an explicit tag, all programs are initially selected.
 
 A tag may also be supplied:
 
@@ -180,7 +172,7 @@ For example:
 ```text
 AUR      | extra          | some-package-git | "Description of the package"
 Suckless | dwm            | username/dwm     | "A dynamic window manager"
-         | wayland,extra  | some-package     | "A package with multiple tags"
+         | hyprland,extra | some-package     | "A package with multiple tags"
          | hyprland       | hyprland         | "A Wayland compositor"
 ```
 

@@ -194,9 +194,8 @@ run_program_selection() {
         programs_to_install="$2/programs.tmp"
 
         cat >"$programs_file.clean" <<EOF
-|wayland,desktop|wl-clipboard|"Wayland clipboard"
+|hyprland,desktop|wl-clipboard|"Wayland clipboard"
 |hyprland|hyprland|"Wayland compositor"
-|default|default-package|"Default application"
 ||base-package|"Always installed"
 |notwayland|wrong-package|"Must not partially match"
 EOF

@@ -51,7 +51,7 @@ get_programs_by_tag() {
     awk -F'|' -v tag_regex="$tag_regex" '
         {
             if ($2 == "") {
-                if ("" ~ tag_regex) {
+                if (tag_regex == "") {
                     print $3
                 }
 
@@ -61,34 +61,13 @@ get_programs_by_tag() {
             tag_count = split($2, tags, ",")
 
             for (i = 1; i <= tag_count; i++) {
-                if (tags[i] ~ tag_regex) {
+                if (tags[i] == tag_regex) {
                     print $3
                     break
                 }
             }
         }
     ' "$cleaned_file"
-}
-
-# Resolve a tag to its selection regex.
-program_tag_resolver() {
-    case "$1" in
-        x11)      printf '%s\n' '^x11$';;
-        dwm)      printf '%s\n' '^(x11|dwm)$';;
-        wayland)  printf '%s\n' '^wayland$';;
-        hyprland) printf '%s\n' '^(wayland|hyprland)$';;
-        dev)      printf '%s\n' '^(dev|python|clang|lua|bash|js)$';;
-        python)   printf '%s\n' '^python$';;
-        clang)    printf '%s\n' '^clang$';;
-        lua)      printf '%s\n' '^lua$';;
-        bash)     printf '%s\n' '^bash$';;
-        js)       printf '%s\n' '^js$';;
-        virt)     printf '%s\n' '^virt$';;
-        extra)    printf '%s\n' '^extra$';;
-        default)  printf '%s\n' '^default$';;
-        all)      printf '%s\n' '.*';;
-        *)        return 1;;
-    esac
 }
 
 install_package() {
@@ -137,7 +116,7 @@ install_program_list() {
 }
 
 install_programs() {
-    local tag_regex
+    local tag_regex="$1"
 
     # Create an empty tmp file.
     : > "$programs_to_install"
@@ -146,13 +125,10 @@ install_programs() {
     if [[ "$1" == "all" ]]; then
         cut -d'|' -f3 "$programs_file.clean" >> "$programs_to_install"
     else
-        # Resolve the requested tag to its matching expression.
-        tag_regex="$(program_tag_resolver "$1")" || eprint "'$1' is not a valid program tag."
-
-        get_programs_by_tag "$tag_regex" "$programs_file.clean" >>"$programs_to_install"
+        get_programs_by_tag "$tag_regex" "$programs_file.clean" >> "$programs_to_install"
 
         # Also include programs with no tag.
-        get_programs_by_tag "^$" "$programs_file.clean" >>"$programs_to_install"
+        get_programs_by_tag "" "$programs_file.clean" >> "$programs_to_install"
     fi
 
     # Install NVIDIA drivers when an NVIDIA GPU is detected.
@@ -168,32 +144,30 @@ select_programs_tui() {
     local max_package_width=0
     local max_description_width
     local cutoff
-    local tag_regex
     local package
     local description
     local status
     local menu_items=()
     local -A preselected=()
 
-    if [[ -z "$programs" ]]; then
-        tag_regex="$(program_tag_resolver default)"
+    local selected_tag="${programs:-all}"
+
+    if [[ "$selected_tag" == "all" ]]; then
+        while IFS="|" read -r _ _ package _; do
+            [[ -n "$package" ]] || continue
+            preselected["$package"]=true
+        done < "$programs_file.clean"
     else
-        tag_regex="$(program_tag_resolver "$programs")" || eprint "'$programs' is not a valid program tag."
-    fi
-
-    # Mark packages belonging to the requested tag hierarchy.
-    while IFS= read -r package; do
-        [[ -n "$package" ]] || continue
-        preselected["$package"]=true
-    done < <(get_programs_by_tag "$tag_regex" "$programs_file.clean")
-
-    # Preselect untagged packages unless "all" was explicitly requested,
-    # since "all" already matches every program.
-    if [[ "$programs" != "all" ]]; then
         while IFS= read -r package; do
             [[ -n "$package" ]] || continue
             preselected["$package"]=true
-        done < <(get_programs_by_tag "^$" "$programs_file.clean")
+        done < <(get_programs_by_tag "$selected_tag" "$programs_file.clean")
+
+        # Untagged programs are part of every normal selection.
+        while IFS= read -r package; do
+            [[ -n "$package" ]] || continue
+            preselected["$package"]=true
+        done < <(get_programs_by_tag "" "$programs_file.clean")
     fi
 
     while IFS="|" read -r _ _ package _; do

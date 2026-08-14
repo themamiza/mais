@@ -7,44 +7,38 @@
 # 2. Tags
 #    Multiple tags are separated by commas.
 #
-#    Current tag hierarchy:
-#
-#      x11   wayland        |-dev-|-----|-----|-----|    extra
-#       |       |           |     |     |     |     |
-#      dwm   hyprland    python clang  lua   bash  js    virt
-#
 #    Programs with no tag are included with tagged selections.
 #
 # 3. Package name
 # 4. Description
 
 # Windowing System
-                | x11        | xorg-server                      | "Xorg X server"
-                | x11        | xorg-xinit                       | "X.Org initialisation program"
-                | x11        | xorg-xset                        | "User preference utility for X"
-                | x11        | libxft                           | "FreeType-based font drawing library for X"
-                | x11        | libxinerama                      | "X11 Xinerama extension library"
-                | x11        | fribidi                          | "A Free Implementation of the Unicode Bidirectional Algorithm"
-                | x11        | xf86-video-intel                 | "X.org Intel i810/i830/i915/945G/G965+ video drivers"
+                | dwm        | xorg-server                      | "Xorg X server"
+                | dwm        | xorg-xinit                       | "X.Org initialisation program"
+                | dwm        | xorg-xset                        | "User preference utility for X"
+                | dwm        | libxft                           | "FreeType-based font drawing library for X"
+                | dwm        | libxinerama                      | "X11 Xinerama extension library"
+                | dwm        | fribidi                          | "A Free Implementation of the Unicode Bidirectional Algorithm"
+                | dwm        | xf86-video-intel                 | "X.org Intel i810/i830/i915/945G/G965+ video drivers"
 
 # X11
-                | x11        | xorg-xinput                      | "Small commandline tool to configure devices"
-                | x11        | numlockx                         | "Turns on the numlock key in X11."
-                | x11        | xorg-xev                         | "Print contents of X events"
-                | x11        | xdotool                          | "Command-line X11 automation tool"
-                | x11        | unclutter                        | "A small program for hiding the mouse cursor"
-                | x11        | arandr                           | "Provide a simple visual front end for XRandR 1.2."
-                | x11        | xcolor                           | "Lightweight color picker for X11"
+                | dwm        | xorg-xinput                      | "Small commandline tool to configure devices"
+                | dwm        | numlockx                         | "Turns on the numlock key in X11."
+                | dwm        | xorg-xev                         | "Print contents of X events"
+                | dwm        | xdotool                          | "Command-line X11 automation tool"
+                | dwm        | unclutter                        | "A small program for hiding the mouse cursor"
+                | dwm        | arandr                           | "Provide a simple visual front end for XRandR 1.2."
+                | dwm        | xcolor                           | "Lightweight color picker for X11"
 
 Suckless        | dwm        | themamiza/dwm                    | "A dynamic window manager for X"
-                | x11        | xcompmgr                         | "Composite window effect manager for X.org"
+                | dwm        | xcompmgr                         | "Composite window effect manager for X.org"
 
 # Window Manager / Compositor
                 | hyprland   | hyprland                         | "a highly customizable dynamic tiling Wayland compositor"
                 | hyprland   | hyprshutdown                     | "A graceful shutdown utility for Hyprland"
 
 # Wayland
-                | extra      | wlr-randr                        | "Utility to manage outputs of a Wayland compositor"
+                | hyprland   | wlr-randr                        | "Utility to manage outputs of a Wayland compositor"
 
 # Keyboard
                 |            | keyd                             | "A key remapping daemon for linux"
@@ -58,27 +52,27 @@ Suckless        | dwm        | themamiza/st                     | "A simple virt
 AUR             |            | brave-bin                        | "Web browser that blocks ads and trackers by default (binary release)"
 
 # Clipboard
-                | wayland    | wl-clipboard                     | "Command-line copy/paste utilities for Wayland"
-                | x11        | xclip                            | "Command line interface to the X11 clipboard"
+                | hyprland   | wl-clipboard                     | "Command-line copy/paste utilities for Wayland"
+                | dwm        | xclip                            | "Command line interface to the X11 clipboard"
 
 # Lock Screen
                 | hyprland   | hyprlock                         | "hyprland’s GPU-accelerated screen locking utility"
-#               | wayland    | waylock                          | "A simple screenlocker for wayland compositors"
+#               | extra      | waylock                          | "A simple screenlocker for wayland compositors"
                 | dwm        | slock                            | "A simple screen locker for X"
 
 # Wallpaper
                 | hyprland   | hyprpaper                        | "a blazing fast wayland wallpaper utility with IPC controls"
-                | x11        | xwallpaper                       | "Wallpaper setting utility for X"
+                | dwm        | xwallpaper                       | "Wallpaper setting utility for X"
 
 # Bar / Panel
-                | wayland    | waybar                           | "Highly customizable Wayland bar for Sway and Wlroots based compositors"
+                | hyprland   | waybar                           | "Highly customizable Wayland bar for Sway and Wlroots based compositors"
 Suckless        | dwm        | themamiza/dwmblocks              | "N/A"
 Suckless        | dwm        | themamiza/dmenu                  | "N/A"
 
 # Screenshot
-                | wayland    | slurp                            | "Select a region in a Wayland compositor"
-                | wayland    | grim                             | "Screenshot utility for Wayland"
-                | x11        | scrot                            | "Simple command-line screenshot utility for X"
+                | hyprland   | slurp                            | "Select a region in a Wayland compositor"
+                | hyprland   | grim                             | "Screenshot utility for Wayland"
+                | dwm        | scrot                            | "Simple command-line screenshot utility for X"
 
 # Audio
                 |            | pipewire                         | "Low-latency audio/video router and processor"
@@ -90,8 +84,8 @@ Suckless        | dwm        | themamiza/dmenu                  | "N/A"
 
 
 # Image Viewer
-                | x11        | nsxiv                            | "Neo (or New or Not) Simple (or Small or Suckless) X Image Viewer"
-                | wayland    | swayimg                          | "A lightweight image viewer for Wayland display servers"
+                | dwm        | nsxiv                            | "Neo (or New or Not) Simple (or Small or Suckless) X Image Viewer"
+                | hyprland   | swayimg                          | "A lightweight image viewer for Wayland display servers"
 
 # Video Player
                 |            | mpv                              | "a free, open source, and cross-platform media player"
@@ -113,9 +107,9 @@ Suckless        | dwm        | themamiza/dmenu                  | "N/A"
 # Network
                 |            | network-manager-applet           | "Applet for managing network connections"
                 |            | openssh                          | "SSH protocol implementation for remote login, command execution and file transfer"
-                |            | sshpass                          | "Fool ssh into accepting an interactive password non-interactively"
-                |            | proxychains-ng                   | "A hook preloader that allows to redirect TCP traffic of existing dynamically linked programs through one or more SOCKS or HTTP proxies"
-AUR             |            | v2rayn-bin                       | "A GUI client for Windows and Linux, support Xray core and others"
+                | extra      | sshpass                          | "Fool ssh into accepting an interactive password non-interactively"
+                | extra      | proxychains-ng                   | "A hook preloader that allows to redirect TCP traffic of existing dynamically linked programs through one or more SOCKS or HTTP proxies"
+AUR             | extra      | v2rayn-bin                       | "A GUI client for Windows and Linux, support Xray core and others"
 
 # File Manager
                 |            | yazi                             | "Blazing fast terminal file manager written in Rust, based on async I/O"
@@ -146,9 +140,9 @@ AUR             |            | v2rayn-bin                       | "A GUI client 
                 |            | zsh                              | "A very advanced and programmable command interpreter (shell) for UNIX"
                 |            | zsh-autosuggestions              | "Fish-like autosuggestions for zsh"
 AUR             |            | zsh-fast-syntax-highlighting-git | "Optimized and extended zsh-syntax-highlighting"
-                | bash       | bash-completion                  | "Programmable completion for the bash shell"
-                | bash       | bash-language-server             | "Bash language server implementation based on Tree Sitter and its grammar for Bash"
-                | bash       | shellcheck                       | "Shell script analysis tool"
+                | dev,bash   | bash-completion                  | "Programmable completion for the bash shell"
+                | dev,bash   | bash-language-server             | "Bash language server implementation based on Tree Sitter and its grammar for Bash"
+                | dev,bash   | shellcheck                       | "Shell script analysis tool"
 
 # Archive Management
                 |            | 7zip                             | "File archiver for extremely high compression"
@@ -198,6 +192,7 @@ AUR             | extra      | simple-mtpfs                     | "A FUSE filesy
                 |            | ttf-dejavu                       | "Font family based on the Bitstream Vera Fonts with a wider range of characters"
                 |            | ttf-iosevka-nerd                 | "Patched font Iosevka from nerd fonts library"
                 |            | ttf-firacode-nerd                | "Patched font Fira (Fura) Code from nerd fonts library"
+                |            | ttf-jetbrains-mono-nerd          | "Patched font JetBrains Mono from nerd fonts library"
                 |            | ttf-ubuntu-font-family           | "Ubuntu font family"
                 |            | noto-fonts-emoji                 | "Google Noto Color Emoji font"
                 |            | ttf-cascadia-code-nerd           | "Patched font Cascadia Code (Caskaydia) from nerd fonts library"
@@ -208,33 +203,33 @@ AUR             |            | dracula-gtk-theme-git            | "Dark theme fo
                 |            | breeze-icons                     | "Breeze icon theme"
                 |            | breeze-cursors                   | "Breeze cursors"
 AUR             |            | catppuccin-gtk-theme-macchiato   | "Soothing pastel theme for GTK - Macchiato"
-# AUR             | extra      | alacritty-theme-git              | "Collection of Alacritty color schemes." # Broken install
+AUR             | extra      | alacritty-theme-git              | "Collection of Alacritty color schemes."
                 |            | nwg-look                         | "GTK settings editor adapted to work on wlroots-based compositors"
                 |            | kvantum                          | "SVG-based theme engine for Qt6 (including config tool and extra themes)"
                 |            | kvantum-qt5                      | "SVG-based theme engine for Qt5"
 
 # C
-                | clang      | clang                            | "C language family frontend for LLVM"
-                | clang      | cmake                            | "A cross-platform open-source make system"
+                | dev,clang  | clang                            | "C language family frontend for LLVM"
+                | dev,clang  | cmake                            | "A cross-platform open-source make system"
 
 # Python
-                | python     | python                           | "The Python programming language"
-                | python     | python-lsp-server                | "Fork of the python-language-server project, maintained by the Spyder IDE team and the community"
-                | python     | python-pip                       | "The PyPA recommended tool for installing Python packages"
-                | python     | python-pipenv                    | "Sacred Marriage of Pipfile, Pip, & Virtualenv."
-                | python     | ipython                          | "Enhanced Interactive Python shell"
+                | dev,python | python                           | "The Python programming language"
+                | dev,python | python-lsp-server                | "Fork of the python-language-server project, maintained by the Spyder IDE team and the community"
+                | dev,python | python-pip                       | "The PyPA recommended tool for installing Python packages"
+                | dev,python | python-pipenv                    | "Sacred Marriage of Pipfile, Pip, & Virtualenv."
+                | dev,python | ipython                          | "Enhanced Interactive Python shell"
 
 
 # Lua
-                | lua        | lua-language-server              | "Lua Language Server coded by Lua"
+                | dev,lua    | lua-language-server              | "Lua Language Server coded by Lua"
 
 # Javascript
-                | js         | nodejs                           | "Evented I/O for V8 javascript ("Current" release)"
-                | js         | typescript                       | "JavaScript with syntax for types"
-                | js         | typescript-language-server       | "Language Server Protocol (LSP) implementation for TypeScript using tsserver"
+                | dev,js     | nodejs                           | "Evented I/O for V8 javascript ("Current" release)"
+                | dev,js     | typescript                       | "JavaScript with syntax for types"
+                | dev,js     | typescript-language-server       | "Language Server Protocol (LSP) implementation for TypeScript using tsserver"
 
 # Emacs
-                | dev        | emacs                            | "The extensible, customizable, self-documenting real-time display editor"
+                | dev,extra  | emacs                            | "The extensible, customizable, self-documenting real-time display editor"
 
 # Communication
                 | extra      | telegram-desktop                 | "Official Telegram Desktop client"

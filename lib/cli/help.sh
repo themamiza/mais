@@ -31,8 +31,8 @@ print_help() {
 
         install-programs [TAG]
                 Install programs from a 'programs.csv' file
-                TAG should be one of x11, dwm, wayland, hyprland,
-                dev, python, clang, lua, bash, js, extra, virt, default or all.
+                TAG should be one of dwm, hyprland, dev,
+                python, clang, lua, bash, js, extra, virt or all.
 
                 With '--tui', all programs are shown in an interactive checklist.
                 The selected tag determines which programs are initially checked.
