@@ -114,7 +114,7 @@ arch_install_run_in_chroot() {
         useradd --create-home --user-group --groups wheel --shell /bin/zsh "$username"
     fi
 
-    wheel_can_sudo
+    configure_sudo
 
     sprint "Enabling NetworkManager."
     run_cmd systemctl enable NetworkManager
@@ -196,7 +196,7 @@ arch_install() {
     # Exporting the function to later be passed to arch-chroot as a command.
     # That is why all the variables are passed manually.
     # TODO: Investigate if it can be done any other way.
-    local exported_functions=(arch_install_run_in_chroot run_cmd install_sudoers_file wheel_can_sudo trap_cleanup_sudoers yes_no nprint sprint wprint)
+    local exported_functions=(arch_install_run_in_chroot run_cmd install_sudoers_file configure_sudo yes_no nprint sprint wprint)
     for fn in "${exported_functions[@]}"; do
         # shellcheck disable=2163
         export -f "$fn"

@@ -3,6 +3,7 @@
 command_configure() {
     isRoot || eprint "Only root can configure the system."
 
+    configure_sudo
     configure_grub
     configure_pacman
     configure_makepkg

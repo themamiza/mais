@@ -44,6 +44,7 @@ mais_load_module "lib/commands/install-aurhelper.sh"
 mais_load_module "lib/commands/install-programs.sh"
 
 # Load configuration functions before the configure command
+mais_load_module "lib/commands/configure/sudo.sh"
 mais_load_module "lib/commands/configure/grub.sh"
 mais_load_module "lib/commands/configure/pacman.sh"
 mais_load_module "lib/commands/configure/makepkg.sh"
