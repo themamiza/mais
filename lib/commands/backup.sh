@@ -57,6 +57,6 @@ perform_backup() {
 
 command_backup() {
     isRoot && eprint "Root cannot take backups."
+    check_installed rsync || eprint "'rsync' is required for backups."
     perform_backup
 }
-

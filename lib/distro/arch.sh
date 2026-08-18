@@ -28,7 +28,7 @@ sync_packages() {
 
 ensure_package() {
     local package="$1"
-    local desc="${2:-\"Required dependency.\"}"
+    local desc="${2:-Required dependency.}"
 
     check_installed "$package" && return 0
     wprint "'$package' is not installed."
@@ -66,17 +66,16 @@ install_aurhelper() {
     )
 }
 
-install_essentials() {
-    local essential_programs=("base-devel" "git" "rsync")
+aur_ready=false
+ensure_aur_support() {
+    $aur_ready && return 0
 
-    sprint "Installing essential programs."
-    for p in "${essential_programs[@]}"; do
-        if check_installed "$p"; then
-            sprint "'$p' is already installed."
-        else
-            pacman_install "$p" "Installing $p which is required to install and configure other packages."
-        fi
-    done
+    ensure_package base-devel "Required for building AUR packages." || return 1
+    ensure_package git "Required for cloning AUR packages." || return 1
+
+    install_aurhelper
+
+    aur_ready=true
 }
 
 update_mirrors() {

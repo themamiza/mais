@@ -25,6 +25,12 @@ install_dotfiles() {
     else
         local repo_dir="$user_home/.local/src/$dotfiles_name"
 
+        if isRoot; then
+            ensure_package git "Required for cloning dotfiles." || return 1
+        else
+            check_installed git || eprint "'git' is required to clone the dotfiles repository."
+        fi
+
         sprint "Cloning or updating remote repository."
         sync_git_repo "$username" "$dotfiles_url" "$repo_dir" || return
 
@@ -56,6 +62,10 @@ install_dotfiles() {
 command_install_dotfiles() {
     isRoot && wheel_can_sudo
     ask_username
-    install_essentials || eprint "Could not install essential programs.\nHint: Run as root."
+    if isRoot; then
+        ensure_package rsync "Required for installing dotfiles." || return 0
+    else
+        check_installed rsync || eprint "'rsync' is required. Install it first or run this command as root."
+    fi
     install_dotfiles
 }

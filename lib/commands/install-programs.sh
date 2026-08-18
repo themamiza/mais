@@ -79,7 +79,10 @@ install_package() {
     while IFS="|" read -r method _ _ description; do
         case "$method" in
             "Pacman"|"") pacman_install    "$1" "$description";;
-            "AUR")       aur_install       "$1" "$description";;
+            "AUR")
+                ensure_aur_support || return 0
+                aur_install "$1" "$description"
+                ;;
             "Suckless")  suckless_install  "$1" "$description";;
             "DoomEmacs") doomemacs_install "$1" "$description";;
         esac
@@ -88,6 +91,9 @@ install_package() {
 
 suckless_install() {
     check_installed "$(basename "$1")" && return 0
+
+    ensure_package base-devel "Required for building source packages." || return 0
+    ensure_package git "Required for cloning source repositories." || return 0
 
     local repo="$1"
 
@@ -106,6 +112,9 @@ suckless_install() {
 
 doomemacs_install() {
     local user_home
+
+    ensure_package git "Required for cloning Doom Emacs." || return 0
+
     user_home="$(getent passwd "$username" | cut -d: -f6)" || eprint "Could not determine the home directory for '$username'."
 
     [[ -n "$user_home" ]] || eprint "Could not determine the home directory for '$username'."
@@ -230,8 +239,8 @@ select_programs_tui() {
 command_install_programs() {
     isRoot || eprint "Only root can install packages."
 
-    if $tui && ! command -v whiptail >/dev/null 2>&1; then
-        eprint "whiptail is required for --tui. Install the libnewt package first."
+    if $tui; then
+        ensure_package libnewt "Not Erik's Windowing Toolkit - text mode windowing with slang" || return 0
     fi
 
     ask_username
@@ -258,8 +267,6 @@ command_install_programs() {
     wheel_can_sudo
 
     sync_packages
-    install_essentials
-    install_aurhelper
 
     if $tui; then
         install_program_list

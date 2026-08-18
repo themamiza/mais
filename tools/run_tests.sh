@@ -77,7 +77,6 @@ functions=(
     is_archlinux
     pacman_install
     aur_install
-    install_essentials
     install_aurhelper
     update_mirrors
 
