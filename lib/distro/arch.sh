@@ -13,7 +13,6 @@ check_installed() {
 }
 
 packages_synced=false
-
 sync_packages() {
     $packages_synced && return 0
 
@@ -73,7 +72,10 @@ ensure_aur_support() {
     ensure_package base-devel "Required for building AUR packages." || return 1
     ensure_package git "Required for cloning AUR packages." || return 1
 
-    install_aurhelper
+    if ! check_installed "$aurhelper"; then
+        sync_packages
+        install_aurhelper || eprint "Failed to install '$aurhelper'."
+    fi
 
     aur_ready=true
 }

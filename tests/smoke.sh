@@ -217,29 +217,179 @@ EOF
 }
 
 run_package_lookup() {
+    local package="$1"
+
     bash -c '
         source "$1/lib/commands/install-programs.sh"
 
         programs_file="$2/programs.csv"
+        package="$3"
 
         cat >"$programs_file.clean" <<EOF
 |extra|alacritty|"Terminal"
 AUR|extra|alacritty-theme-git|"Themes"
+|extra|already-installed|"Installed package"
 EOF
 
+        calls=()
+
         check_installed() {
-            return 1
+            [[ "$1" == already-installed ]]
+        }
+
+        sync_packages() {
+            calls+=(sync)
+        }
+
+        ensure_aur_support() {
+            calls+=(aur-support)
         }
 
         pacman_install() {
-            printf "method=<pacman:%s>\n" "$1"
+            calls+=("pacman:$1")
         }
 
         aur_install() {
-            printf "method=<aur:%s>\n" "$1"
+            calls+=("aur:$1")
         }
 
-        install_package alacritty
+        nprint() {
+            :
+        }
+
+        install_package "$package"
+
+        printf "calls=<%s>\n" "${calls[*]}"
+    ' _ "$TEST_ROOT" "$TEST_TMP" "$package"
+}
+
+run_aur_support() {
+    bash -c '
+        source "$1/lib/distro/arch.sh"
+
+        aurhelper=yay
+        aur_ready=false
+        helper_installed=false
+        calls=()
+
+        ensure_package() {
+            calls+=("ensure:$1")
+        }
+
+        check_installed() {
+            [[ "$1" == "$aurhelper" && "$helper_installed" == true ]]
+        }
+
+        sync_packages() {
+            calls+=(sync)
+        }
+
+        install_aurhelper() {
+            calls+=(aurhelper)
+            helper_installed=true
+        }
+
+        eprint() {
+            printf "%s\n" "$1" >&2
+            exit 1
+        }
+
+        ensure_aur_support
+        ensure_aur_support
+
+        printf "calls=<%s> ready=<%s>\n" \
+            "${calls[*]}" \
+            "$aur_ready"
+    ' _ "$TEST_ROOT"
+}
+
+run_install_aurhelper_command() {
+    local scenario="$1"
+
+    bash -c '
+        source "$1/lib/commands/install-aurhelper.sh"
+
+        scenario="$2"
+        aurhelper=yay
+        calls=()
+
+        isRoot() {
+            return 0
+        }
+
+        check_installed() {
+            [[ "$scenario" == installed && "$1" == "$aurhelper" ]]
+        }
+
+        nprint() {
+            calls+=(found)
+        }
+
+        wheel_can_sudo() {
+            calls+=(sudo)
+        }
+
+        ask_username() {
+            calls+=(username)
+            username=testuser
+        }
+
+        ensure_aur_support() {
+            calls+=(aur-support)
+        }
+
+        command_install_aurhelper
+
+        printf "calls=<%s>\n" "${calls[*]}"
+    ' _ "$TEST_ROOT" "$scenario"
+}
+
+run_doom_installed() {
+    bash -c '
+        source "$1/lib/commands/install-programs.sh"
+
+        test_home="$2/doom-installed"
+        username=testuser
+        calls=()
+
+        rm -rf "$test_home"
+        mkdir -p \
+            "$test_home/.config/emacs/bin" \
+            "$test_home/.config/emacs/.local"
+
+        : >"$test_home/.config/emacs/bin/doom"
+        chmod +x "$test_home/.config/emacs/bin/doom"
+
+        getent() {
+            printf "%s:x:1000:1000::%s:/bin/bash\n" \
+                "$username" \
+                "$test_home"
+        }
+
+        ensure_package() {
+            calls+=("ensure:$1")
+        }
+
+        nprint() {
+            calls+=(found)
+        }
+
+        sync_git_repo() {
+            calls+=(clone)
+        }
+
+        run_cmd() {
+            calls+=(install)
+        }
+
+        eprint() {
+            printf "%s\n" "$1" >&2
+            exit 1
+        }
+
+        doomemacs_install doomemacs "Doom Emacs"
+
+        printf "calls=<%s>\n" "${calls[*]}"
     ' _ "$TEST_ROOT" "$TEST_TMP"
 }
 
@@ -921,11 +1071,53 @@ run_test \
     run_program_selection
 
 run_test \
-    "exact-package-lookup" \
+    "pacman-package-syncs-before-install" \
     0 \
     stdout \
-    "method=<pacman:alacritty>" \
-    run_package_lookup
+    "calls=<sync pacman:alacritty>" \
+    run_package_lookup alacritty
+
+run_test \
+    "aur-package-prepares-support-and-syncs" \
+    0 \
+    stdout \
+    "calls=<aur-support sync aur:alacritty-theme-git>" \
+    run_package_lookup alacritty-theme-git
+
+run_test \
+    "installed-package-skips-package-operations" \
+    0 \
+    stdout \
+    "calls=<>" \
+    run_package_lookup already-installed
+
+run_test \
+    "aur-support-is-prepared-once" \
+    0 \
+    stdout \
+    "calls=<ensure:base-devel ensure:git sync aurhelper> ready=<true>" \
+    run_aur_support
+
+run_test \
+    "aurhelper-existing-skips-preparation" \
+    0 \
+    stdout \
+    "calls=<found>" \
+    run_install_aurhelper_command installed
+
+run_test \
+    "aurhelper-missing-uses-aur-support" \
+    0 \
+    stdout \
+    "calls=<sudo username aur-support>" \
+    run_install_aurhelper_command missing
+
+run_test \
+    "doom-installed-skips-git-dependency" \
+    0 \
+    stdout \
+    "calls=<found>" \
+    run_doom_installed
 
 run_test \
     "sudoers-file-permissions" \

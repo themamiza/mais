@@ -78,9 +78,13 @@ install_package() {
 
     while IFS="|" read -r method _ _ description; do
         case "$method" in
-            "Pacman"|"") pacman_install    "$1" "$description";;
+            "Pacman"|"")
+                sync_packages
+                pacman_install "$1" "$description"
+                ;;
             "AUR")
                 ensure_aur_support || return 0
+                sync_packages
                 aur_install "$1" "$description"
                 ;;
             "Suckless")  suckless_install  "$1" "$description";;
@@ -113,8 +117,6 @@ suckless_install() {
 doomemacs_install() {
     local user_home
 
-    ensure_package git "Required for cloning Doom Emacs." || return 0
-
     user_home="$(getent passwd "$username" | cut -d: -f6)" || eprint "Could not determine the home directory for '$username'."
 
     [[ -n "$user_home" ]] || eprint "Could not determine the home directory for '$username'."
@@ -127,6 +129,8 @@ doomemacs_install() {
         nprint "Found '$1'."
         return 0
     fi
+
+    ensure_package git "Required for cloning Doom Emacs." || return 0
 
     nprint "Installing $1 -> $2"
 
@@ -265,8 +269,6 @@ command_install_programs() {
     fi
 
     wheel_can_sudo
-
-    sync_packages
 
     if $tui; then
         install_program_list

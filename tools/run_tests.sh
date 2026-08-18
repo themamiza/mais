@@ -75,9 +75,12 @@ functions=(
     check_installed
 
     is_archlinux
+    sync_packages
+    ensure_package
     pacman_install
     aur_install
     install_aurhelper
+    ensure_aur_support
     update_mirrors
 
     text_input
