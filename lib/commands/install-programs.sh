@@ -256,6 +256,8 @@ command_install_programs() {
     fi
 
     wheel_can_sudo
+
+    sync_packages
     install_essentials
     install_aurhelper
 

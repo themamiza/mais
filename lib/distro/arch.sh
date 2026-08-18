@@ -12,6 +12,20 @@ check_installed() {
     return 1
 }
 
+packages_synced=false
+
+sync_packages() {
+    $packages_synced && return 0
+
+    nprint "Synchronizing package databases and keyring."
+    run_cmd pacman -Sy --needed --noconfirm archlinux-keyring || eprint "Failed to synchronize package databases and keyring."
+
+    nprint "Upgrading installed packages."
+    run_cmd pacman -Su --noconfirm || eprint "Failed to upgrade the system."
+
+    packages_synced=true
+}
+
 pacman_install() {
     nprint "Installing $1 -> $2"
     run_cmd pacman -S --noconfirm "$1"
