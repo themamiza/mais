@@ -26,6 +26,19 @@ sync_packages() {
     packages_synced=true
 }
 
+ensure_package() {
+    local package="$1"
+    local desc="${2:-\"Required dependency.\"}"
+
+    check_installed "$package" && return 0
+    wprint "'$package' is not installed."
+
+    ! yes_no "Install '$package' now? (Y/N): " && return 1
+
+    sync_packages
+    pacman_install "$package" "$desc" || eprint "Failed to install '$package'."
+}
+
 pacman_install() {
     nprint "Installing $1 -> $2"
     run_cmd pacman -S --noconfirm "$1"
